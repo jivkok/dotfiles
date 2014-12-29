@@ -1,0 +1,30 @@
+{
+    "install_prereleases":
+    {
+        "IsPresent": false
+    },
+    "installed_packages":
+    [
+        "All Autocomplete",
+        "CodeFormatter",
+        "EasyMotion",
+        "Emmet",
+        "ExportHtml",
+        "FileDiffs",
+        "Gist",
+        "Git",
+        "GitGutter",
+        "Http Requester",
+        "Jedi - Python autocompletion",
+        "JsFormat",
+        "Markdown Preview",
+        "Package Control",
+        "PlainTasks",
+        "SFTP",
+        "SideBarEnhancements",
+        "StringEncode",
+        "SublimeCodeIntel",
+        "SublimeLinter",
+        "TrailingSpaces"
+    ]
+}
