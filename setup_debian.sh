@@ -13,6 +13,8 @@ sudo apt-get install -y rlwrap
 sudo apt-get install -y screen
 sudo apt-get install -y vim
 sudo apt-get install -y wget
+sudo apt-get clean
+sudo apt-get autoremove
 
 cd $HOME
 
