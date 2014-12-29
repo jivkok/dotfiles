@@ -36,7 +36,7 @@ function precmd {
     fi
     local location="${PWD}"
 
-    local prefix="\n${BLUE_BOLD}${user}${COLOR_RESET}${separator}${YELLOW_BOLD}${location}${COLOR_RESET}${CYAN_BOLD}$(__git_ps1 " (%s)")${COLOR_RESET}"
+    local prefix="\n${YELLOW_BOLD}${user}${COLOR_RESET}${separator}${GREEN_BOLD}${location}${COLOR_RESET}${BLUE_BOLD}$(__git_ps1 " (%s)")${COLOR_RESET}"
 
     local title="${user}${separator}${location}$(__git_ps1 " (%s)")"
     echo -ne "\033]0;${title}\007"

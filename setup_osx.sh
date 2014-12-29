@@ -54,6 +54,7 @@ ln -sf dotfiles/osx/.functions .
 ln -sf dotfiles/osx/.screenrc .
 ln -sf dotfiles/osx/.vimrc .
 ln -sf dotfiles/osx/.wgetrc .
+wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
 # Packages
 ask_and_run dotfiles/osx/brew.sh "Would you like to install Homebrew packages? "
