@@ -18,34 +18,38 @@ brew cask install google-chrome
 brew cask install firefox
 
 # development
-brew cask install diffmerge
-brew cask install filezilla
-brew cask install gimp
-brew cask install iterm2
-brew cask install kaleidoscope
-brew cask install kdiff3
-brew cask install snippet-edit
-brew cask install sourcetree
-brew cask install sublime-text3
-brew cask install uncrustifyx
-brew cask install virtualbox
+brew cask install filezilla # file transfer
+brew cask install dash # documentation sets
+brew cask install gimp # imaging
+brew cask install gisto # Github gists editor
+brew cask install iterm2 # terminal
+brew cask install kaleidoscope # file diff
+brew cask install kdiff3 # file diff
+brew cask install snippet-edit # XCode snippets
+brew cask install sourcetree # Git gui
+brew cask install sublime-text3 # code/text editor
+brew cask install uncrustifyx # documentation sets
+brew cask install virtualbox # virtual machines
 
 # other
-brew cask install alfred
-brew cask install appcleaner
-brew cask install calibre
-brew cask install cleanmymac
-brew cask install disk-inventory-x
-brew cask install dropbox
-brew cask install evernote
-brew cask install keepassx
-brew cask install private-eye
-brew cask install remote-desktop-connection
-brew cask install skype
-brew cask install spectacle
-brew cask install superduper
-# brew cask install teamviewer
-brew cask install wireshark
+brew cask install alfred # Spotlight-replacement, workflow automation
+brew cask install appcleaner # apps cleaner
+brew cask install calibre # books
+brew cask install cleanmymac # apps & mac cleaner
+brew cask install disk-inventory-x # disk utilization
+brew cask install dropbox # files sync
+brew cask install evernote # notes sync
+brew cask install keepassx # passwords sync
+brew cask install private-eye # network monitor
+brew cask install remote-desktop-connection # Windows connectivity
+brew cask install skype # chat
+brew cask install spectacle # window management
+brew cask install superduper # disk duplication
+# brew cask install teamviewer # remote sharing
+brew cask install wireshark # network monitor
 
 # setup
 brew cask alfred link
+
+# Remove outdated versions from the cellar.
+brew cleanup

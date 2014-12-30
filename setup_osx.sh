@@ -1,7 +1,6 @@
 #!/bin/bash
-# Configuring OSX environment
+# Configure OSX environment
 
-# private helper
 # $1 - file
 # $2 - message
 function ask_and_run ()
@@ -20,11 +19,6 @@ function ask_and_run ()
 
 cd $HOME
 
-# Install homebrew
-if [ ! -f /usr/local/bin/brew ]; then
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-fi
-
 # repo
 if [ -d dotfiles/.git ]; then
     cd dotfiles
@@ -36,11 +30,6 @@ else
     fi
     git clone https://github.com/jivkok/dotfiles.git dotfiles
 fi
-
-# Ask for the administrator password upfront.
-sudo -v
-# Keep-alive: update existing `sudo` time stamp until the script has finished.
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 # dotfiles
 ln -sF dotfiles/osx/.vim .
@@ -65,8 +54,8 @@ ask_and_run dotfiles/osx/software.sh "Would you like to install additional softw
 # OSX tweaks
 ask_and_run dotfiles/osx/.osx "Would you like to set sensible OSX defaults? "
 
-# Git
+# Configure Git
 ask_and_run dotfiles/configure_git.sh "Would you like to configure Git? "
 
-# SublimeText
+# Configure SublimeText
 ask_and_run dotfiles/osx/configure_sublimetext.sh "Would you like to configure SublimeText? "
