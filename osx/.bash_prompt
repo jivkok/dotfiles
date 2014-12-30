@@ -58,10 +58,10 @@ fi;
 
 function precmd {
     local separator=' : '
-    local user="${USER}@${HOSTNAME}"
-    if [ -z "$SSH_CLIENT" ] && [ -z "$SSH_TTY" ]; then
-        user="$user (local)"
-    fi
+    local user="${USER} @ ${HOSTNAME}"
+    # if [ -z "$SSH_CLIENT" ] && [ -z "$SSH_TTY" ]; then
+    #     user="$user (local)"
+    # fi
     local location="${PWD}"
 
     local prefix="\n${YELLOW_BOLD}${user}${COLOR_RESET}${separator}${GREEN_BOLD}${location}${COLOR_RESET}${BLUE_BOLD}$(__git_ps1 " (%s)")${COLOR_RESET}"
