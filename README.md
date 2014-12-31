@@ -3,15 +3,16 @@
 ## OSX
 
 ### Content
-* Aliases
-* Functions
-* Customized Bash prompt
-* Environment settings (common, vim, wget)
-* Homebrew packages (optional)
-* Additional software (optional)
-* OSX tweaks (optional)
-* Git configuration (optional)
-* SublimeText configuration (optional)
+* [Aliases](https://github.com/jivkok/dotfiles/blob/master/osx/.aliases)
+* [Functions](https://github.com/jivkok/dotfiles/blob/master/osx/.functions)
+* Customized [Bash prompt](https://github.com/jivkok/dotfiles/blob/master/osx/.bash_prompt)
+* [Environment settings](https://github.com/jivkok/dotfiles/blob/master/osx/.bashrc) (common, vim, wget)
+* [Homebrew packages](https://github.com/jivkok/dotfiles/blob/master/osx/brew.sh) (optional)
+* [Additional software](https://github.com/jivkok/dotfiles/blob/master/osx/software.sh) (optional)
+* [OSX tweaks](https://github.com/jivkok/dotfiles/blob/master/osx/.osx) (optional)
+* [Git configuration](https://github.com/jivkok/dotfiles/blob/master/configure_git.sh) (optional)
+* [SublimeText configuration](https://github.com/jivkok/dotfiles/tree/master/sublimetext) (optional)
+* [Alfred workflows](https://github.com/jivkok/alfred-workflows) (optional)
 
 ### Installation
 The setup script will configure aliases, function, prompt, and environment settings.
@@ -19,7 +20,7 @@ For the rest of the steps - it will ask whether to run each one.
 
 #### Option #1
 ```sh
-wget -qO- https://raw.githubusercontent.com/jivkok/dotfiles/master/setup-osx.sh | sh
+curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup-osx.sh | sh
 ```
 #### Option #2
 ```sh
@@ -52,7 +53,7 @@ You can also use `~/.bash_extra` to override dotfiles settings, functions and al
 
 ### Option 1
 ```sh
-wget -qO- https://raw.githubusercontent.com/jivkok/dotfiles/master/setup-debian.sh | sh
+curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup-debian.sh | sh
 ```
 ### Option 2
 ```sh
@@ -71,5 +72,7 @@ git pull
 
 
 ## Credits
+
 * Mathias Bynens for his [dotfiles](https://github.com/mathiasbynens/dotfiles)
 * Balaji Srinivasan for his [dotfiles](https://github.com/startup-class/dotfiles)
+* Zeno Rocha for his [Alfred workflows](https://github.com/zenorocha/alfred-workflows)

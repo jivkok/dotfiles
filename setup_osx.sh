@@ -59,3 +59,6 @@ ask_and_run dotfiles/configure_git.sh "Would you like to configure Git? "
 
 # Configure SublimeText
 ask_and_run dotfiles/osx/configure_sublimetext.sh "Would you like to configure SublimeText? "
+
+# Configure Alfred workflows
+ask_and_run dotfiles/osx/alfred.sh "Would you like to configure Alfred workflows? "
