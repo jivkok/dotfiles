@@ -1,10 +1,10 @@
 {
     // Live mode evaluates changes every time file is modified,
     // Set false to disable evaluation after each input
-    "live_mode": false,
+    "live_mode": true,
     // Focus Change mode evaluates changes every time a view gets the focus
     // Set false to disable evaluation when changing views
-    "focus_change_mode": false,
+    "focus_change_mode": true,
     // When set to true GitGutter runs asynchronously in a seperate thread
     // This may cause a small delay between a modification and the icon change
     // but can increase performance greatly if needed.
@@ -12,7 +12,7 @@
 
     // When using non_blocking mode, delay update of gutter icons by the
     // following amount (in milliseconds).
-    "debounce_delay": 1000,
+    "debounce_delay": 2000,
 
     // Determines whether GitGutter ignores whitespace in modified files.
     // Set "none" to ensure whitespace is considered in the diff

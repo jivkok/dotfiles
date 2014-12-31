@@ -6,6 +6,7 @@
     "installed_packages":
     [
         "All Autocomplete",
+        "BracketHighlighter",
         "CodeFormatter",
         "EasyMotion",
         "Emmet",
@@ -26,6 +27,7 @@
         "StringEncode",
         "SublimeCodeIntel",
         "SublimeLinter",
+        "Theme - Soda",
         "TrailingSpaces"
     ]
 }
