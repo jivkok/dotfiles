@@ -7,8 +7,8 @@ function ask_and_run ()
 {
     if [ ! -f $1 ]; then return; fi
     read -p "$2" -n 1 -r
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then return; fi
     echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then return; fi
 
     source $1
 
@@ -32,17 +32,16 @@ else
 fi
 
 # dotfiles
-ln -sF dotfiles/osx/.vim .
-ln -sf dotfiles/osx/.aliases .
-ln -sf dotfiles/osx/.bash_profile .
-ln -sf dotfiles/osx/.bash_prompt .
-ln -sf dotfiles/osx/.bashrc .
+ln -sF dotfiles/.vim .
+ln -sf dotfiles/.aliases .
+ln -sf dotfiles/.bash_profile .
+ln -sf dotfiles/.bash_prompt .
+ln -sf dotfiles/.bashrc .
+ln -sf dotfiles/.exports .
+ln -sf dotfiles/.functions .
+ln -sf dotfiles/.vimrc .
+ln -sf dotfiles/.wgetrc .
 ln -sf dotfiles/osx/.duti .
-ln -sf dotfiles/osx/.exports .
-ln -sf dotfiles/osx/.functions .
-ln -sf dotfiles/osx/.screenrc .
-ln -sf dotfiles/osx/.vimrc .
-ln -sf dotfiles/osx/.wgetrc .
 curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
 # Packages
@@ -58,7 +57,7 @@ ask_and_run dotfiles/osx/.osx "Would you like to set sensible OSX defaults? "
 ask_and_run dotfiles/configure_git.sh "Would you like to configure Git? "
 
 # Configure SublimeText
-ask_and_run dotfiles/osx/configure_sublimetext.sh "Would you like to configure SublimeText? "
+ask_and_run dotfiles/configure_sublimetext.sh "Would you like to configure SublimeText? "
 
 # Configure Alfred workflows
 ask_and_run dotfiles/osx/alfred.sh "Would you like to configure Alfred workflows? "

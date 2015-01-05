@@ -13,10 +13,10 @@ else
 fi
 
 if tput setaf 1 &> /dev/null; then
+    # Solarized colors, taken from http://git.io/solarized-colors.
 	tput sgr0; # reset colors
 	BOLD=$(tput bold);
 	COLOR_RESET=$(tput sgr0);
-	# Solarized colors, taken from http://git.io/solarized-colors.
 	BLACK=$(tput setaf 0);
 	RED=$(tput setaf 124);
 	RED_BOLD="$BOLD$RED";
@@ -58,10 +58,11 @@ fi;
 
 function precmd {
     local separator=' : '
-    local user="${USER} @ ${HOSTNAME}"
-    # if [ -z "$SSH_CLIENT" ] && [ -z "$SSH_TTY" ]; then
-    #     user="$user (local)"
-    # fi
+    local user=${LOGNAME} || ${USER} || ${USERNAME}
+    user="${user} @ ${HOSTNAME}"
+    if [ -z "$SSH_CLIENT" ] && [ -z "$SSH_TTY" ]; then
+       user="$user(local)"
+    fi
     local location="${PWD}"
 
     local prefix="\n${YELLOW_BOLD}${user}${COLOR_RESET}${separator}${GREEN_BOLD}${location}${COLOR_RESET}${BLUE_BOLD}$(__git_ps1 " (%s)")${COLOR_RESET}"

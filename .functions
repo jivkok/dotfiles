@@ -1,3 +1,47 @@
+function lsd() {
+    dir="$1"
+    if [ "$dir" == "" ]; then
+        dir=.
+    fi
+    find "$dir" -mindepth 1 -maxdepth 1 -type d
+}
+
+function ff() {
+    if [ "$1" == "" ]; then
+        echo "Usage: ff file_pattern [string_pattern]"
+        return
+    fi
+
+    if [ "$2" == "" ]; then
+        find . -iname "$1"
+    else
+        find . -iname "$1" -exec grep -l -i "$2" {} \;
+    fi
+}
+
+# lazy man extract - example: ex tarball.tar
+function ex() {
+    if [ -f $1 ] ; then
+        case $1 in
+            *.tar.bz2)   tar xjfv $1        ;;
+            *.tar.gz)    tar xzfv $1     ;;
+            *.tar.xz)    tar xJfv $1     ;;
+            *.bz2)       bunzip2 $1       ;;
+            *.rar)       rar x $1     ;;
+            *.gz)        gunzip $1     ;;
+            *.tar)       tar xfv $1        ;;
+            *.tbz2)      tar xjfv $1      ;;
+            *.tgz)       tar xzfv $1       ;;
+            *.zip)       unzip $1     ;;
+            *.Z)         uncompress $1  ;;
+            *.7z)        7z x $1    ;;
+            *)           echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
 # Simple calculator
 function calc() {
     local result="";
@@ -19,11 +63,6 @@ function calc() {
 # Create a new directory and enter it
 function mkd() {
     mkdir -p "$@" && cd "$_";
-}
-
-# Change working directory to the top-most Finder window location
-function cdf() { # short for `cdfinder`
-    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
 }
 
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
@@ -53,28 +92,6 @@ function targz() {
     [ -f "${tmpFile}" ] && rm "${tmpFile}";
     echo "${tmpFile}.gz created successfully.";
 }
-
-# Determine size of a file or total size of a directory
-function fs() {
-    if du -b /dev/null > /dev/null 2>&1; then
-        local arg=-sbh;
-    else
-        local arg=-sh;
-    fi
-    if [[ -n "$@" ]]; then
-        du $arg -- "$@";
-    else
-        du $arg .[^.]* *;
-    fi;
-}
-
-# Use Git’s colored diff when available
-hash git &>/dev/null;
-if [ $? -eq 0 ]; then
-    function diff() {
-        git diff --no-index --color-words "$@";
-    }
-fi;
 
 # Create a data URL from a file
 function dataurl() {
@@ -112,15 +129,6 @@ function phpserver() {
     php -S "${ip}:${port}";
 }
 
-# Compare original and gzipped file size
-function gz() {
-    local origsize=$(wc -c < "$1");
-    local gzipsize=$(gzip -c "$1" | wc -c);
-    local ratio=$(echo "$gzipsize * 100 / $origsize" | bc -l);
-    printf "orig: %d bytes\n" "$origsize";
-    printf "gzip: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio";
-}
-
 # Syntax-highlight JSON strings or files
 # Usage: `json '{"foo":42}'` or `echo '{"foo":42}' | json`
 function json() {
@@ -129,11 +137,6 @@ function json() {
     else # pipe
         python -mjson.tool | pygmentize -l javascript;
     fi;
-}
-
-# Run `dig` and display the most useful info
-function digga() {
-    dig +nocmd "$1" any +multiline +noall +answer;
 }
 
 # UTF-8-encode a string of Unicode symbols
@@ -197,16 +200,6 @@ function getcertnames() {
     fi;
 }
 
-# `o` with no arguments opens the current directory, otherwise opens the given
-# location
-function o() {
-    if [ $# -eq 0 ]; then
-        open .;
-    else
-        open "$@";
-    fi;
-}
-
 # `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
 # the `.git` directory, listing directories first. The output gets piped into
 # `less` with options to preserve color and line numbers, unless the output is
@@ -214,3 +207,24 @@ function o() {
 function tre() {
     tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
 }
+
+os=$(uname -s)
+
+if [ "$os" = "Linux" ]; then
+
+    # View HTTP traffic
+    alias sniff="sudo ngrep -d 'eth0' -t '^(GET|POST) ' 'tcp and port 80'"
+    alias httpdump="sudo tcpdump -i eth0 -n -s 0 -w -"
+
+elif [ "$os" = "Darwin" ]; then
+
+    # `o` with no arguments opens the current directory, otherwise opens the given location
+    function o() {
+        if [ $# -eq 0 ]; then
+            open .;
+        else
+            open "$@";
+        fi;
+    }
+
+fi

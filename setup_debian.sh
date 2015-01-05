@@ -12,6 +12,7 @@ sudo apt-get install -y gitstats
 sudo apt-get install -y ngrep
 sudo apt-get install -y rlwrap
 sudo apt-get install -y screen
+sudo apt-get install -y tree
 sudo apt-get install -y vim
 sudo apt-get install -y wget
 sudo apt-get clean
@@ -31,19 +32,18 @@ else
     git clone https://github.com/jivkok/dotfiles.git dotfiles
 fi
 
-ln -sf dotfiles/linux/.emacs.d .
-ln -sf dotfiles/linux/.vim .
-ln -sb dotfiles/linux/.aliases .
-ln -sb dotfiles/linux/.bash_profile .
-ln -sb dotfiles/linux/.bash_prompt .
-ln -sb dotfiles/linux/.bashrc .
-ln -sb dotfiles/linux/.curlrc .
-ln -sb dotfiles/linux/.exports .
-ln -sb dotfiles/linux/.functions .
-ln -sb dotfiles/linux/.screenrc .
-ln -sb dotfiles/linux/.vimrc .
-ln -sb dotfiles/linux/.wgetrc .
-wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+ln -sf dotfiles/.emacs.d .
+ln -sf dotfiles/.vim .
+ln -sb dotfiles/.aliases .
+ln -sb dotfiles/.bash_profile .
+ln -sb dotfiles/.bash_prompt .
+ln -sb dotfiles/.bashrc .
+ln -sb dotfiles/.curlrc .
+ln -sb dotfiles/.exports .
+ln -sb dotfiles/.functions .
+ln -sb dotfiles/.vimrc .
+ln -sb dotfiles/.wgetrc .
+curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
 # Git
 [ -f ~/dotfiles/configure_git.sh ] && source ~/dotfiles/configure_git.sh
@@ -55,7 +55,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     sudo add-apt-repository ppa:webupd8team/sublime-text-2
     sudo apt-get update
     sudo apt-get install -y sublime-text
-    [ -f ~/dotfiles/linux/configure_sublimetext.sh ] && source ~/dotfiles/linux/configure_sublimetext.sh
+    [ -f ~/dotfiles/configure_sublimetext.sh ] && source ~/dotfiles/configure_sublimetext.sh
 fi
 
 source ~/.bash_profile
