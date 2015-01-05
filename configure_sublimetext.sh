@@ -13,8 +13,8 @@ else
     echo "Unsupported OS: $os"
     return
 fi
-mkdir -p $sublimeUserDataPath
-mkdir -p $sublimeInstalledPackagesPath
+mkdir -p "$sublimeUserDataPath"
+mkdir -p "$sublimeInstalledPackagesPath"
 
 scriptdir="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 settingsDir="$scriptdir/sublimetext"
