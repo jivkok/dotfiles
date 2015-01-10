@@ -3,10 +3,10 @@
 ## OSX
 
 ### Content
-* [Aliases](https://github.com/jivkok/dotfiles/blob/master/osx/.aliases)
-* [Functions](https://github.com/jivkok/dotfiles/blob/master/osx/.functions)
-* Customized [Bash prompt](https://github.com/jivkok/dotfiles/blob/master/osx/.bash_prompt)
-* [Environment settings](https://github.com/jivkok/dotfiles/blob/master/osx/.bashrc) (common, vim, wget)
+* [Aliases](https://github.com/jivkok/dotfiles/blob/master/.aliases)
+* [Functions](https://github.com/jivkok/dotfiles/blob/master/.functions)
+* Customized [Bash prompt](https://github.com/jivkok/dotfiles/blob/master/.bash_prompt)
+* [Environment settings](https://github.com/jivkok/dotfiles/blob/master/.bashrc) (common, vim, wget)
 * [Homebrew packages](https://github.com/jivkok/dotfiles/blob/master/osx/brew.sh) (optional)
 * [Additional software](https://github.com/jivkok/dotfiles/blob/master/osx/software.sh) (optional)
 * [OSX tweaks](https://github.com/jivkok/dotfiles/blob/master/osx/.osx) (optional)
