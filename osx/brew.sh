@@ -63,6 +63,7 @@ brew install sqlmap
 brew install tcpflow
 brew install tcpreplay
 brew install tcptrace
+brew install tmux
 brew install ucspi-tcp # `tcpserver` etc.
 brew install xpdf
 brew install xz

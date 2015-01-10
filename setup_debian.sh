@@ -11,7 +11,7 @@ sudo apt-get install -y gitk
 sudo apt-get install -y gitstats
 sudo apt-get install -y ngrep
 sudo apt-get install -y rlwrap
-sudo apt-get install -y screen
+sudo apt-get install -y tmux
 sudo apt-get install -y tree
 sudo apt-get install -y vim
 sudo apt-get install -y wget
