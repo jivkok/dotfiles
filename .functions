@@ -8,15 +8,38 @@ function lsd() {
 
 function ff() {
     if [ "$1" == "" ]; then
-        echo "Usage: ff file_pattern [string_pattern]"
+        echo "Find Files (or directories)"
+        echo "Usage: ff file_pattern [directory]"
         return
     fi
 
-    if [ "$2" == "" ]; then
-        find . -iname "$1"
-    else
-        find . -iname "$1" -exec grep -l -i "$2" {} \;
+    file_pattern="$1"
+    directory="$2"
+    if [ "$directory" == "" ]; then
+        directory='.'
     fi
+
+    find "$directory" -iname "$file_pattern"
+}
+
+function fs() {
+    if [ "$1" == "" ]; then
+        echo "Find Strings in files"
+        echo "Usage: fs string_pattern [file_pattern] [directory]"
+        return
+    fi
+
+    string_pattern="$1"
+    file_pattern="$2"
+    directory="$3"
+    if [ "$file_pattern" == "" ]; then
+        file_pattern='*'
+    fi
+    if [ "$directory" == "" ]; then
+        directory='.'
+    fi
+
+    find "$directory" -type f -iname "$file_pattern" -exec grep -I -l -i "$string_pattern" {} \; -exec grep -I -n -i "$string_pattern" {} \;
 }
 
 # lazy man extract - example: ex tarball.tar

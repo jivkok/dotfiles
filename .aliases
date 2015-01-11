@@ -76,11 +76,25 @@ os=$(uname -s)
 
 if [ "$os" = "Linux" ]; then
 
+    alias pkfind="sudo apt-cache search"
+    alias pkget="sudo apt-get install"
+    alias pkremove="sudo apt-get remove"
+    alias pklist="sudo apt-cache pkgnames"
+    alias pkupg="sudo apt-get update && sudo apt-get upgrade && sudo apt-get clean"
+
     # View HTTP traffic
     alias sniff="sudo ngrep -d 'eth0' -t '^(GET|POST) ' 'tcp and port 80'"
     alias httpdump="sudo tcpdump -i eth0 -n -s 0 -w -"
 
 elif [ "$os" = "Darwin" ]; then
+
+    # Packages
+    alias pkfind="brew search"
+    alias pkget="brew install"
+    alias pkremove="brew uninstall"
+    alias pklist="brew list"
+    alias pkupg="brew update && brew upgrade && brew doctor"
+    alias cask="brew cask"
 
     # View HTTP traffic
     alias sniff="sudo ngrep -d 'en1' -t '^(GET|POST) ' 'tcp and port 80'"
