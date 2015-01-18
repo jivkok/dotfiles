@@ -23,6 +23,7 @@ done;
 unset file;
 
 ## set options
+set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
 
 # Shell options
