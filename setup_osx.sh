@@ -56,6 +56,17 @@ ask_and_run dotfiles/osx/.osx "Would you like to set sensible OSX defaults? "
 # Configure Git
 ask_and_run dotfiles/configure_git.sh "Would you like to configure Git? "
 
+# ZSH
+read -p "Would you like to install and configure ZSH ? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    sudo apt-get install zsh
+    curl -L http://install.ohmyz.sh | sh
+    ln -sf dotfiles/.zprofile .
+    ln -sf dotfiles/.zshrc .
+    ln -sf dotfiles/.zsh-theme .
+fi
+
 # Configure SublimeText
 ask_and_run dotfiles/configure_sublimetext.sh "Would you like to configure SublimeText? "
 
