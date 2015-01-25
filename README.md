@@ -5,18 +5,19 @@
 ### Content
 * [Aliases](https://github.com/jivkok/dotfiles/blob/master/.aliases)
 * [Functions](https://github.com/jivkok/dotfiles/blob/master/.functions)
-* Customized [Bash prompt](https://github.com/jivkok/dotfiles/blob/master/.bash_prompt)
-* [Environment settings](https://github.com/jivkok/dotfiles/blob/master/.bashrc) (common, vim, wget)
+* Shell options: [Bash](https://github.com/jivkok/dotfiles/blob/master/.bashrc) / [Zsh](https://github.com/jivkok/dotfiles/blob/master/.zshrc)
+* Shell theme: [Bash](https://github.com/jivkok/dotfiles/blob/master/.bash_prompt) / [Zsh](https://github.com/jivkok/dotfiles/blob/master/.zsh-theme)
 * [Homebrew packages](https://github.com/jivkok/dotfiles/blob/master/osx/brew.sh) (optional)
 * [Additional software](https://github.com/jivkok/dotfiles/blob/master/osx/software.sh) (optional)
 * [OSX tweaks](https://github.com/jivkok/dotfiles/blob/master/osx/.osx) (optional)
+* [Zsh configuration](https://github.com/jivkok/dotfiles/blob/master/configure_zsh.sh) (optional)
 * [Git configuration](https://github.com/jivkok/dotfiles/blob/master/configure_git.sh) (optional)
 * [SublimeText configuration](https://github.com/jivkok/dotfiles/tree/master/sublimetext) (optional)
 * [Alfred workflows](https://github.com/jivkok/alfred-workflows) (optional)
 
 ### Installation
-The setup script will configure aliases, function, prompt, and environment settings.
-For the rest of the steps - it will ask whether to run each one.
+The setup script will configure shell options, theme, aliases, and functions.
+The setup script will ask whether to run each of the optional steps.
 
 #### Option #1
 ```sh
@@ -49,13 +50,27 @@ If `~/.bash_extra` exists, it will be sourced along with the other files. You ca
 You can also use `~/.bash_extra` to override dotfiles settings, functions and aliases.
 
 
+
 ## Linux (Debian-style)
 
-### Option 1
+### Content
+* [Aliases](https://github.com/jivkok/dotfiles/blob/master/.aliases)
+* [Functions](https://github.com/jivkok/dotfiles/blob/master/.functions)
+* Shell options: [Bash](https://github.com/jivkok/dotfiles/blob/master/.bashrc) / [Zsh](https://github.com/jivkok/dotfiles/blob/master/.zshrc)
+* Shell theme: [Bash](https://github.com/jivkok/dotfiles/blob/master/.bash_prompt) / [Zsh](https://github.com/jivkok/dotfiles/blob/master/.zsh-theme)
+* [Zsh configuration](https://github.com/jivkok/dotfiles/blob/master/configure_zsh.sh) (optional)
+* [Git configuration](https://github.com/jivkok/dotfiles/blob/master/configure_git.sh) (optional)
+* [SublimeText configuration](https://github.com/jivkok/dotfiles/tree/master/sublimetext) (optional)
+
+### Installation
+The setup script will configure shell options, theme, aliases, and functions.
+The setup script will ask whether to run each of the optional steps.
+
+#### Option 1
 ```sh
 curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup-debian.sh | sh
 ```
-### Option 2
+#### Option 2
 ```sh
 cd $HOME
 sudo apt-get install git
@@ -64,11 +79,12 @@ source dotfiles/setup-debian.sh
 ```
 
 
-## Upgrade
+### Upgrade
 ```sh
 cd ~/dotfiles
 git pull
 ```
+
 
 
 ## Credits
