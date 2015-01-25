@@ -52,11 +52,7 @@ curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/c
 read -p "Would you like to install and configure ZSH ? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    sudo apt-get install zsh
-    curl -L http://install.ohmyz.sh | sh
-    ln -sb dotfiles/.zprofile .
-    ln -sb dotfiles/.zshrc .
-    ln -sb dotfiles/.zsh-theme .
+    source ~/dotfiles/configure_git.sh
 fi
 
 # SublimeText
