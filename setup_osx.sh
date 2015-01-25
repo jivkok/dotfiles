@@ -57,10 +57,12 @@ ask_and_run dotfiles/osx/.osx "Would you like to set sensible OSX defaults? "
 ask_and_run dotfiles/configure_git.sh "Would you like to configure Git? "
 
 # ZSH
-ask_and_run dotfiles/configure_zsh.sh "Would you like to configure Git? "
+ask_and_run dotfiles/configure_zsh.sh "Would you like to configure Zsh? "
 
 # Configure SublimeText
 ask_and_run dotfiles/configure_sublimetext.sh "Would you like to configure SublimeText? "
 
 # Configure Alfred workflows
 ask_and_run dotfiles/osx/alfred.sh "Would you like to configure Alfred workflows? "
+
+echo "Done"

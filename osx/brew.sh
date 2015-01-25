@@ -90,5 +90,10 @@ brew install duti
 # Install Node.js. Note: this installs `npm` too, using the recommended installation method.
 brew install node
 
+# Python packages
+if [ -n "$(command -v easy_install)" ]; then
+    sudo easy_install Pygments
+fi
+
 # Remove outdated versions from the cellar.
 brew cleanup

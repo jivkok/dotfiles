@@ -10,6 +10,7 @@ sudo apt-get install -y git-extras
 sudo apt-get install -y gitk
 sudo apt-get install -y gitstats
 sudo apt-get install -y ngrep
+sudo apt-get install -y python-pygments
 sudo apt-get install -y rlwrap
 sudo apt-get install -y tmux
 sudo apt-get install -y tree
@@ -64,7 +65,5 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     sudo apt-get install -y sublime-text
     [ -f ~/dotfiles/configure_sublimetext.sh ] && source ~/dotfiles/configure_sublimetext.sh
 fi
-
-source ~/.bash_profile
 
 echo "Done"

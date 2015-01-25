@@ -39,6 +39,7 @@ brew cask install cleanmymac # apps & mac cleaner
 brew cask install disk-inventory-x # disk utilization
 brew cask install dropbox # files sync
 brew cask install evernote # notes sync
+brew cask install hermes # Pandora.com
 brew cask install keepassx # passwords sync
 brew cask install private-eye # network monitor
 brew cask install remote-desktop-connection # Windows connectivity
