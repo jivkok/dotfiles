@@ -54,7 +54,11 @@ export ZSH=$HOME/.oh-my-zsh
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git colored-man colorize github python brew osx zsh-syntax-highlighting)
+if [[ "$OSTYPE" = darwin* ]]; then
+    plugins=(colored-man colorize rsync zsh-syntax-highlighting brew osx xcode)
+else
+    plugins=(colored-man colorize rsync zsh-syntax-highlighting)
+fi
 
 # User configuration
 
