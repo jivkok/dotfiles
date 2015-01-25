@@ -575,7 +575,8 @@ fi;
 #defaults write com.apple.terminal FocusFollowsMouse -bool true
 #defaults write org.x.X11 wm_ffm -bool true
 
-# Install the Solarized Dark theme for iTerm
+# Install the Solarized themes for iTerm
+open "${HOME}/dotfiles/osx/Solarized Light.itermcolors"
 open "${HOME}/dotfiles/osx/Solarized Dark.itermcolors"
 
 # Don’t display the annoying prompt when quitting iTerm
