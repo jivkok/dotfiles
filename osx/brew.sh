@@ -21,15 +21,13 @@ brew upgrade
 brew install coreutils
 sudo ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
 
-# Install some other useful utilities like `sponge`.
 brew install moreutils
-# Install GNU `find`, `locate`, `updatedb`, and `xargs`, `g`-prefixed.
-brew install findutils
-# Install GNU `sed`, overwriting the built-in `sed`.
+brew install findutils --with-default-names # GNU `find`, `locate`, `updatedb`, and `xargs`
 brew install gnu-sed --with-default-names
+brew install gnu-tar --with-default-names
+brew install gnu-which --with-default-names
 # Install Bash 4.
-# Note: don’t forget to add `/usr/local/bin/bash` to `/etc/shells` before
-# running `chsh`.
+# Note: don’t forget to add `/usr/local/bin/bash` to `/etc/shells` before running `chsh`.
 brew install bash
 brew install bash-completion
 
@@ -39,7 +37,6 @@ brew install wget --with-iri
 # Install more recent versions of some OS X tools.
 brew install vim --override-system-vi
 brew install homebrew/dupes/grep
-brew install homebrew/dupes/screen
 brew install homebrew/php/php55 --with-gmp
 
 # Install some CTF tools; see https://github.com/ctfs/write-ups.
@@ -51,6 +48,7 @@ brew install dex2jar
 brew install dns2tcp
 brew install fcrackzip
 brew install foremost
+brew install gzip
 brew install hashpump
 brew install hydra
 brew install john
@@ -65,6 +63,7 @@ brew install tcpreplay
 brew install tcptrace
 brew install tmux
 brew install ucspi-tcp # `tcpserver` etc.
+brew install watch
 brew install xpdf
 brew install xz
 

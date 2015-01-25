@@ -93,7 +93,7 @@ elif [ "$os" = "Darwin" ]; then
     alias pkgget="brew install"
     alias pkgremove="brew uninstall"
     alias pkglist="brew list"
-    alias pkgupd="brew update && brew upgrade && brew doctor"
+    alias pkgupd="brew update && brew upgrade && brew cleanup && brew doctor"
     alias cask="brew cask"
 
     # View HTTP traffic
