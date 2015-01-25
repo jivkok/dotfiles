@@ -23,12 +23,13 @@ cd $HOME
 if [ -d dotfiles/.git ]; then
     cd dotfiles
     git pull origin master
+    git submodule update --remote
     cd ..
 else
     if [ -d dotfiles ]; then
         mv dotfiles dotfiles.old
     fi
-    git clone https://github.com/jivkok/dotfiles.git dotfiles
+    git clone --recursive https://github.com/jivkok/dotfiles.git dotfiles
 fi
 
 # dotfiles

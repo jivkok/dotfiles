@@ -23,7 +23,7 @@ export ZSH=$HOME/.oh-my-zsh
 # DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
+export UPDATE_ZSH_DAYS=30
 
 # Uncomment the following line to disable colors in ls.
 # DISABLE_LS_COLORS="true"
@@ -69,7 +69,7 @@ set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
 
 # Load the shell dotfiles, (~/.bash_extra can be used for any local settings you don’t want to commit)
-for file in ~/.{zsh-theme,aliases,functions,bash_extra}; do
+for file in ~/{.zsh-theme,.aliases,.functions,.extra,dotfiles/submodules/z/z.sh}; do
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
