@@ -40,6 +40,7 @@ ln -sf dotfiles/.bash_prompt .
 ln -sf dotfiles/.bashrc .
 ln -sf dotfiles/.exports .
 ln -sf dotfiles/.functions .
+ln -sf dotfiles/.tmux.conf .
 ln -sf dotfiles/.vimrc .
 ln -sf dotfiles/.wgetrc .
 ln -sf dotfiles/osx/.duti .

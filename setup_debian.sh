@@ -43,6 +43,7 @@ ln -sb dotfiles/.bashrc .
 ln -sb dotfiles/.curlrc .
 ln -sb dotfiles/.exports .
 ln -sb dotfiles/.functions .
+ln -sb dotfiles/.tmux.conf .
 ln -sb dotfiles/.vimrc .
 ln -sb dotfiles/.wgetrc .
 curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
