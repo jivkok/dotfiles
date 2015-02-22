@@ -36,7 +36,7 @@ git config --global core.autocrlf input
 git config --global core.safecrlf true
 git config --global help.format html
 git config --global pack.packSizeLimit 2g
-git config --global push.default simple
+git config --global push.default current
 git config --global rebase.autosquash true
 
 # Colors

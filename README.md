@@ -87,6 +87,40 @@ git pull
 
 
 
+## Windows ([Babun](http://babun.github.io)-distro of Cygwin)
+
+### Content
+* [Aliases](https://github.com/jivkok/dotfiles/blob/master/.aliases)
+* [Functions](https://github.com/jivkok/dotfiles/blob/master/.functions)
+* Shell options: [Bash](https://github.com/jivkok/dotfiles/blob/master/.bashrc) / [Zsh](https://github.com/jivkok/dotfiles/blob/master/.zshrc)
+* Shell theme: [Bash](https://github.com/jivkok/dotfiles/blob/master/.bash_prompt) / [Zsh](https://github.com/jivkok/dotfiles/blob/master/.zsh-theme)
+* [Zsh configuration](https://github.com/jivkok/dotfiles/blob/master/configure_zsh.sh) (optional)
+* [Git configuration](https://github.com/jivkok/dotfiles/blob/master/configure_git.sh) (optional)
+
+### Installation
+The setup script will configure shell options, theme, aliases, and functions.
+The setup script will ask whether to run each of the optional steps.
+
+#### Option 1
+```sh
+curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup-babun.sh | sh
+```
+#### Option 2
+```sh
+cd $HOME
+git clone https://github.com/jivkok/dotfiles.git dotfiles
+source dotfiles/setup-babun.sh
+```
+
+
+### Upgrade
+```sh
+cd ~/dotfiles
+git pull
+```
+
+
+
 ## Credits
 
 * Mathias Bynens for his [dotfiles](https://github.com/mathiasbynens/dotfiles)

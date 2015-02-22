@@ -55,7 +55,7 @@ curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/c
 read -p "Would you like to install and configure ZSH ? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    source ~/dotfiles/configure_git.sh
+    source ~/dotfiles/configure_zsh.sh
 fi
 
 # SublimeText
