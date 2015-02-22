@@ -80,7 +80,7 @@ if [ "$os" = "Linux" ]; then
     alias pkgget="sudo apt-get install"
     alias pkgremove="sudo apt-get remove"
     alias pkglist="sudo apt-cache pkgnames"
-    alias pkgupd="sudo apt-get update && sudo apt-get upgrade && sudo apt-get clean"
+    alias pkgupd="sudo apt-get update --fix-missing && sudo apt-get upgrade && sudo apt-get clean && sudo apt-get autoremove"
 
     # View HTTP traffic
     alias sniff="sudo ngrep -d 'eth0' -t '^(GET|POST) ' 'tcp and port 80'"
