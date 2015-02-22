@@ -64,15 +64,22 @@ alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.ar
 # Reload the shell (i.e. invoke as a login shell)
 alias reload="exec $SHELL -l"
 
-# One of @janmoesen’s ProTip™s
-for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
-    alias "$method"="lwp-request -m '$method'"
-done
-
 # Make Grunt print stack traces by default
 command -v grunt > /dev/null && alias grunt="grunt --stack"
 
 os=$(uname -s)
+
+if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ]; then
+
+    for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
+        alias "$method"="lwp-request -m '$method'"
+    done
+
+    # View HTTP traffic
+    alias sniff="sudo ngrep -d 'eth0' -t '^(GET|POST) ' 'tcp and port 80'"
+    alias httpdump="sudo tcpdump -i eth0 -n -s 0 -w -"
+
+fi
 
 if [ "$os" = "Linux" ]; then
 
@@ -81,10 +88,6 @@ if [ "$os" = "Linux" ]; then
     alias pkgremove="sudo apt-get remove"
     alias pkglist="sudo apt-cache pkgnames"
     alias pkgupd="sudo apt-get update --fix-missing && sudo apt-get upgrade && sudo apt-get clean && sudo apt-get autoremove"
-
-    # View HTTP traffic
-    alias sniff="sudo ngrep -d 'eth0' -t '^(GET|POST) ' 'tcp and port 80'"
-    alias httpdump="sudo tcpdump -i eth0 -n -s 0 -w -"
 
 elif [ "$os" = "Darwin" ]; then
 
@@ -95,10 +98,6 @@ elif [ "$os" = "Darwin" ]; then
     alias pkglist="brew list"
     alias pkgupd="brew update && brew upgrade && brew cleanup && brew doctor"
     alias cask="brew cask"
-
-    # View HTTP traffic
-    alias sniff="sudo ngrep -d 'en1' -t '^(GET|POST) ' 'tcp and port 80'"
-    alias httpdump="sudo tcpdump -i en1 -n -s 0 -w - | grep -a -o -E \"Host\: .*|GET \/.*\""
 
     # Get OS X Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
     alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update'
