@@ -76,8 +76,12 @@ if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ]; then
     done
 
     # View HTTP traffic
-    alias sniff="sudo ngrep -d 'eth0' -t '^(GET|POST) ' 'tcp and port 80'"
-    alias httpdump="sudo tcpdump -i eth0 -n -s 0 -w -"
+    local _interface=eth0
+    if [ "$os" = "Darwin" ]; then
+        _interface=en1
+    fi
+    alias sniff="sudo ngrep -d $_interface -t '^(GET|POST) ' 'tcp and port 80'"
+    alias httpdump="sudo tcpdump -i $_interface -n -s 0 -w -"
 
 fi
 
@@ -156,5 +160,7 @@ elif [ "$os" = "Darwin" ]; then
 
     # Lock the screen (when going AFK)
     alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+
+    alias of='open -a Finder ./'
 
 fi

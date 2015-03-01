@@ -1,7 +1,29 @@
+# ls dirs flag
+if ls ~ --group-directories-first > /dev/null 2>&1; then
+    local dirsflag="--group-directories-first"
+else
+    local dirsflag=""
+fi
+# ls color flag
+if ls --color ~ > /dev/null 2>&1; then
+    # GNU
+    local colorflag="--color=auto"
+elif ls -G ~ > /dev/null 2>&1; then
+    # OSX
+    local colorflag="-G"
+else
+    local colorflag=""
+fi
+
+function cdd () {
+    cd "$1";
+    ls -AlF $dirsflag $colorflag;
+}
+
 function lsd() {
-    dir="$1"
-    if [ "$dir" == "" ]; then
-        dir=.
+    local dir=.
+    if [ -n "$1" ]; then
+        dir="$1"
     fi
     find "$dir" -mindepth 1 -maxdepth 1 -type d
 }
@@ -233,13 +255,7 @@ function tre() {
 
 os=$(uname -s)
 
-if [ "$os" = "Linux" ]; then
-
-    # View HTTP traffic
-    alias sniff="sudo ngrep -d 'eth0' -t '^(GET|POST) ' 'tcp and port 80'"
-    alias httpdump="sudo tcpdump -i eth0 -n -s 0 -w -"
-
-elif [ "$os" = "Darwin" ]; then
+if [ "$os" = "Darwin" ]; then
 
     # `o` with no arguments opens the current directory, otherwise opens the given location
     function o() {
@@ -250,4 +266,13 @@ elif [ "$os" = "Darwin" ]; then
         fi;
     }
 
+    # cd to the path of the front Finder window
+    cdf() {
+        target=`osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as text)'`
+        if [ "$target" != "" ]; then
+            cd "$target"; pwd
+        else
+            echo 'No Finder window found' >&2
+        fi
+    }
 fi
