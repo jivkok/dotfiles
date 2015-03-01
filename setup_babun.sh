@@ -10,8 +10,9 @@ cd $HOME
 # dotfiles
 if [ -d dotfiles/.git ]; then
     cd dotfiles
-    git pull origin master
-    git submodule update --remote
+    git pull origin master --recurse-submodules
+    git submodule init
+    git submodule update --remote --recursive
     cd ..
 else
     if [ -d dotfiles ]; then
