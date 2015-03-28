@@ -33,6 +33,8 @@ else
 fi
 
 git config --global core.autocrlf input
+git config --global core.fscache true
+git config --global core.preloadindex true
 git config --global core.safecrlf true
 git config --global help.format html
 git config --global pack.packSizeLimit 2g
@@ -79,6 +81,7 @@ git config --global alias.lasttag 'describe --tags --abbrev=0'
 git config --global alias.lg 'log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short'
 git config --global alias.loglist 'log --oneline'
 git config --global alias.pick 'add -p'
+git config --global alias.pp 'pull --prune'
 git config --global alias.pullom 'pull origin master'
 git config --global alias.pushom 'push origin master'
 git config --global alias.re 'rebase'
