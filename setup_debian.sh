@@ -9,6 +9,7 @@ sudo apt-get install -y git
 sudo apt-get install -y git-extras
 sudo apt-get install -y gitk
 sudo apt-get install -y gitstats
+sudo apt-get install -y jq
 sudo apt-get install -y libwww-perl
 sudo apt-get install -y ngrep
 sudo apt-get install -y python-pygments

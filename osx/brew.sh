@@ -52,6 +52,7 @@ brew install gzip
 brew install hashpump
 brew install hydra
 brew install john
+brew install jq
 brew install knock
 brew install ngrep
 brew install nmap
