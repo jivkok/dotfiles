@@ -76,12 +76,13 @@ if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ]; then
     done
 
     # View HTTP traffic
-    local _interface=eth0
+    _interface=eth0
     if [ "$os" = "Darwin" ]; then
         _interface=en1
     fi
     alias sniff="sudo ngrep -d $_interface -t '^(GET|POST) ' 'tcp and port 80'"
     alias httpdump="sudo tcpdump -i $_interface -n -s 0 -w -"
+    unset _interface
 
 fi
 

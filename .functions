@@ -1,24 +1,25 @@
 # ls dirs flag
 if ls ~ --group-directories-first > /dev/null 2>&1; then
-    local dirsflag="--group-directories-first"
+    dirsflag="--group-directories-first"
 else
-    local dirsflag=""
+    dirsflag=""
 fi
 # ls color flag
 if ls --color ~ > /dev/null 2>&1; then
     # GNU
-    local colorflag="--color=auto"
+    colorflag="--color=auto"
 elif ls -G ~ > /dev/null 2>&1; then
     # OSX
-    local colorflag="-G"
+    colorflag="-G"
 else
-    local colorflag=""
+    colorflag=""
 fi
 
 function cdd () {
     cd "$1";
     ls -AlF $dirsflag $colorflag;
 }
+unset dirsflag colorflag
 
 function lsd() {
     local dir=.
