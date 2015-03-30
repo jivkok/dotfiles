@@ -21,7 +21,7 @@ The setup script will ask whether to run each of the optional steps.
 
 #### Option #1
 ```sh
-curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup-osx.sh | sh
+curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup_osx.sh | sh
 ```
 #### Option #2
 ```sh
@@ -29,7 +29,7 @@ cd $HOME
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" # Homebrew
 brew install git
 git clone https://github.com/jivkok/dotfiles.git dotfiles
-source dotfiles/setup-osx.sh
+source dotfiles/setup_osx.sh
 ```
 
 ### Customizations
@@ -68,14 +68,14 @@ The setup script will ask whether to run each of the optional steps.
 
 #### Option 1
 ```sh
-curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup-debian.sh | sh
+curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup_debian.sh | sh
 ```
 #### Option 2
 ```sh
 cd $HOME
 sudo apt-get install git
 git clone https://github.com/jivkok/dotfiles.git dotfiles
-source dotfiles/setup-debian.sh
+source dotfiles/setup_debian.sh
 ```
 
 
@@ -103,13 +103,13 @@ The setup script will ask whether to run each of the optional steps.
 
 #### Option 1
 ```sh
-curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup-babun.sh | sh
+curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup_babun.sh | sh
 ```
 #### Option 2
 ```sh
 cd $HOME
 git clone https://github.com/jivkok/dotfiles.git dotfiles
-source dotfiles/setup-babun.sh
+source dotfiles/setup_babun.sh
 ```
 
 
