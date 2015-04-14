@@ -92,9 +92,7 @@ if [ "$os" = "Linux" ]; then
     alias pkgget="sudo apt-get install"
     alias pkgremove="sudo apt-get remove"
     alias pkglist="sudo apt-cache pkgnames"
-    alias pkgupd="sudo apt-get update --fix-missing && sudo apt-get upgrade && sudo apt-get clean && sudo apt-get autoremove"
-
-elif [ "$os" = "Darwin" ]; then
+    alias pkgupd="sudo apt-get update --fix-missing && sudo apt-get dist-upgrade && sudo ap
 
     # Packages
     alias pkgfind="brew search"
