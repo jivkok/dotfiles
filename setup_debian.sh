@@ -3,6 +3,7 @@
 
 # Packages
 sudo apt-get update
+sudo apt-get install -y cifs-utils
 sudo apt-get install -y curl
 sudo apt-get install -y dstat
 sudo apt-get install -y git
@@ -12,6 +13,7 @@ sudo apt-get install -y gitstats
 sudo apt-get install -y jq
 sudo apt-get install -y libwww-perl
 sudo apt-get install -y ngrep
+sudo apt-get install -y python-pip
 sudo apt-get install -y python-pygments
 sudo apt-get install -y rlwrap
 sudo apt-get install -y tmux
