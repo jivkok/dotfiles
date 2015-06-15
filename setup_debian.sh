@@ -56,6 +56,9 @@ curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/c
 # Git
 [ -f ~/dotfiles/configure_git.sh ] && source ~/dotfiles/configure_git.sh
 
+# Python
+[ -f ~/dotfiles/configure_python.sh ] && source ~/dotfiles/configure_python.sh
+
 # ZSH
 read -p "Would you like to install and configure ZSH ? " -n 1 -r
 echo

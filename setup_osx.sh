@@ -56,6 +56,9 @@ ask_and_run dotfiles/osx/software.sh "Would you like to install additional softw
 # OSX tweaks
 ask_and_run dotfiles/osx/.osx "Would you like to set sensible OSX defaults? "
 
+# Configure Python
+ask_and_run dotfiles/configure_python.sh "Would you like to configure Python? "
+
 # Configure Git
 ask_and_run dotfiles/configure_git.sh "Would you like to configure Git? "
 
