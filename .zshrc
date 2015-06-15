@@ -54,10 +54,9 @@ export UPDATE_ZSH_DAYS=30
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
+plugins=(colored-man colorize encode64 httpie jsontools npm pip python rsync tmux tmuxinator urltools zsh-syntax-highlighting)
 if [[ "$OSTYPE" = darwin* ]]; then
-    plugins=(colored-man colorize rsync zsh-syntax-highlighting brew osx xcode)
-else
-    plugins=(colored-man colorize rsync zsh-syntax-highlighting)
+    plugins=("${plugins[@]}" brew osx pod xcode)
 fi
 
 # User configuration
