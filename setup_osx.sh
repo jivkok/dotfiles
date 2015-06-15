@@ -68,4 +68,7 @@ ask_and_run dotfiles/configure_sublimetext.sh "Would you like to configure Subli
 # Configure Alfred workflows
 ask_and_run dotfiles/osx/alfred.sh "Would you like to configure Alfred workflows? "
 
+# Configure DotNet
+ask_and_run dotfiles/osx/dotnet.sh "Would you like to configure DotNet? "
+
 echo "Done"
