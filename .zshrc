@@ -68,8 +68,9 @@ source $ZSH/oh-my-zsh.sh
 set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
 
-# Load the shell dotfiles, (~/.bash_extra can be used for any local settings you don’t want to commit)
-for file in ~/{.zsh-theme,.aliases,.functions,.extra,dotfiles/submodules/z/z.sh}; do
+# Load the shell dotfiles
+#   ~/.profile_extra can be used for any local settings you don’t want to commit
+for file in ~/{.zsh-theme,.aliases,.functions,.profile_extra,dotfiles/submodules/z/z.sh}; do
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
