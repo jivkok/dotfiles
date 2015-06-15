@@ -70,9 +70,9 @@ fi
 read -p "Would you like to install and configure SublimeText ? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    sudo add-apt-repository ppa:webupd8team/sublime-text-2
+    sudo add-apt-repository ppa:webupd8team/sublime-text-3
     sudo apt-get update
-    sudo apt-get install -y sublime-text
+    sudo apt-get install -y sublime-text-installer
     [ -f ~/dotfiles/configure_sublimetext.sh ] && source ~/dotfiles/configure_sublimetext.sh
 fi
 
