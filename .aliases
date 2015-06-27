@@ -7,9 +7,20 @@ alias -- -="cd -"
 # Directories
 alias md="mkdir"
 alias rd="rm -rf"
-alias du='du -h $* | sort -h -r'
 alias tree2='tree -A -C -L 2 --dirsfirst'
 alias tree2a='tree -a -A -C -L 2 --dirsfirst'
+if echo zzz | sort -h > /dev/null 2>&1; then
+    dushow="-h"
+    dusort="-h"
+else
+    dushow=""
+    dusort="-n"
+fi
+alias dud="du $dushow -d 1 | sort $dusort -r"
+alias dud2="du $dushow -d 2 | sort $dusort -r"
+alias dud3="du $dushow -d 3 | sort $dusort -r"
+alias dud4="du $dushow -d 4 | sort $dusort -r"
+alias ducks='du -cks * | sort -n -r | head -n 30'
 
 # Shortcuts
 alias g="git"
@@ -88,6 +99,7 @@ fi
 
 if [ "$os" = "Linux" ]; then
 
+    # Packages
     alias pkgfind="sudo apt-cache search"
     alias pkgget="sudo apt-get install"
     alias pkgremove="sudo apt-get remove"
