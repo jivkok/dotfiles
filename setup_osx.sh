@@ -56,8 +56,11 @@ ask_and_run dotfiles/osx/software.sh "Would you like to install additional softw
 # OSX tweaks
 ask_and_run dotfiles/osx/.osx "Would you like to set sensible OSX defaults? "
 
-# Configure Python
-ask_and_run dotfiles/configure_python.sh "Would you like to configure Python? "
+# Python
+ask_and_run dotfiles/configure_python.sh "Would you like to configure Python and install Python packages? "
+
+# Ruby
+ask_and_run dotfiles/configure_ruby.sh "Would you like to configure Ruby and install Ruby packages? "
 
 # Configure Git
 ask_and_run dotfiles/configure_git.sh "Would you like to configure Git? "
@@ -65,13 +68,13 @@ ask_and_run dotfiles/configure_git.sh "Would you like to configure Git? "
 # ZSH
 ask_and_run dotfiles/configure_zsh.sh "Would you like to configure Zsh? "
 
-# Configure SublimeText
+# SublimeText
 ask_and_run dotfiles/configure_sublimetext.sh "Would you like to configure SublimeText? "
 
-# Configure Alfred workflows
+# Alfred workflows
 ask_and_run dotfiles/osx/alfred.sh "Would you like to configure Alfred workflows? "
 
-# Configure DotNet
+# DotNet
 ask_and_run dotfiles/osx/dotnet.sh "Would you like to configure DotNet? "
 
 echo "Done"

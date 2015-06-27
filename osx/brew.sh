@@ -92,7 +92,3 @@ brew install node
 
 # Remove outdated versions from the cellar.
 brew cleanup
-
-# More packages
-sudo gem install cocoapods
-sudo gem install tmuxinator
