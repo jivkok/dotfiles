@@ -1,6 +1,20 @@
 #!/bin/bash
 # Configuring Linux environment (Debian-style)
 
+# $1 - file
+# $2 - message
+function ask_and_run ()
+{
+    if [ ! -f $1 ]; then return; fi
+    read -p "$2" -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then return; fi
+
+    source $1
+
+    return
+}
+
 # Packages
 sudo apt-get update
 sudo apt-get install -y cifs-utils
@@ -63,11 +77,10 @@ curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/c
 [ -f ~/dotfiles/configure_ruby.sh ] && source ~/dotfiles/configure_ruby.sh
 
 # ZSH
-read -p "Would you like to install and configure ZSH ? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    source ~/dotfiles/configure_zsh.sh
-fi
+ask_and_run dotfiles/configure_zsh.sh "Would you like to install and configure ZSH ? "
+
+# Vim
+ask_and_run dotfiles/configure_vim.sh "Would you like to install and configure Vim ? "
 
 # SublimeText
 read -p "Would you like to install and configure SublimeText ? " -n 1 -r

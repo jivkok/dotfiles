@@ -68,6 +68,9 @@ ask_and_run dotfiles/configure_git.sh "Would you like to configure Git? "
 # ZSH
 ask_and_run dotfiles/configure_zsh.sh "Would you like to configure Zsh? "
 
+# Vim
+ask_and_run dotfiles/configure_vim.sh "Would you like to configure Vim? "
+
 # SublimeText
 ask_and_run dotfiles/configure_sublimetext.sh "Would you like to configure SublimeText? "
 
