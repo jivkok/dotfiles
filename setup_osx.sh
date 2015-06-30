@@ -42,7 +42,7 @@ ln -sf dotfiles/.bashrc .
 ln -sf dotfiles/.exports .
 ln -sf dotfiles/.functions .
 ln -sf dotfiles/.tmux.conf .
-ln -sf dotfiles/.vimrc .
+ln -sf dotfiles/.vim/.vimrc .
 ln -sf dotfiles/.wgetrc .
 ln -sf dotfiles/osx/.duti .
 curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
