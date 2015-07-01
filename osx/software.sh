@@ -18,6 +18,7 @@ brew cask install google-chrome
 brew cask install firefox
 
 # development
+brew cask install atom # code/text editor
 brew cask install filezilla # file transfer
 brew cask install dash # documentation sets
 brew cask install gimp # imaging
@@ -41,13 +42,16 @@ brew cask install dropbox # files sync
 brew cask install evernote # notes sync
 brew cask install hermes # Pandora.com
 brew cask install keepassx # passwords sync
+brew cask install mplayer-osx-extended # media
+brew cask install pacifist # OSX package files extractor
 brew cask install private-eye # network monitor
 brew cask install remote-desktop-connection # Windows connectivity
 brew cask install skype # chat
 brew cask install spectacle # window management
 brew cask install superduper # disk duplication
 # brew cask install teamviewer # remote sharing
-brew cask install wireshark # network monitor
+brew cask install xquartz # X11
+brew cask install wireshark # network monitor, depends on xquartz
 
 # setup
 brew cask alfred link
