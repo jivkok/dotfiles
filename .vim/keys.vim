@@ -18,12 +18,12 @@ map <silent> <leader><cr> :noh<cr>
 " Buffers
 nmap <F3> :bp<cr> " Previous (F3)
 nmap <F4> :bn<cr> " Next (F4)
-map <leader>bd :Bclose<cr> " Close
+map <leader>bc :close<cr> " Close
 " Switch CWD to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>:pwd<cr>
 
 " Tabs
-nmap <Leader>tt :tabnew<cr>
+nmap <Leader>tn :tabnew<cr>
 nmap <Leader>tc :tabclose<cr>
 " Opens new tab with the current buffer's tab
 map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
