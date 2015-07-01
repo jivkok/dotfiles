@@ -30,6 +30,7 @@ sudo apt-get install -y ngrep
 sudo apt-get install -y python-pip
 sudo apt-get install -y python-pygments
 sudo apt-get install -y rlwrap
+sudo apt-get install -y silversearcher-ag
 sudo apt-get install -y tmux
 sudo apt-get install -y tree
 sudo apt-get install -y vim
