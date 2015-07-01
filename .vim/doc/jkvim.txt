@@ -1,0 +1,225 @@
+*jkvim.txt*                 Jivko's Vim Reference
+*jkvim*
+
+                   _ _       _                    _                          ~
+                 (_|_)_   _| | _____      __   _(_)_ __ ___                  ~
+                 | | \ \ / / |/ / _ \ ____\ \ / / | '_ ` _ \                 ~
+                 | | |\ V /|   < (_) |_____\ V /| | | | | | |                ~
+                _/ |_| \_/ |_|\_\___/       \_/ |_|_| |_| |_|                ~
+               |__/                                                          ~
+                                                                             ~
+==============================================================================
+CONTENTS                                                  *jkvim-contents*
+
+   01. Intro ............................................. |jkvim-summary|
+   02. Commands ......................................... |jkvim-commands|
+   03. Plugins ........................................... |jkvim-plugins|
+
+==============================================================================
+SUMMARY                                                    *jkvim-summary*
+
+Cheat-sheet for all vim-related.
+
+==============================================================================
+COMMANDS                                                  *jkvim-commands*
+
+Lists frequently used commands and shortcuts.
+NOTE: custom shortcuts are shown as surrounded with parentheses.
+Leader key: comma (,)
+
+=== Misc
+:h :help some_topic
+:q :quit Ctrl-W_q - quits current window
+(,ss) - strip trailing whitespace
+
+=== Buffers/Files
+:e :edit            - opens file for editing
+:w :write (,w)      - writes buffer to file
+(,W)                - save file as root
+:bp :bprevious (F3) - previous buffer
+:bn :bnext (F4)     - next buffer
+
+=== Windows - Ctrl-W
+:new Ctrl-W_n        - creates new window and starts editing empty file
+:c :close Ctrl-W_q   - closes current window
+:sp :split Ctrl-W_s  - split current window in two, horizontally
+:vs :vsplit Ctrl-W_v - split current window in two, vertically
+Ctrl-W_arrows        - moves between windows
+(,cd)                - Switch CWD to the directory of the open buffer
+
+=== Tabs
+:tabnew (,tn)
+:tabclose (,tc)
+:tabedit (,te)
+:tabp (F3) - previous tab
+:tabn (F$) - next tab
+
+Searching
+/
+n - next match
+N - previous match
+:%s/SSS/RRR/g - searches SSS and replaces it with RRR
+(*) (#) - searches for current selection and highlights matches
+(,) - un-highlights previous matches
+
+==============================================================================
+PLUGINS                                                    *jkvim-plugins*
+
+Describes used plugins and their behaviors / shortcuts
+
+=== Plugin manager
+
+=== Vundle
+:h vundle
+:PluginInstall - installs plugins configured in the .vimrc
+:PluginInstall plugin_1 plugin_2 - installs specific plugins
+:PluginInstall! :PluginUpdate - updates plugins
+:PluginSearch foo - searches for foo in Vim Scripts (http://vim-scripts.org/vim/scripts.html)
+:PluginList - Displays a list of installed bundles.
+
+=== UI
+
+=== vim-startify
+Start screen with MRUs, sessions, bookmarks, etc.
+:h startify-options
+:h startify-commands
+:Startify - shows the startup screen again
+:SLoad    - load a session
+:SSave    - save a session
+:SDelete  - delete a session
+
+=== vimux
+tmux integration, runs shell commands
+:help vimux
+
+=== vim-airline
+status line
+:h airline
+:AirlineToggle
+:AirlineRefresh
+
+=== vim-gitgutter
+git diff in the gutter and stages/reverts hunks
+Features:
+* Shows signs for added, modified, and removed lines.
+* Ensures signs are always as up to date as possible (but without running more than necessary).
+* Quick jumping between blocks of changed lines ("hunks").
+* Stage/revert/preview individual hunks.
+* Optional line highlighting.
+* Fully customisable (signs, sign column, line highlights, mappings, extra git-diff arguments, etc).
+* Can be toggled on/off.
+* Preserves signs from other plugins.
+* Easy to integrate diff stats into status line; built-in integration with vim-airline.
+Help:
+:h gitgutter
+:h GitGutterCommands
+Usage:
+:GitGutterDisable :GitGutterEnable :GitGutterToggle
+:GitGutterSignsEnable :GitGutterSignsDisable :GitGutterSignsToggle
+:GitGutterLineHighlightsEnable :GitGutterLineHighlightsDisable :GitGutterLineHighlightsToggle (,ht)
+:GitGutterNextHunk (]c) - jump to next change
+:GitGutterPrevHunk ([c) - jump to next change
+:GitGutterStageHunk (,hs) - stage the hunk
+:GitGutterRevertHunk (,hr) - revert the hunk
+:GitGutterPreviewHunk (,hp) - preview hunk's changes
+
+=== Editing
+
+=== snipmate.vim
+snippets mgmt for various languages
+:h snipMate
+
+=== vim-table-mode
+tables creation
+:h table-mode.txt
+
+=== tabular
+text alignment
+:h tabular
+:Tabularize
+
+=== Buffers/files
+
+=== ctrlp.vim
+Full path fuzzy file, buffer, mru, tag, ... finder
+Basic Usage
+* Run :CtrlP or :CtrlP [starting-directory] to invoke CtrlP in find file mode.
+* Run :CtrlPBuffer or :CtrlPMRU to invoke CtrlP in find buffer or find MRU file mode.
+* Run :CtrlPMixed to search in Files, Buffers and MRU files at the same time.
+* Check :help ctrlp-commands and :help ctrlp-extensions for other commands.
+Once CtrlP is open:
+* Press <F5> to purge the cache for the current directory to get new files, remove deleted files and apply new ignore options.
+* Press <c-f> and <c-b> to cycle between modes.
+* Press <c-d> to switch to filename only search instead of full path.
+* Press <c-r> to switch to regexp mode.
+* Use <c-j>, <c-k> or the arrow keys to navigate the result list.
+* Use <c-t> or <c-v>, <c-x> to open the selected entry in a new tab or in a new split.
+* Use <c-n>, <c-p> to select the next/previous string in the prompt's history.
+* Use <c-y> to create a new file and its parent directories.
+* Use <c-z> to mark/unmark multiple files and <c-o> to open them.
+Run :help ctrlp-mappings or submit ? in CtrlP for more mapping help.
+* Submit two or more dots .. to go up the directory tree by one or multiple levels.
+* End the input string with a colon : followed by a command to execute it on the opening file(s):
+  - Use :25 to jump to line 25.
+  - Use :diffthis when opening multiple files to run :diffthis on the first 4 files.
+
+=== nerdtree
+File tree explorer
+:h NERDTree
+:h NERDTreeBookmarkCommands
+:h NERDTreeMappings
+:NERDTreeToggle (F5) (,nt) - toggles the explorer on/off
+:NERDTree /home/marty/vim7/src
+:NERDTree foo   (foo is the name of a bookmark)
+:NERDTreeCWD - Change tree root to current directory
+
+=== vim-scratch
+Temporary scratch buffers
+:Scratch  - open/edit the scratch buffer
+:Sscratch - open the scratch buffer in a new split window
+
+=== Code checking and formatting
+
+=== syntastic
+syntax checking
+:h syntastic
+:h syntastic-commands
+:Errors
+:SyntasticCheck
+:SyntasticInfo
+:SyntasticReset
+
+=== nerdcommenter
+comments mgmt
+:h NERDCommenter
+:h NERDComFunctionalitySummary
+:h NERDComToggleComment
+(,cc) - comments block
+(,cu) - uncomments block
+(,cm) - uses multipart delimiters if possible - as in /* ... */
+(,ci) - inverts the comment state
+(,cl) (,cr) - left/right alligned comments
+
+=== Misc
+
+=== ag.vim
+Plugin for the_silver_searcher 'ag' - code-searching tool
+:h ag.txt
+:Ag[!] [options] {pattern} [{directory}]
+:AgBuffer[!] [options] {pattern}
+:AgFile [options] {pattern} [{directory}]
+:AgHelp[!] [options] {pattern}
+Mappings:
+* e                   open file and close the quickfix window.
+* o                   open file (same as enter).
+* go                  preview file (open but maintain focus on ag.vim results).
+* t                   open in a new tab.
+* T                   open in new tab silently.
+* h                   open in horizontal split.
+* H                   open in horizontal split silently.
+* v                   open in vertical split.
+* gv                  open in vertical split silently.
+* q                   close the quickfix window.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
