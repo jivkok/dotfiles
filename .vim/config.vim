@@ -1,6 +1,6 @@
 " config.vim
 
-" Basic ---------------------------------------------------------------
+" Basic -------------------------------------------------------------
 syntax on                 " Enable syntax highlighting
 set encoding=utf-8 nobomb " Use UTF-8 without BOM
 set visualbell t_vb=      " Turn off bell: most annoying default ever created
@@ -20,6 +20,7 @@ set showmatch             " Briefly jump to matching bracket when inserted
 set number                " Enable line numbers
 set laststatus=2          " Always show status line
 set ruler                 " Show the cursor position
+set nowrap                " Do not wrap long lines
 set shortmess=atI         " Don’t show the intro message when starting Vim
 set lcs=tab:▸\ ,trail:·,nbsp:_ " Show “invisible” characters. set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
 set list
@@ -32,6 +33,7 @@ set noswapfile            " Not much need for swapfiles in the 21st century
 set nojoinspaces          " Use only one space after period when joining lines
 set ttyfast               " Optimize for fast terminal connections
 set mouse=a               " Enable mouse in all modes
+set confirm               " If command requires saved file, raise a dialog when unsaved changes exist
 
 " Editor --------------------------------------------------------------------
 set backspace=indent,eol,start " Allow backspace in insert mode
@@ -40,8 +42,6 @@ set binary
 set nostartofline         " Don’t reset cursor to start of line when moving around.
 set noerrorbells          " Disable error bells
 set scrolloff=3           " Start scrolling three lines before the horizontal window border
-set modeline              " Respect modeline in files
-set modelines=4
 set exrc                  " Enable per-directory .vimrc files
 set secure                " Disable unsafe commands in .vimrc files
 
@@ -64,7 +64,10 @@ set hlsearch              " Highlight searches
 set incsearch             " Show first search result as query is typed
 set gdefault              " Add the g flag to search/replace by default
 
-" Backups, swapfiles, and undo ------------------------------------------------
+" Files and buffers ------------------------------------------------------------
+set hidden                " Allows switching between buffers while they are unsaved
+
+" Backups, swapfiles, and undo -------------------------------------------------
 set backupdir=~/.vim/backups
 set directory=~/.vim/swaps
 if exists("&undodir")

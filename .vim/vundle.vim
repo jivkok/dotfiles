@@ -17,18 +17,24 @@ Plugin 'gmarik/Vundle.vim'
 " Plugin bundles --------------------------------------------------------------
 
 " UI
-Plugin 'mhinz/vim-startify'
+Plugin 'mhinz/vim-startify' " Start screen with MRUs, sessions, bookmarks, etc.
+Plugin 'benmills/vimux' " tmux integration, runs shell commands
 
-" Behaviors
+" Editing
+Plugin 'msanders/snipmate.vim' " snippets mgmt for various languages
+Plugin 'dhruvasagar/vim-table-mode' " tables creation
+Plugin 'godlygeek/tabular' " text alignment
+"Plugin 'tpope/vim-surround' " surroundings: parentheses, brackets, quotes, XML tags, and more
+"Plugin 'mattn/emmet-vim' " HTML/CSS high-speed coding
+"Plugin 'davidhalter/jedi-vim' " Python autocompletion
 
 " Buffers/files
 Plugin 'duff/vim-scratch'
 Plugin 'scrooloose/nerdtree'
 
-" Language syntax
-
 " Code checking and formatting
-
+Plugin 'scrooloose/syntastic' " syntax checking
+Plugin 'scrooloose/nerdcommenter' " comments mgmt
 
 " No plugins below this line --------------------------------------------------
 call vundle#end()
