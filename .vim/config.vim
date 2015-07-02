@@ -6,11 +6,10 @@ set encoding=utf-8 nobomb " Use UTF-8 without BOM
 set visualbell t_vb=      " Turn off bell: most annoying default ever created
 
 " UI ---------------------------------------------------------------
-" Use the Solarized Dark theme
 set background=dark
 if filereadable(expand("~/.vim/colors/solarized.vim"))
-    colorscheme solarized
     let g:solarized_termtrans=1
+    colorscheme solarized
 endif
 set title                 " Show the filename in the window titlebar
 set cursorline            " Highlight the line the cursor is on
@@ -66,6 +65,20 @@ set gdefault              " Add the g flag to search/replace by default
 
 " Files and buffers ------------------------------------------------------------
 set hidden                " Allows switching between buffers while they are unsaved
+
+" Folding ----------------------------------------------------------------------
+set foldmethod=syntax
+set foldlevelstart=20
+set foldcolumn=1
+let g:vim_markdown_folding_disabled=1 " Markdown
+let javaScript_fold=1                 " JavaScript
+let perl_fold=1                       " Perl
+let php_folding=1                     " PHP
+let r_syntax_folding=1                " R
+let ruby_fold=1                       " Ruby
+let sh_fold_enabled=1                 " sh
+let vimsyn_folding='af'               " Vim script
+let xml_syntax_folding=1              " XML
 
 " Backups, swapfiles, and undo -------------------------------------------------
 set backupdir=~/.vim/backups
