@@ -21,11 +21,16 @@ Plugin 'mhinz/vim-startify' " Start screen with MRUs, sessions, bookmarks, etc.
 Plugin 'benmills/vimux' " tmux integration, runs shell commands
 Plugin 'bling/vim-airline' " status line
 Plugin 'airblade/vim-gitgutter' " git diff in the gutter and stages/reverts hunks
+Plugin 'tpope/vim-fugitive' " Git wrapper
+Plugin 'sheerun/vim-polyglot' " collection of language packs - syntax, indent, ftdetect
 
 " Editing
 Plugin 'msanders/snipmate.vim' " snippets mgmt for various languages
+Plugin 'Valloric/YouCompleteMe' " code-completion engine
 Plugin 'dhruvasagar/vim-table-mode' " tables creation
 Plugin 'godlygeek/tabular' " text alignment
+Plugin 'vim-scripts/ZoomWin' " Zoom in/out of windows (toggle between one window and multi-window)
+Plugin 'terryma/vim-multiple-cursors' " multiple selections
 "Plugin 'tpope/vim-surround' " surroundings: parentheses, brackets, quotes, XML tags, and more
 "Plugin 'mattn/emmet-vim' " HTML/CSS high-speed coding
 "Plugin 'davidhalter/jedi-vim' " Python autocompletion
@@ -38,6 +43,7 @@ Plugin 'scrooloose/nerdtree' " File tree explorer
 " Code checking and formatting
 Plugin 'scrooloose/syntastic' " syntax checking
 Plugin 'scrooloose/nerdcommenter' " comments mgmt
+Plugin 'majutsushi/tagbar' " class outline viewer
 
 " Misc
 Plugin 'rking/ag.vim' " Vim plugin for the_silver_searcher 'ag' - code-searching tool

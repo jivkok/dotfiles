@@ -18,7 +18,7 @@ map <silent> <leader><cr> :noh<cr>
 " Buffers
 nmap <F3> :bp<cr> " Previous (F3)
 nmap <F4> :bn<cr> " Next (F4)
-map <leader>bc :close<cr> " Close
+map <leader>bd :bd<cr> " Close
 " Switch CWD to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>:pwd<cr>
 

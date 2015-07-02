@@ -54,13 +54,25 @@ Ctrl-W_arrows        - moves between windows
 :tabp (F3) - previous tab
 :tabn (F$) - next tab
 
-Searching
+=== Searching
 /
 n - next match
 N - previous match
 :%s/SSS/RRR/g - searches SSS and replaces it with RRR
 (*) (#) - searches for current selection and highlights matches
 (,) - un-highlights previous matches
+
+=== Folding
+zc - close a fold
+zo - open a fold
+za - toggle a fold
+zC, zO, zA - same as above but operating on all folding levels
+zr - open one more level of folds throughout the buffer
+zR - open all folds
+zm - close one more lovel of folds throughout the buffer
+zM - close all folds
+zx - fixup current fold if it is broken for some reason
+zX - fixup all folds
 
 ==============================================================================
 PLUGINS                                                    *jkvim-plugins*
@@ -123,6 +135,17 @@ Usage:
 :GitGutterRevertHunk (,hr) - revert the hunk
 :GitGutterPreviewHunk (,hp) - preview hunk's changes
 
+=== vim-fugitive
+Git wrapper
+Custom mappings:
+:Gstatus (,gs)
+:Gcommit (,gc)
+(,ga) - adds everything and commits
+:Gblame (,gb)
+More help:
+:h fugitive
+:h Gstatus - for more keys during the status message
+
 === Editing
 
 === snipmate.vim
@@ -137,6 +160,19 @@ tables creation
 text alignment
 :h tabular
 :Tabularize
+
+=== ZoomWin
+Zoom in/out of windows (toggle between one window and multi-window)
+:ZoomWin <c-w>o : toggles the current window zooms into a full screen or the original set of windows
+
+=== vim-multiple-cursors
+Multiple selections
+:h multiple-cursors-usage
+Mappings:
+C-n - pressing it selects the current word. Pressing it again finds the next matching occurence and selects it.
+Note: If selection already exists prior to pressing C-n for the first time, it will be used instead.
+C-p - removes the current virtual cursor and go back to the previous one - useful for uno-ing actions.
+C-x - remove the current virtual cursor and skip to the next one.
 
 === Buffers/files
 
@@ -170,8 +206,48 @@ File tree explorer
 :h NERDTreeMappings
 :NERDTreeToggle (F5) (,nt) - toggles the explorer on/off
 :NERDTree /home/marty/vim7/src
-:NERDTree foo   (foo is the name of a bookmark)
+:NERDTree foo - roots the tree at foo (foo is the name of a bookmark)
+:NERDTreeFind - Find the current file in the tree
 :NERDTreeCWD - Change tree root to current directory
+Bookmarks:
+:Bookmark <name> - bookmark the current node as <name>
+:OpenBookmark <bookmark> - opens the bookmark - it must be a file
+:ClearBookmarks [<bookmarks>]
+:ClearAllBookmarks
+Mappings:
+:NERDTreeMapActivateNode (o,<cr>,mouse-click) - Open files, directories and bookmarks
+go - Open selected file, but leave cursor in the NERDTree
+:NERDTreeMapOpenInTab (t) - Open selected node/bookmark in a new tab
+:NERDTreeMapOpenInTabSilent (T) - Same as 't' but keep the focus on the current tab
+:NERDTreeMapOpenSplit (i) - Open selected file in a split window
+(gi) - Same as i, but leave the cursor on the NERDTree
+:NERDTreeMapOpenVSplit (s) - Open selected file in a new vsplit
+(gs) - Same as s, but leave the cursor on the NERDTree
+:NERDTreeMapOpenRecursively (O) - Recursively open the selected directory
+:NERDTreeMapCloseDir (x) - Close the current nodes parent
+:NERDTreeMapCloseChildren (X) - Recursively close all children of the current node
+:NERDTreeMapDeleteBookmark (D) - Delete the current bookmark
+:NERDTreeMapJumpRoot (P) - Jump to the root node
+:NERDTreeMapJumpParent (p) - Jump to current nodes parent
+:NERDTreeMapJumpFirstChild (K) - Jump up inside directories at the current tree depth
+:NERDTreeMapJumpLastChild (J) - Jump down inside directories at the current tree depth
+:NERDTreeMapJumpNextSibling <C-j>.-.Jump down to the next sibling of the current directory
+:NERDTreeMapJumpPrevSibling <C-k>.-.Jump up to the previous sibling of the current directory
+:NERDTreeMapChangeRoot (C) - Change the tree root to the selected dir
+:NERDTreeMapUpdir (u) - Move the tree root up one directory
+:NERDTreeMapUpdirKeepOpen (U) - Same as 'u' except the old root node is left open
+:NERDTreeMapRefresh (r) - Recursively refresh the current directory
+:NERDTreeMapRefreshRoot (R) - Recursively refresh the current root
+:NERDTreeMapMenu (m) - Display the NERD tree menu - copy/move directories/files
+:NERDTreeMapChdir (cd) - Change the CWD to the dir of the selected node
+:NERDTreeMapCWD (CD) - Change tree root to the CWD
+:NERDTreeMapToggleHidden (I) - Toggle whether hidden files displayed
+:NERDTreeMapToggleFilters (f) - Toggle whether the file filters are used
+:NERDTreeMapToggleFiles (F) - Toggle whether files are displayed
+:NERDTreeMapToggleBookmarks (B) - Toggle whether the bookmark table is displayed
+:NERDTreeMapQuit (q) - Close the NERDTree window
+:NERDTreeMapToggleZoom (A) - Zoom (maximize/minimize) the NERDTree window
+:NERDTreeMapHelp (?) - Toggle the display of the quick help
 
 === vim-scratch
 Temporary scratch buffers
@@ -200,6 +276,35 @@ comments mgmt
 (,ci) - inverts the comment state
 (,cl) (,cr) - left/right alligned comments
 
+=== Tagbar
+Class outline viewer
+:h tagbar
+:h tagbar-usage
+:TagbarToggle (F8)
+:TagbarTogglePause - Freezes/Unfreezes the Tagbar window. Stops the contents of the window from changing when a different source file is selected.
+Mappings:
+:tagbar_map_help <F1>/? - Display key mapping help.
+:tagbar_map_jump <cr>/<Enter> - Jump to the tag under the cursor
+:tagbar_map_preview (p) - Jump to the tag under the cursor, but stay in the Tagbar window
+:tagbar_map_previewwin (P) - Open the tag in a preview-window
+<LeftMouse> - When on a fold icon, open or close the fold depending on the current state
+<2-LeftMouse> Same as <CR>. See |g:tagbar_singleclick| if you want to use a single - instead of a double-click.
+:tagbar_map_nexttag <C-N> - Go to the next top-level tag.
+:tagbar_map_prevtag <C-P> - Go to the previous top-level tag.
+:tagbar_map_showproto <Space> - Display the prototype of the current tag (i.e. the line defining it) in the command line.
+:tagbar_map_hidenonpublic (v) - Hide tags that are declared non-public. Tags without any visibility information will still be shown.
+:tagbar_map_openfold (+/zo) - Open the fold under the cursor.
+:tagbar_map_closefold (-/zc) - Close the fold under the cursor or the current one if there is no fold under the cursor.
+:tagbar_map_togglefold (o/za) - Toggle the fold under the cursor or the current one if there is no fold under the cursor.
+:tagbar_map_openallfolds (*/zR) - Open all folds by setting foldlevel to 99.
+:tagbar_map_closeallfolds (=/zM) - Close all folds by setting foldlevel to 0.
+:tagbar_map_nextfold (zj) - Go to the start of the next fold, like the standard Vim |zj|.
+:tagbar_map_prevfold (zk) - Go to the end of the previous fold, like the standard Vim |zk|.
+:tagbar_map_togglesort (s) - Toggle sort order between name and file order.
+:tagbar_map_toggleautoclose (c) - Toggle the |g:tagbar_autoclose| option.
+:tagbar_map_zoomwin (x) - Toggle zooming the window.
+:tagbar_map_close (q) - Close the Tagbar window.
+
 === Misc
 
 === ag.vim
@@ -210,16 +315,16 @@ Plugin for the_silver_searcher 'ag' - code-searching tool
 :AgFile [options] {pattern} [{directory}]
 :AgHelp[!] [options] {pattern}
 Mappings:
-* e                   open file and close the quickfix window.
-* o                   open file (same as enter).
-* go                  preview file (open but maintain focus on ag.vim results).
-* t                   open in a new tab.
-* T                   open in new tab silently.
-* h                   open in horizontal split.
-* H                   open in horizontal split silently.
-* v                   open in vertical split.
-* gv                  open in vertical split silently.
-* q                   close the quickfix window.
+e - open file and close the quickfix window.
+o - open file (same as enter).
+go- preview file (open but maintain focus on ag.vim results).
+t - open in a new tab.
+T - open in new tab silently.
+h - open in horizontal split.
+H - open in horizontal split silently.
+v - open in vertical split.
+gv- open in vertical split silently.
+q - close the quickfix window.
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:
