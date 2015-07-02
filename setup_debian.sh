@@ -20,6 +20,7 @@ sudo apt-get update
 sudo apt-get install -y cifs-utils
 sudo apt-get install -y curl
 sudo apt-get install -y dstat
+sudo apt-get install -y exuberant-ctags
 sudo apt-get install -y git
 sudo apt-get install -y git-extras
 sudo apt-get install -y gitk
