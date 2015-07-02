@@ -44,6 +44,8 @@ brew install bfg
 brew install binutils
 brew install binwalk
 brew install cifer
+brew install cmake
+brew install ctags
 brew install dex2jar
 brew install dns2tcp
 brew install fcrackzip
@@ -54,6 +56,7 @@ brew install hydra
 brew install john
 brew install jq
 brew install knock
+brew install macvim
 brew install ngrep
 brew install nmap
 brew install pngcheck
