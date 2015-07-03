@@ -31,6 +31,7 @@ Plugin 'dhruvasagar/vim-table-mode' " tables creation
 Plugin 'godlygeek/tabular' " text alignment
 Plugin 'vim-scripts/ZoomWin' " Zoom in/out of windows (toggle between one window and multi-window)
 Plugin 'terryma/vim-multiple-cursors' " multiple selections
+Plugin 'easymotion/vim-easymotion' " motions - mark all words on a screen and then allow one-key-press to jump to any of them
 "Plugin 'tpope/vim-surround' " surroundings: parentheses, brackets, quotes, XML tags, and more
 "Plugin 'mattn/emmet-vim' " HTML/CSS high-speed coding
 "Plugin 'davidhalter/jedi-vim' " Python autocompletion
