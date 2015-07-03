@@ -79,6 +79,7 @@ PLUGINS                                                    *jkvim-plugins*
 
 Describes used plugins and their behaviors / shortcuts
 
+
 === Plugin manager
 
 === Vundle
@@ -88,6 +89,7 @@ Describes used plugins and their behaviors / shortcuts
 :PluginInstall! :PluginUpdate - updates plugins
 :PluginSearch foo - searches for foo in Vim Scripts (http://vim-scripts.org/vim/scripts.html)
 :PluginList - Displays a list of installed bundles.
+
 
 === UI
 
@@ -146,6 +148,7 @@ More help:
 :h fugitive
 :h Gstatus - for more keys during the status message
 
+
 === Editing
 
 === snipmate.vim
@@ -173,6 +176,40 @@ C-n - pressing it selects the current word. Pressing it again finds the next mat
 Note: If selection already exists prior to pressing C-n for the first time, it will be used instead.
 C-p - removes the current virtual cursor and go back to the previous one - useful for uno-ing actions.
 C-x - remove the current virtual cursor and skip to the next one.
+
+=== EasyMotion
+Speedy moving within the page text
+:h easymotion
+Example usage:
+    Start with:
+        <cursor>Lorem ipsum dolor sit amet.
+    Type <Leader><Leader>w to trigger the word motion w. When the motion is triggered, the text is updated (no braces are actually added, the text is highlighted in red by default):
+        <cursor>Lorem {a}psum {b}olor {c}it {d}met.
+    Press c to jump to the beginning of the word "sit":
+        Lorem ipsum dolor <cursor>sit amet.
+    Similarly, if you're looking for an "o", you can use the f motion. Type <Leader><Leader>fo, and all "o" characters are highlighted:
+        <cursor>L{a}rem ipsum d{b}l{c}r sit amet.
+    Press b to jump to the second "o":
+        Lorem ipsum d<cursor>olor sit amet.
+Mappings:
+    <Leader><Leader>f{char} | Find {char} to the right
+    <Leader><Leader>F{char} | Find {char} to the left
+    <Leader><Leader>s{char} | Find(Search) {char} forward and backward.
+    <Leader><Leader>t{char} | Till before the {char} to the right
+    <Leader><Leader>T{char} | Till after the {char} to the left
+    <Leader><Leader>w       | Beginning of word forward
+    <Leader><Leader>W       | Beginning of WORD forward
+    <Leader><Leader>b       | Beginning of word backward
+    <Leader><Leader>B       | Beginning of WORD backward
+    <Leader><Leader>e       | End of word forward
+    <Leader><Leader>E       | End of WORD forward
+    <Leader><Leader>ge      | End of word backward.
+    <Leader><Leader>gE      | End of WORD backward.
+    <Leader><Leader>j       | Line downward
+    <Leader><Leader>k       | Line upward
+    <Leader><Leader>n       | Jump to latest "/" or "?" forward
+    <Leader><Leader>N       | Jump to latest "/" or "?" backward
+
 
 === Buffers/files
 
@@ -304,6 +341,7 @@ Mappings:
 :tagbar_map_toggleautoclose (c) - Toggle the |g:tagbar_autoclose| option.
 :tagbar_map_zoomwin (x) - Toggle zooming the window.
 :tagbar_map_close (q) - Close the Tagbar window.
+
 
 === Misc
 
