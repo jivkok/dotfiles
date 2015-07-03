@@ -4,7 +4,7 @@
 # $1 - message
 function echo2 ()
 {
-    echo "\n$1\n"
+    echo -e "\n$1\n"
 }
 
 echo2 'Configuring Vim ...'
