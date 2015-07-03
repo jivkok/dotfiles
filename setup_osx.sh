@@ -6,7 +6,12 @@
 function ask_and_run ()
 {
     if [ ! -f $1 ]; then return; fi
-    read -p "$2 " -n 1 -r
+    shh=$(ps -p $$ -oargs=)
+    if [ "-zsh" = $shh ]; then
+        read "REPLY?$2 "
+    else
+        read -p "$2 " -n 1 -r
+    fi
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then return; fi
 
