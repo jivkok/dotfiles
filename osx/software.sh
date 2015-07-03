@@ -53,8 +53,5 @@ brew cask install superduper # disk duplication
 brew cask install xquartz # X11
 brew cask install wireshark # network monitor, depends on xquartz
 
-# setup
-brew cask alfred link
-
 # Remove outdated versions from the cellar.
 brew cleanup
