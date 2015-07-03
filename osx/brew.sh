@@ -56,7 +56,6 @@ brew install hydra
 brew install john
 brew install jq
 brew install knock
-brew install macvim
 brew install ngrep
 brew install nmap
 brew install pngcheck
@@ -90,6 +89,10 @@ brew install tree
 brew install webkit2png
 brew install zopfli
 brew install duti
+
+# Install MacVim
+brew install macvim --with-cscope --with-luajit
+brew linkapps macvim
 
 # Install Node.js. Note: this installs `npm` too, using the recommended installation method.
 brew install node
