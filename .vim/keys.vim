@@ -3,11 +3,6 @@
 " Custom mapleader
 let mapleader=","
 
-" Fast saving (,w)
-nmap <leader>w :w!<cr>
-" Save a file as root (,W)
-noremap <leader>W :w !sudo tee % > /dev/null<cr>
-
 " Searching
 " Visual mode pressing * or # searches for the current selection, forward or backward, respectively
 vnoremap <silent> * :call VisualSelection('f')<cr>
@@ -16,6 +11,10 @@ vnoremap <silent> # :call VisualSelection('b')<cr>
 map <silent> <leader><cr> :noh<cr>
 
 " Buffers
+" Fast saving (,w)
+nmap <leader>w :w!<cr>
+" Save a file as root (,W)
+noremap <leader>W :w !sudo tee % > /dev/null<cr>
 nmap <F3> :bp<cr> " Previous (F3)
 nmap <F4> :bn<cr> " Next (F4)
 map <leader>bd :bd<cr> " Close
