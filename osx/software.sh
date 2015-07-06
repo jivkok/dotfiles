@@ -19,10 +19,12 @@ brew cask install firefox
 
 # development
 brew cask install atom # code/text editor
+brew cask install diffmerge # file diff
 brew cask install filezilla # file transfer
 brew cask install dash # documentation sets
 brew cask install gimp # imaging
 brew cask install gisto # Github gists editor
+brew cask install google-chrome # browser
 brew cask install iterm2 # terminal
 brew cask install kaleidoscope # file diff
 brew cask install kdiff3 # file diff
@@ -40,8 +42,10 @@ brew cask install cleanmymac # apps & mac cleaner
 brew cask install disk-inventory-x # disk utilization
 brew cask install dropbox # files sync
 brew cask install evernote # notes sync
+brew cask install firefox # browser
 brew cask install hermes # Pandora.com
 brew cask install keepassx # passwords sync
+brew cask install kindle # books
 brew cask install mplayer-osx-extended # media
 brew cask install pacifist # OSX package files extractor
 brew cask install private-eye # network monitor
