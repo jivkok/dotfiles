@@ -148,6 +148,11 @@ More help:
 :h fugitive
 :h Gstatus - for more keys during the status message
 
+=== indent-guides
+Displays indent levels
+:IndentGuidesToggle (,ig) - toggles the indent guides on and off
+:h indent-guide
+
 
 === Editing
 
