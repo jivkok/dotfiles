@@ -210,6 +210,56 @@ Mappings:
     <Leader><Leader>n       | Jump to latest "/" or "?" forward
     <Leader><Leader>N       | Jump to latest "/" or "?" backward
 
+=== Surround
+Surroundings: parentheses, brackets, quotes, XML tags, and more
+:h surround
+Examples. An asterisk (*) is used to denote the cursor position.
+  Old text                  Command     New text
+  "Hello *world!"           ds"         Hello world!
+  [123+4*56]/2              cs])        (123+456)/2
+  "Look ma, I'm *HTML!"     cs"<q>      <q>Look ma, I'm HTML!</q>
+  if *x>3 {                 ysW(        if ( x>3 ) {
+  my $str = *whee!;         vllllS'     my $str = 'whee!';
+ds - delete surrounding
+  Old text                  Command     New text ~
+  "Hello *world!"           ds"         Hello world!
+  (123+4*56)/2              ds)         123+456/2
+  <div>Yo!*</div>           dst         Yo!
+cs - change surrounding
+  Old text                  Command     New text
+  "Hello *world!"           cs"'        'Hello world!'
+  "Hello *world!"           cs"<q>      <q>Hello world!</q>
+  (123+4*56)/2              cs)]        [123+456]/2
+  (123+4*56)/2              cs)[        [ 123+456 ]/2
+  <div>Yo!*</div>           cst<p>      <p>Yo!</p>
+ys - takes a valid Vim motion or text object as the first object, and wraps it using the second argument as with |cs|.
+  Old text                  Command     New text
+  Hello w*orld!             ysiw)       Hello (world)!
+yss - operates on the current line, ignoring leading whitespace.
+  Old text                  Command     New text
+  Hello w*orld!             yssB        {Hello world!}
+S - In visual mode, a simple "S" with an argument wraps the selection.
+
+=== Repeat
+Enable repeating supported plugin maps with "."
+Supported plugins:
+* surround.vim
+* speeddating.vim
+* abolish.vim
+* unimpaired.vim
+* commentary.vim
+* vim-easyclip
+Adding support to a plugin is generally as simple as the following command at the end of your map functions.
+  silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)
+
+== Emmet
+Emmet is an editor plugin for high-speed HTML, XML, XSL (or any other
+structured code format) coding and editing. The core of this plugin is a
+powerful abbreviation engine which allows you to expand expressions,
+similar to CSS selectors, into HTML code:   div#page>div.logo+ul#navigation>li*5>a
+Note: too much to list, just go to the help
+:h emmet
+
 
 === Buffers/files
 
