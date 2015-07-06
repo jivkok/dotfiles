@@ -23,6 +23,7 @@ Plugin 'bling/vim-airline' " status line
 Plugin 'airblade/vim-gitgutter' " git diff in the gutter and stages/reverts hunks
 Plugin 'tpope/vim-fugitive' " Git wrapper
 Plugin 'sheerun/vim-polyglot' " collection of language packs - syntax, indent, ftdetect
+Plugin 'nathanaelkane/vim-indent-guides' "displays indent levels
 
 " Editing
 Plugin 'msanders/snipmate.vim' " snippets mgmt for various languages
