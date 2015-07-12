@@ -55,11 +55,12 @@ if [ -d $HOME/.vim/bundle/YouCompleteMe ]; then
         cd $HOME/.vim/bundle/YouCompleteMe
         # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
         ./install.sh --clang-completer --omnisharp-completer
+        cd $HOME
     elif [ "$os" = "Darwin" ]; then
         cd $HOME/.vim/bundle/YouCompleteMe
         # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
         ./install.sh --clang-completer --omnisharp-completer
-        cd
+        cd $HOME
     fi
     echo2 'Configuring YouCompleteMe done.'
 fi
