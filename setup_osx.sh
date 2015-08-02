@@ -25,7 +25,7 @@ cd $HOME
 # repo
 if [ -d dotfiles/.git ]; then
     cd dotfiles
-    git pull origin master --recurse-submodules
+    git pull --prune --recurse-submodules
     git submodule init
     git submodule update --remote --recursive
     cd ..

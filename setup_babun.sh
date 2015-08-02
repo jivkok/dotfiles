@@ -10,7 +10,7 @@ cd $HOME
 # dotfiles
 if [ -d dotfiles/.git ]; then
     cd dotfiles
-    git pull origin master --recurse-submodules
+    git pull --prune --recurse-submodules
     git submodule init
     git submodule update --remote --recursive
     cd ..
@@ -21,6 +21,7 @@ else
     git clone --recursive https://github.com/jivkok/dotfiles.git dotfiles
 fi
 
+ln -sf dotfiles/.vim .
 ln -sb dotfiles/.aliases .
 ln -sb dotfiles/.bash_profile .
 ln -sb dotfiles/.bash_prompt .
@@ -29,6 +30,7 @@ ln -sb dotfiles/.curlrc .
 ln -sb dotfiles/.exports .
 ln -sb dotfiles/.functions .
 ln -sb dotfiles/.tmux.conf .
+ln -sb dotfiles/.vim/.vimrc .
 ln -sb dotfiles/.wgetrc .
 curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
