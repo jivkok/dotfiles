@@ -148,6 +148,12 @@ function dataurl() {
     echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')";
 }
 
+function gitpullall() {
+    for i in $(find . -type d -depth 1); do
+        [ -d $i/.git ] && echo $i && git --git-dir=$i/.git --work-tree=$PWD/$i pull --prune;
+    done
+}
+
 # Create a git.io short URL
 function gitio() {
     if [ -z "${1}" -o -z "${2}" ]; then
