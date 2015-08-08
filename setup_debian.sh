@@ -39,6 +39,9 @@ sudo apt-get install -y wget
 sudo apt-get clean
 sudo apt-get autoremove
 
+# Security-related
+sudo apt-get install -y iftop
+
 cd $HOME
 
 # dotfiles
