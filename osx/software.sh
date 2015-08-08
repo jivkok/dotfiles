@@ -39,13 +39,16 @@ brew cask install alfred # Spotlight-replacement, workflow automation
 brew cask install appcleaner # apps cleaner
 brew cask install calibre # books
 brew cask install cleanmymac # apps & mac cleaner
+brew cask install clipmenu # clipboard manager
 brew cask install disk-inventory-x # disk utilization
 brew cask install dropbox # files sync
 brew cask install evernote # notes sync
 brew cask install firefox # browser
+brew cask install flux # color adjustments
 brew cask install hermes # Pandora.com
 brew cask install keepassx # passwords sync
 brew cask install kindle # books
+brew cask install loading # shows network activity per app
 brew cask install mplayer-osx-extended # media
 brew cask install pacifist # OSX package files extractor
 brew cask install private-eye # network monitor

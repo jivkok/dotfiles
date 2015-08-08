@@ -22,7 +22,7 @@ brew install coreutils
 sudo ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
 
 brew install moreutils
-brew install findutils --with-default-names # GNU `find`, `locate`, `updatedb`, and `xargs`
+brew install findutils # GNU `find`, `locate`, `updatedb`, and `xargs`
 brew install gnu-sed --with-default-names
 brew install gnu-tar --with-default-names
 brew install gnu-which --with-default-names
@@ -89,6 +89,9 @@ brew install tree
 brew install webkit2png
 brew install zopfli
 brew install duti
+
+# Security-related
+brew install iftop
 
 # Install MacVim
 brew install macvim --with-cscope --with-luajit
