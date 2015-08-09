@@ -13,6 +13,7 @@ else
     echo "Unsupported OS: $os"
     return
 fi
+
 mkdir -p "$sublimeUserDataPath"
 mkdir -p "$sublimeInstalledPackagesPath"
 
@@ -22,4 +23,4 @@ settingsDir="$scriptdir/sublimetext"
 cp -f $settingsDir/*.sublime-settings "$sublimeUserDataPath"
 cp -f "$settingsDir/Default ($os).sublime-keymap" "$sublimeUserDataPath"
 
-curl -o "$sublimeInstalledPackagesPath/Package Control.sublime-package" http://sublime.wbond.net/Package%20Control.sublime-package
+curl -o "$sublimeInstalledPackagesPath/Package Control.sublime-package" https://packagecontrol.io/Package%20Control.sublime-package
