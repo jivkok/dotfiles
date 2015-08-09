@@ -1,8 +1,7 @@
 #!/bin/bash
 # Configure OSX environment
 
-# $1 - file
-# $2 - message
+# $1 - file, $2 - message
 function ask_and_run ()
 {
     if [ ! -f $1 ]; then return; fi
@@ -50,7 +49,7 @@ ln -sf dotfiles/.wgetrc .
 ln -sf dotfiles/osx/.duti .
 curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
-# Command-line tools
+# Command-line tools (must be first since it installs gcc)
 xcode-select -p
 if [ $? != 0 ]; then
     read -p "Would you like to install the XCode command-line tools?" -n 1 -r
@@ -60,37 +59,26 @@ if [ $? != 0 ]; then
     fi
 fi
 
-# Packages
-ask_and_run dotfiles/osx/brew.sh "Would you like to install Homebrew packages?"
+ask_and_run dotfiles/osx/brew.sh "Would you like to install system packages?"
 
-# Software
-ask_and_run dotfiles/osx/software.sh "Would you like to install additional software?"
+ask_and_run dotfiles/osx/software.sh "Would you like to install GUI packages?"
 
-# OSX tweaks
-ask_and_run dotfiles/osx/.osx "Would you like to set sensible OSX defaults?"
-
-# Python
-ask_and_run dotfiles/configure_python.sh "Would you like to configure Python and install Python packages?"
-
-# Ruby
-ask_and_run dotfiles/configure_ruby.sh "Would you like to configure Ruby and install Ruby packages?"
-
-# Configure Git
 ask_and_run dotfiles/configure_git.sh "Would you like to configure Git?"
 
-# ZSH
 ask_and_run dotfiles/configure_zsh.sh "Would you like to configure Zsh?"
 
-# Vim
+ask_and_run dotfiles/configure_python.sh "Would you like to configure Python (plus packages)?"
+
+ask_and_run dotfiles/configure_ruby.sh "Would you like to configure Ruby (plus packages)?"
+
 ask_and_run dotfiles/configure_vim.sh "Would you like to configure Vim?"
 
-# SublimeText
 ask_and_run dotfiles/configure_sublimetext.sh "Would you like to configure SublimeText?"
 
-# Alfred workflows
-ask_and_run dotfiles/osx/alfred.sh "Would you like to configure Alfred workflows?"
+ask_and_run dotfiles/osx/.osx "Would you like to set sensible OSX defaults?"
 
-# DotNet
+ask_and_run dotfiles/osx/alfred.sh "Would you like to configure Alfred?"
+
 ask_and_run dotfiles/osx/dotnet.sh "Would you like to configure DotNet?"
 
 echo "Done"

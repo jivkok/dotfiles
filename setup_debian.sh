@@ -1,12 +1,16 @@
 #!/bin/bash
 # Configuring Linux environment (Debian-style)
 
-# $1 - file
-# $2 - message
+# $1 - file, $2 - message
 function ask_and_run ()
 {
     if [ ! -f $1 ]; then return; fi
-    read -p "$2" -n 1 -r
+    shh=$(ps -p $$ -oargs=)
+    if [ "-zsh" = $shh ]; then
+        read "REPLY?$2 "
+    else
+        read -p "$2 " -n 1 -r
+    fi
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then return; fi
 
@@ -14,33 +18,6 @@ function ask_and_run ()
 
     return
 }
-
-# Packages
-sudo apt-get update
-sudo apt-get install -y cifs-utils
-sudo apt-get install -y curl
-sudo apt-get install -y dstat
-sudo apt-get install -y exuberant-ctags
-sudo apt-get install -y git
-sudo apt-get install -y git-extras
-sudo apt-get install -y gitk
-sudo apt-get install -y gitstats
-sudo apt-get install -y jq
-sudo apt-get install -y libwww-perl
-sudo apt-get install -y ngrep
-sudo apt-get install -y python-pip
-sudo apt-get install -y python-pygments
-sudo apt-get install -y rlwrap
-sudo apt-get install -y silversearcher-ag
-sudo apt-get install -y tmux
-sudo apt-get install -y tree
-sudo apt-get install -y vim
-sudo apt-get install -y wget
-sudo apt-get clean
-sudo apt-get autoremove
-
-# Security-related
-sudo apt-get install -y iftop
 
 cd $HOME
 
@@ -71,29 +48,20 @@ ln -sb dotfiles/.vim/.vimrc .
 ln -sb dotfiles/.wgetrc .
 curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
-# Git
-[ -f ~/dotfiles/configure_git.sh ] && source ~/dotfiles/configure_git.sh
+ask_and_run dotfiles/linux/packages.sh "Would you like to install system packages?"
 
-# Python & packages
-[ -f ~/dotfiles/configure_python.sh ] && source ~/dotfiles/configure_python.sh
+ask_and_run dotfiles/linux/software.sh "Would you like to install GUI packages?"
 
-# Ruby & packages
-[ -f ~/dotfiles/configure_ruby.sh ] && source ~/dotfiles/configure_ruby.sh
+ask_and_run dotfiles/configure_git.sh "Would you like to configure Git?"
 
-# ZSH
-ask_and_run dotfiles/configure_zsh.sh "Would you like to install and configure ZSH ? "
+ask_and_run dotfiles/configure_zsh.sh "Would you like to install and configure ZSH?"
 
-# Vim
-ask_and_run dotfiles/configure_vim.sh "Would you like to install and configure Vim ? "
+ask_and_run dotfiles/configure_python.sh "Would you like to configure Python (plus packages)?"
 
-# SublimeText
-read -p "Would you like to install and configure SublimeText ? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    sudo add-apt-repository ppa:webupd8team/sublime-text-3
-    sudo apt-get update
-    sudo apt-get install -y sublime-text-installer
-    [ -f ~/dotfiles/configure_sublimetext.sh ] && source ~/dotfiles/configure_sublimetext.sh
-fi
+ask_and_run dotfiles/configure_ruby.sh "Would you like to configure Ruby (plus packages)?"
+
+ask_and_run dotfiles/configure_vim.sh "Would you like to install and configure Vim?"
+
+ask_and_run dotfiles/configure_sublimetext.sh "Would you like to configure SublimeText?"
 
 echo "Done"
