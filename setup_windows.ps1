@@ -8,10 +8,16 @@ function InstallChocolatey()
   }
 }
 
-function InstallChocolateyPackage($package)
+function InstallChocolateyPackage($package, $source)
 {
-  if (!(Test-Path "$Env:ChocolateyInstall\lib\$package")) {
-    & "$Env:ChocolateyInstall\bin\cinst.exe" -y $package
+  if (Test-Path "$Env:ChocolateyInstall\lib\$package") { return }
+
+  if ($source -eq $null) {
+    echo "Installing $package"
+    & cinst.exe $package -y
+  } else {
+    echo "Installing $package from $source"
+    & cinst.exe $package -y -source $source
   }
 }
 
@@ -34,7 +40,7 @@ function New-Shortcut($ShortcutPath, $TargetPath, $Arguments, $IconLocation)
 function PinToTaskBar($filePath)
 {
   if (!(Test-Path $filePath)) {
-    Write-Warning "$filePath doesn't exist."
+    Write-Warning "$filePath does not exist."
     return
   }
 
@@ -49,7 +55,7 @@ function PinToTaskBar($filePath)
 function CreateDirectorySymlink($folder, $srcPath, $destPath)
 {
   if (!(Test-Path "$srcPath\$folder")) {
-    Write-Warning "$srcPath\$folder doesn't exist."
+    Write-Warning "$srcPath\$folder does not exist."
     return
   }
 
@@ -64,7 +70,7 @@ function CreateDirectorySymlink($folder, $srcPath, $destPath)
 function CreateFileSymlink($file, $srcPath, $destPath)
 {
   if (!(Test-Path "$srcPath\$file")) {
-    Write-Warning "$srcPath\$file doesn't exist."
+    Write-Warning "$srcPath\$file does not exist."
     return
   }
 
@@ -83,15 +89,18 @@ try {
     throw "Required folder not found: $windowsPath"
   }
 
+  # Workaround for not having Git on the path right after install
+  $Env:Path += ";$ProgramFiles(x86)\Git\cmd"
+
   # Chocolatey and package dependencies
   InstallChocolatey
   InstallChocolateyPackage 'powershell'
   InstallChocolateyPackage 'console2'
-  InstallChocolateyPackage 'git-credential-winstore'
+  InstallChocolateyPackage 'git'
   InstallChocolateyPackage 'poshgit'
   InstallChocolateyPackage 'psget'
-  InstallChocolateyPackage 'jivkok.SublimeText3.Packages'
-  InstallChocolateyPackage 'jivkok.GitConfig'
+  InstallChocolateyPackage 'jivkok.SublimeText3.Packages' 'http://www.myget.org/F/jivkok-chocolatey'
+  InstallChocolateyPackage 'jivkok.GitConfig' 'http://www.myget.org/F/jivkok-chocolatey'
 
   echo "Desktop shortcut (and taskbar pin): $Home\Desktop\Shell.lnk ==> $Env:ChocolateyInstall\bin\Console.exe"
   New-Shortcut "$Home\Desktop\Shell.lnk" "$Env:ChocolateyInstall\bin\Console.exe" "-c $windowsPath\console.xml" "cmd.exe,0"
