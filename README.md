@@ -120,25 +120,23 @@ iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.co
 # Note: run from elevated shell
 # DOS
 @powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))" && SET PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin
-cinst jivkok.shell -source http://www.myget.org/F/jivkok-chocolatey
+cinst jivkok.shell -y -source http://www.myget.org/F/jivkok-chocolatey
 
 # Powershell
 iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
-cinst jivkok.shell -source http://www.myget.org/F/jivkok-chocolatey
+cinst jivkok.shell -y -source http://www.myget.org/F/jivkok-chocolatey
 ```
 
 #### Option #4 (manual repo cloning)
 ```
 # Note: run from elevated shell
 # DOS
-cd /d %USERPROFILE%
-git clone https://github.com/jivkok/dotfiles.git dotfiles
-@powershell -NoProfile -ExecutionPolicy Bypass -File dotfiles\setup_windows.ps1
+git clone https://github.com/jivkok/dotfiles.git %USERPROFILE%\dotfiles
+@powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\dotfiles\setup_windows.ps1
 
 # Powershell
-cd $HOME
-git clone https://github.com/jivkok/dotfiles.git dotfiles
-. dotfiles\setup_windows.ps1
+git clone https://github.com/jivkok/dotfiles.git $HOME\dotfiles
+. $HOME\dotfiles\setup_windows.ps1
 ```
 
 ### Customizations
