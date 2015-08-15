@@ -1,3 +1,7 @@
+param (
+    [string]$dotfiles = "$HOME\dotfiles"
+)
+
 function InstallChocolatey()
 {
   if (!(Test-Path Env:ChocolateyInstall)) {
@@ -83,12 +87,6 @@ function CreateFileSymlink($file, $srcPath, $destPath)
 }
 
 try {
-  $scriptPath = Get-CurrentDirectory
-  $windowsPath = Join-Path $scriptPath 'windows'
-  if (!(Test-Path $windowsPath)) {
-    throw "Required folder not found: $windowsPath"
-  }
-
   # Workaround for not having Git on the path right after install
   $Env:Path += ";$ProgramFiles(x86)\Git\cmd"
 
@@ -102,23 +100,52 @@ try {
   InstallChocolateyPackage 'jivkok.SublimeText3.Packages' 'http://www.myget.org/F/jivkok-chocolatey'
   InstallChocolateyPackage 'jivkok.GitConfig' 'http://www.myget.org/F/jivkok-chocolatey'
 
+  # find git.exe path
+  $git_exe = 'git.exe'
+  if ((Get-Command $git_exe -ErrorAction SilentlyContinue) -eq $null) {
+    if (Test-Path "${Env:ProgramFiles(x86)}\Git\bin\git.exe") {
+      $git_exe = "${Env:ProgramFiles(x86)}\Git\bin\git.exe"
+      } else {
+        throw 'Could not find git.exe'
+      }
+  }
+
+  # clone / refresh dotfiles repo
+  if (Test-Path "$dotfiles\.git") {
+    . $git_exe -C $dotfiles pull --quiet --prune --recurse-submodules 2> $null
+    . $git_exe -C $dotfiles submodule init --quiet 2> $null
+    . $git_exe -C $dotfiles submodule update --quiet --remote --recursive 2> $null
+  } else {
+    if (Test-Path $dotfiles) {
+      if (Test-Path "$dotfiles.BACKUP") { Remove-Item "$dotfiles.BACKUP" -Recurse -Force }
+      Rename-Item $dotfiles "$dotfiles.BACKUP" -Force
+    }
+    . $git_exe clone --quiet --recursive https://github.com/jivkok/dotfiles.git $dotfiles 2> $null
+  }
+
+  $windowsPath = Join-Path $dotfiles 'windows'
+  if (!(Test-Path $windowsPath)) {
+    throw "Required folder not found: $windowsPath"
+  }
+
+  # Desktop shortcut
   echo "Desktop shortcut (and taskbar pin): $Home\Desktop\Shell.lnk ==> $Env:ChocolateyInstall\bin\Console.exe"
   New-Shortcut "$Home\Desktop\Shell.lnk" "$Env:ChocolateyInstall\bin\Console.exe" "-c $windowsPath\console.xml" "cmd.exe,0"
   PinToTaskBar "$Home\Desktop\Shell.lnk"
 
   # Bash
   $destPath = "$Home"
-  CreateDirectorySymlink '.vim' $scriptPath $destPath
-  CreateFileSymlink '.aliases' $scriptPath $destPath
-  CreateFileSymlink '.bash_profile' $scriptPath $destPath
-  CreateFileSymlink '.bash_prompt' $scriptPath $destPath
-  CreateFileSymlink '.bashrc' $scriptPath $destPath
-  CreateFileSymlink '.curlrc' $scriptPath $destPath
-  CreateFileSymlink '.exports' $scriptPath $destPath
-  CreateFileSymlink '.functions' $scriptPath $destPath
-  CreateFileSymlink '.tmux.conf' $scriptPath $destPath
-  CreateFileSymlink '.vimrc' "$scriptPath\.vim" $destPath
-  CreateFileSymlink '.wgetrc' $scriptPath $destPath
+  CreateDirectorySymlink '.vim' $dotfiles $destPath
+  CreateFileSymlink '.aliases' $dotfiles $destPath
+  CreateFileSymlink '.bash_profile' $dotfiles $destPath
+  CreateFileSymlink '.bash_prompt' $dotfiles $destPath
+  CreateFileSymlink '.bashrc' $dotfiles $destPath
+  CreateFileSymlink '.curlrc' $dotfiles $destPath
+  CreateFileSymlink '.exports' $dotfiles $destPath
+  CreateFileSymlink '.functions' $dotfiles $destPath
+  CreateFileSymlink '.tmux.conf' $dotfiles $destPath
+  CreateFileSymlink '.vimrc' "$dotfiles\.vim" $destPath
+  CreateFileSymlink '.wgetrc' $dotfiles $destPath
   echo "Git prompt: https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh ==> $Home\git-prompt.sh"
   (New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh', "$Home\git-prompt.sh")
 
