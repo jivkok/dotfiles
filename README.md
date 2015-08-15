@@ -101,7 +101,7 @@ git pull
 The setup script will install packages with Chocolatey, configure a multi-tabbed console and its desktop shortcut, configure system options, theme, aliases, and functions.
 
 #### Option #1 (concise, with Boxstarter & Chocolatey)
-Open [http://j.mp/jivkokshell]() in Internet Explorer. Same as:
+Open [http://j.mp/jivkokshell](http://j.mp/jivkokshell) in Internet Explorer. Same as:
 ```
 START http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/jivkok/Chocolatey-Packages/master/jivkok.Shell/shell.boxstarter.ps1
 ```
@@ -109,15 +109,19 @@ START http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/jiv
 #### Option #2 (concise)
 ```
 # Note: run from elevated shell
+
 # DOS
 @powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/jivkok/dotfiles/master/setup_windows.ps1'))"
+
 # Powershell
+Set-ExecutionPolicy Bypass
 iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/jivkok/dotfiles/master/setup_windows.ps1'))
 ```
 
 #### Option #3 (with Chocolatey)
 ```
 # Note: run from elevated shell
+
 # DOS
 @powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))" && SET PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin
 cinst jivkok.shell -y -source http://www.myget.org/F/jivkok-chocolatey
@@ -130,6 +134,7 @@ cinst jivkok.shell -y -source http://www.myget.org/F/jivkok-chocolatey
 #### Option #4 (manual repo cloning)
 ```
 # Note: run from elevated shell
+
 # DOS
 git clone https://github.com/jivkok/dotfiles.git %USERPROFILE%\dotfiles
 @powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\dotfiles\setup_windows.ps1
