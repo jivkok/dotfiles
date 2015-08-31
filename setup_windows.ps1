@@ -88,7 +88,7 @@ function CreateFileSymlink($file, $srcPath, $destPath)
 
 try {
   # Workaround for not having Git on the path right after install
-  $Env:Path += ";$ProgramFiles(x86)\Git\cmd"
+  $Env:Path += ";$ProgramW6432\Git\cmd;$ProgramFiles(x86)\Git\cmd"
 
   # Chocolatey and package dependencies
   InstallChocolatey
@@ -103,14 +103,16 @@ try {
   # find git.exe path
   $git_exe = 'git.exe'
   if ((Get-Command $git_exe -ErrorAction SilentlyContinue) -eq $null) {
-    if (Test-Path "${Env:ProgramFiles(x86)}\Git\bin\git.exe") {
+    if (Test-Path "${Env:ProgramW6432}\Git\bin\git.exe") {
+      $git_exe = "${Env:ProgramW6432}\Git\bin\git.exe"
+    } else if (Test-Path "${Env:ProgramFiles(x86)}\Git\bin\git.exe") {
       $git_exe = "${Env:ProgramFiles(x86)}\Git\bin\git.exe"
-      } else {
-        throw 'Could not find git.exe'
-      }
+    } else {
+      throw 'Could not find git.exe'
+    }
   }
 
-  # clone / refresh dotfiles repo
+  echo 'dotfiles repo'
   if (Test-Path "$dotfiles\.git") {
     . $git_exe -C $dotfiles pull --quiet --prune --recurse-submodules 2> $null
     . $git_exe -C $dotfiles submodule init --quiet 2> $null
@@ -128,12 +130,11 @@ try {
     throw "Required folder not found: $windowsPath"
   }
 
-  # Desktop shortcut
   echo "Desktop shortcut (and taskbar pin): $Home\Desktop\Shell.lnk ==> $Env:ChocolateyInstall\bin\Console.exe"
   New-Shortcut "$Home\Desktop\Shell.lnk" "$Env:ChocolateyInstall\bin\Console.exe" "-c $windowsPath\console.xml" "cmd.exe,0"
   PinToTaskBar "$Home\Desktop\Shell.lnk"
 
-  # Bash
+  echo 'Bash symlinks'
   $destPath = "$Home"
   CreateDirectorySymlink '.vim' $dotfiles $destPath
   CreateFileSymlink '.aliases' $dotfiles $destPath

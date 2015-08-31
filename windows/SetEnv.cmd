@@ -4,6 +4,7 @@ set COPYCMD=/y
 
 set prompt=$_%USERNAME% @ %COMPUTERNAME% : $P$_$G$S
 
+DOSKEY ~=cd /d %USERPROFILE%
 DOSKEY cd=cd $*$Tdir
 DOSKEY ..=pushd ..
 DOSKEY ...=pushd ..\..
