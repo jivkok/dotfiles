@@ -148,7 +148,7 @@
 			</background>
 		</tab>
 		<tab title="Bash" use_default_icon="0">
-			<console shell="&quot;%ProgramW6432%\Git\bin\sh.exe&quot; --login -i" init_dir="C:\" run_as_user="0" user=""/>
+			<console shell="%SystemRoot%\SysWOW64\cmd.exe /k &quot;&quot;%ProgramW6432%\Git\bin\bash.exe&quot; --login -i&quot;" init_dir="C:\" run_as_user="0" user=""/>
 			<cursor style="5" r="255" g="255" b="255"/>
 			<background type="0" r="0" g="43" b="54">
 				<image file="" relative="0" extend="0" position="0">
