@@ -181,4 +181,7 @@ elif [ "$os" = "Darwin" ]; then
 
     alias of='open -a Finder ./'
 
+    if [ -f $HOME/Applications/p4merge.app/Contents/Resources/launchp4merge ]; then
+        alias p4diff="$HOME/Applications/p4merge.app/Contents/Resources/launchp4merge $*"
+    fi
 fi
