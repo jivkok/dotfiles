@@ -19,15 +19,16 @@ brew cask install firefox
 
 # development
 brew cask install atom # code/text editor
-brew cask install diffmerge # file diff
 brew cask install filezilla # file transfer
 brew cask install dash # documentation sets
 brew cask install gimp # imaging
 brew cask install gisto # Github gists editor
 brew cask install google-chrome # browser
 brew cask install iterm2 # terminal
-brew cask install kaleidoscope # file diff
-brew cask install kdiff3 # file diff
+brew cask install kaleidoscope # file/directory diff/merge
+brew cask install kdiff3 # file/directory diff/merge
+brew install homebrew/x11/meld # file/directory diff/merge
+brew cask install p4merge # file diff/merge
 brew cask install snippet-edit # XCode snippets
 brew cask install sourcetree # Git gui
 brew cask install sublime-text3 # code/text editor

@@ -8,7 +8,7 @@
 
 var="$(git config --global --get user.name)"
 if [ -z "$var" ]; then
-    read -p 'Which Git name would you like to use? ' -d $'\n' var
+    read -p 'What name would you like to use for Git commits? ' -d $'\n' var
 
     if [ -z "$var" ]; then
         echo 'Skipping setting Git user.name'
@@ -21,7 +21,7 @@ fi
 
 var="$(git config --global --get user.email)"
 if [ -z "$var" ]; then
-    read -p 'Which Git email would you like to use? ' -d $'\n' var
+    read -p 'What email would you like to use for Git commits? ' -d $'\n' var
 
     if [ -z "$var" ]; then
         echo 'Skipping setting Git user.email'
@@ -94,6 +94,31 @@ git config --global alias.st 'status -sb'
 git config --global alias.stats 'diff --stat'
 git config --global alias.undo 'reset HEAD~'
 git config --global alias.unstage 'reset HEAD'
+git config --global alias.vimdiff 'difftool --tool=vimdiff --no-prompt'
 git config --global alias.wdiff 'diff --word-diff'
 git config --global alias.who 'shortlog -s -e --'
 git config --global alias.zap 'reset --hard HEAD'
+
+os=$(uname -s)
+if [ "$os" = "Darwin" ]; then
+    # OSX default FileMerge
+    git config --global alias.opendiff 'difftool --tool=opendiff --no-prompt'
+
+    # P4Merge installed with homebrew
+    if [ -f $HOME/Applications/p4merge.app/Contents/Resources/launchp4merge ]; then
+        echo Setting P4Merge as diff and merge tool
+
+        git config --global mergetool.keepBackup false
+        git config --global mergetool.keepTemporaries false
+        git config --global mergetool.prompt false
+
+        git config --global merge.tool p4mergetool
+        git config --global mergetool.p4mergetool.cmd "$HOME/Applications/p4merge.app/Contents/Resources/launchp4merge \$PWD/\$BASE \$PWD/\$REMOTE \$PWD/\$LOCAL \$PWD/\$MERGED"
+        git config --global mergetool.p4mergetool.trustExitCode false
+
+        git config --global difftool.prompt false
+
+        git config --global diff.tool p4mergetool
+        git config --global difftool.p4mergetool.cmd "$HOME/Applications/p4merge.app/Contents/Resources/launchp4merge \$LOCAL \$REMOTE"
+    fi
+fi
