@@ -19,6 +19,7 @@ brew cask install firefox
 
 # development
 brew cask install atom # code/text editor
+brew cask install brackets # code/text editor
 brew cask install filezilla # file transfer
 brew cask install dash # documentation sets
 brew cask install gimp # imaging
@@ -52,6 +53,7 @@ brew cask install kindle # books
 brew cask install loading # shows network activity per app
 brew cask install mplayer-osx-extended # media
 brew cask install pacifist # OSX package files extractor
+brew cask install packet-peeper # network monitor
 brew cask install private-eye # network monitor
 brew cask install remote-desktop-connection # Windows connectivity
 brew cask install skype # chat
