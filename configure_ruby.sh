@@ -21,4 +21,7 @@ else
     return
 fi
 
+sudo gem install compass
 sudo gem install tmuxinator
+
+sudo gem update --system
