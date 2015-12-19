@@ -4,6 +4,7 @@
 # Common
 sudo apt-get update
 sudo apt-get install -y cifs-utils
+sudo apt-get install -y collectl
 sudo apt-get install -y curl
 sudo apt-get install -y dstat
 sudo apt-get install -y exuberant-ctags
@@ -24,7 +25,13 @@ sudo apt-get install -y vim
 sudo apt-get install -y wget
 
 # Security-related
+sudo apt-get install -y htop
 sudo apt-get install -y iftop
+sudo apt-get install -y lsof
+sudo apt-get install -y ltrace
+sudo apt-get install -y nethogs
+sudo apt-get install -y secure-delete
+sudo apt-get install -y strace
 
 sudo apt-get clean
 sudo apt-get autoremove
