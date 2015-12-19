@@ -27,7 +27,7 @@ alias g="git"
 alias h="history"
 alias j="jobs"
 alias s="subl"
-alias a="atom"
+alias e="subl"
 if [ "$(uname -s)" = "Darwin" ]; then
     alias v="gvim"
 else
