@@ -1,0 +1,20 @@
+{
+    "documentation": "https://github.com/adobe/brackets/wiki/User-Key-Bindings",
+    "overrides": {
+        "Cmd-Shift-L":     "edit.splitSelIntoLines",
+        "Ctrl-Shift-Up":   "edit.addCursorToPrevLine",
+        "Ctrl-Shift-Down": "edit.addCursorToNextLine",
+        "Cmd-Shift-D":     "edit.duplicate",
+        "Ctrl-Shift-K":    "edit.deletelines",
+        "Cmd-L":           "edit.selectLine",
+        "Cmd-D":           "cmd.addNextMatch",
+        "Cmd-Opt-1":       "cmd.splitViewNone",
+        "Cmd-Opt-2":       "cmd.splitViewVertical",
+        "Cmd-Opt-Shift-2": "cmd.splitViewHorizontal",
+        "Ctrl-G":          "navigate.gotoLine",
+        "Cmd-Opt-Right":   "navigate.nextDoc",
+        "Cmd-Opt-Left":    "navigate.prevDoc",
+        "Cmd-R":           "navigate.gotoDefinition",
+        "Cmd-P":           "navigate.quickOpen"
+    }
+}

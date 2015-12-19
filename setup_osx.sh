@@ -75,6 +75,8 @@ ask_and_run dotfiles/configure_vim.sh "Would you like to configure Vim?"
 
 ask_and_run dotfiles/configure_sublimetext.sh "Would you like to configure SublimeText?"
 
+ask_and_run dotfiles/configure_brackets.sh "Would you like to configure Brackets?"
+
 ask_and_run dotfiles/osx/.osx "Would you like to set sensible OSX defaults?"
 
 ask_and_run dotfiles/osx/alfred.sh "Would you like to configure Alfred?"
