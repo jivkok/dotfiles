@@ -175,8 +175,11 @@ function server() {
 # Start a PHP server from a directory, optionally specifying the port
 # (Requires PHP 5.4.0+.)
 function phpserver() {
+    local interface=$1
+    if [ -z $interface ]; then interface=en0; fi
+    local ip=$(ipconfig getifaddr $interface);
     local port="${1:-4000}";
-    local ip=$(ipconfig getifaddr en1);
+    echo "Interface: $interface; ip: $ip; port: $port"
     sleep 1 && open "http://${ip}:${port}/" &
     php -S "${ip}:${port}";
 }
