@@ -76,11 +76,14 @@ brew install ack
 #brew install exiv2
 brew install git
 brew install git-extras
+brew install fzf
+[ -f /usr/local/opt/fzf/install ] && /usr/local/opt/fzf/install --key-bindings --completion --no-update-rc
 brew install imagemagick --with-webp
 brew install lua
 brew install lynx
 brew install p7zip
 brew install pigz
+brew install pt
 brew install pv
 brew install rename
 brew install rhino
