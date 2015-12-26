@@ -14,7 +14,7 @@ elif [ "$os" = "Darwin" ]; then
     # Packages
     pip install --upgrade httpie # curl-like with colorized output
     pip install --upgrade mitmproxy # http traffic interception
-    pip install --upgrade Pygments # syntax highlighter
+    pip install --upgrade Pygments # syntax highlighter (colorize)
 else
     echo "Unsupported OS: $os"
     return

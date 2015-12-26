@@ -61,7 +61,7 @@ fi
 
 # User configuration
 
-source $ZSH/oh-my-zsh.sh
+[ -f $ZSH/oh-my-zsh.sh ] && source $ZSH/oh-my-zsh.sh
 
 ## set options
 set -o vi               # vi keys
@@ -69,7 +69,7 @@ set -o noclobber        # prevent overwriting files with cat
 
 # Load the shell dotfiles
 #   ~/.profile.local can be used for any local settings you don’t want to commit
-for file in ~/{.zsh-theme,.aliases,.functions,.profile.local,dotfiles/submodules/z/z.sh}; do
+for file in ~/{.zsh-theme,.aliases,.functions,.profile.local,dotfiles/submodules/z/z.sh,.fzf.zsh}; do
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;

@@ -16,12 +16,6 @@ else
     export PROFILE_SHELL='sh'
 fi
 
-# Load the shell dotfiles, (~/.bash_extra can be used for any local settings you don’t want to commit)
-for file in ~/.{bash_prompt,aliases,functions,bash_extra}; do
-    [ -r "$file" ] && [ -f "$file" ] && source "$file";
-done;
-unset file;
-
 ## set options
 set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
@@ -94,3 +88,9 @@ elif [ "$OS" = "Darwin" ]; then
     complete -o "nospace" -W "Contacts Calendar Dock Finder Mail Safari iTunes SystemUIServer Terminal Twitter" killall;
 
 fi
+
+# Load the shell dotfiles, (~/.bash_extra can be used for any local settings you don’t want to commit)
+for file in ~/{.bash_prompt,.aliases,.functions,.bash_extra,dotfiles/submodules/z/z.sh,.fzf.zsh}; do
+    [ -r "$file" ] && [ -f "$file" ] && source "$file";
+done;
+unset file;

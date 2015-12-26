@@ -16,13 +16,16 @@ sudo apt-get install -y jq
 sudo apt-get install -y libwww-perl
 sudo apt-get install -y ngrep
 sudo apt-get install -y python-pip
-sudo apt-get install -y python-pygments
+sudo apt-get install -y python-pygments # colorize
 sudo apt-get install -y rlwrap
 sudo apt-get install -y silversearcher-ag
 sudo apt-get install -y tmux
 sudo apt-get install -y tree
 sudo apt-get install -y vim
 sudo apt-get install -y wget
+
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install --key-bindings --completion --no-update-rc
 
 # Security-related
 sudo apt-get install -y htop
