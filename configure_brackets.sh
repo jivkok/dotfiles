@@ -32,11 +32,11 @@ function install_extension ()
     echo "Searching in the registry"
     extensionName=$(cat "$extensionsRegistryPath" | jq ".[] | select(.metadata.title == \"$extensionDisplayName\").metadata.name" | sed 's/"//g')
     extensionVersion=$(cat "$extensionsRegistryPath" | jq ".[] | select(.metadata.title == \"$extensionDisplayName\").metadata.version" | sed 's/"//g')
-    if [ -z $extensionName ]; then
+    if [ -z "$extensionName" ]; then
         echo "Error: could not find package name within the registry" >&2
         return
     fi
-    if [ -z $extensionVersion ]; then
+    if [ -z "$extensionVersion" ]; then
         echo "Error: could not find package version within the registry" >&2
         return
     fi
@@ -55,8 +55,8 @@ function install_extension ()
     [ -d "$extensionZipDirPath" ] && rm -rf "$extensionZipDirPath"
 
     echo "Downloading $extensionUrl   to   $extensionZipPath"
-    curl -o "$extensionZipPath" $extensionUrl
-    if [ ! -f $extensionZipPath ]; then
+    curl -o "$extensionZipPath" "$extensionUrl"
+    if [ ! -f "$extensionZipPath" ]; then
         echo "Error: download failed - $extensionUrl" >&2
         return
     fi
@@ -64,7 +64,7 @@ function install_extension ()
     unzip -q "$extensionZipPath" -d "$extensionZipDirPath"
 
     packagejsonPath=$(find "$extensionZipDirPath" -maxdepth 2 -iname package.json | head -n 1)
-    if [ -z $packagejsonPath ]; then
+    if [ -z "$packagejsonPath" ]; then
         echo "Error: could not find package.json in $extensionZipDirPath" >&2
         return
     fi
@@ -89,7 +89,7 @@ if [ "$os" = "Darwin" ]; then
 
     for f in brackets.json keymap.json
     do
-        copy_config_file $f $settingsDir $bracketsUserPath
+        copy_config_file $f "$settingsDir" "$bracketsUserPath"
     done
 
     extensionsRegistryPath="${TMPDIR}registry.json"

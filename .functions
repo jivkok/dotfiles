@@ -67,20 +67,20 @@ function fs() {
 
 # lazy man extract - example: ex tarball.tar
 function ex() {
-    if [ -f $1 ] ; then
+    if [ -f "$1" ] ; then
         case $1 in
-            *.tar.bz2)   tar xjfv $1        ;;
-            *.tar.gz)    tar xzfv $1     ;;
-            *.tar.xz)    tar xJfv $1     ;;
-            *.bz2)       bunzip2 $1       ;;
-            *.rar)       rar x $1     ;;
-            *.gz)        gunzip $1     ;;
-            *.tar)       tar xfv $1        ;;
-            *.tbz2)      tar xjfv $1      ;;
-            *.tgz)       tar xzfv $1       ;;
-            *.zip)       unzip $1     ;;
-            *.Z)         uncompress $1  ;;
-            *.7z)        7z x $1    ;;
+            *.tar.bz2)   tar xjfv "$1"        ;;
+            *.tar.gz)    tar xzfv "$1"     ;;
+            *.tar.xz)    tar xJfv "$1"     ;;
+            *.bz2)       bunzip2 "$1"       ;;
+            *.rar)       rar x "$1"     ;;
+            *.gz)        gunzip "$1"     ;;
+            *.tar)       tar xfv "$1"        ;;
+            *.tbz2)      tar xjfv "$1"      ;;
+            *.tgz)       tar xzfv "$1"       ;;
+            *.zip)       unzip "$1"     ;;
+            *.Z)         uncompress "$1"  ;;
+            *.7z)        7z x "$1"    ;;
             *)           echo "'$1' cannot be extracted via extract()" ;;
         esac
     else
@@ -150,7 +150,7 @@ function dataurl() {
 
 function gitpullall() {
     for i in $(find . -type d -depth 1); do
-        [ -d $i/.git ] && echo $i && git --git-dir=$i/.git --work-tree=$PWD/$i pull --prune;
+        [ -d "$i/.git" ] && echo "Repo: $i" && git -C "$i" pull --prune;
     done
 }
 
@@ -175,10 +175,11 @@ function server() {
 # Start a PHP server from a directory, optionally specifying the port
 # (Requires PHP 5.4.0+.)
 function phpserver() {
-    local interface=$1
-    if [ -z $interface ]; then interface=en0; fi
-    local ip=$(ipconfig getifaddr $interface);
-    local port="${1:-4000}";
+    local interface, ip, port
+    interface=$1
+    if [ -z "$interface" ]; then interface=en0; fi
+    ip=$(ipconfig getifaddr $interface);
+    port="${2:-4000}";
     echo "Interface: $interface; ip: $ip; port: $port"
     sleep 1 && open "http://${ip}:${port}/" &
     php -S "${ip}:${port}";

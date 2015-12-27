@@ -61,7 +61,7 @@ fi
 
 # User configuration
 
-[ -f $ZSH/oh-my-zsh.sh ] && source $ZSH/oh-my-zsh.sh
+[ -f "$ZSH/oh-my-zsh.sh" ] && source "$ZSH/oh-my-zsh.sh"
 
 ## set options
 set -o vi               # vi keys

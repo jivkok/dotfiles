@@ -8,7 +8,7 @@
 
 var="$(git config --global --get user.name)"
 if [ -z "$var" ]; then
-    read -p 'What name would you like to use for Git commits? ' -d $'\n' var
+    read -r -p 'What name would you like to use for Git commits? ' -d $'\n' var
 
     if [ -z "$var" ]; then
         echo 'Skipping setting Git user.name'
@@ -21,7 +21,7 @@ fi
 
 var="$(git config --global --get user.email)"
 if [ -z "$var" ]; then
-    read -p 'What email would you like to use for Git commits? ' -d $'\n' var
+    read -r -p 'What email would you like to use for Git commits? ' -d $'\n' var
 
     if [ -z "$var" ]; then
         echo 'Skipping setting Git user.email'
@@ -105,7 +105,7 @@ if [ "$os" = "Darwin" ]; then
     git config --global alias.opendiff 'difftool --tool=opendiff --no-prompt'
 
     # P4Merge installed with homebrew
-    if [ -f $HOME/Applications/p4merge.app/Contents/Resources/launchp4merge ]; then
+    if [ -f "$HOME/Applications/p4merge.app/Contents/Resources/launchp4merge" ]; then
         echo Setting P4Merge as diff and merge tool
 
         git config --global mergetool.keepBackup false
