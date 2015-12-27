@@ -1,46 +1,46 @@
 #!/bin/bash
-# Configuring Windows environment (Babun distro for Cygwin)
+# Configure Windows environment (Babun distro for Cygwin)
+
+echo "Configuring Windows environment (Babun distro for Cygwin) ..."
 
 # Packages
 pact update
 pact install tmux
 
-cd $HOME
-
 # dotfiles
-if [ -d dotfiles/.git ]; then
-    cd dotfiles
-    git pull --prune --recurse-submodules
-    git submodule init
-    git submodule update --remote --recursive
-    cd ..
+dotdir="$HOME/dotfiles"
+
+if [ -d "$dotdir/.git" ]; then
+    git -C "$dotdir" pull --prune --recurse-submodules
+    git -C "$dotdir" submodule init
+    git -C "$dotdir" submodule update --remote --recursive
 else
-    if [ -d dotfiles ]; then
-        mv dotfiles dotfiles.old
+    if [ -d "$dotdir" ]; then
+        mv "$dotdir" "${dotdir}.old"
     fi
-    git clone --recursive https://github.com/jivkok/dotfiles.git dotfiles
+    git clone --recursive https://github.com/jivkok/dotfiles.git "$dotdir"
 fi
 
-ln -sf dotfiles/.vim .
-ln -sb dotfiles/.aliases .
-ln -sb dotfiles/.bash_profile .
-ln -sb dotfiles/.bash_prompt .
-ln -sb dotfiles/.bashrc .
-ln -sb dotfiles/.curlrc .
-ln -sb dotfiles/.exports .
-ln -sb dotfiles/.functions .
-ln -sb dotfiles/.tmux.conf .
-ln -sb dotfiles/.vim/.vimrc .
-ln -sb dotfiles/.wgetrc .
-curl -o git-prompt.sh https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+ln -sf "$dotdir/.vim" "$HOME/"
+ln -sb "$dotdir/.aliases" "$HOME/"
+ln -sb "$dotdir/.bash_profile" "$HOME/"
+ln -sb "$dotdir/.bash_prompt" "$HOME/"
+ln -sb "$dotdir/.bashrc" "$HOME/"
+ln -sb "$dotdir/.curlrc" "$HOME/"
+ln -sb "$dotdir/.exports" "$HOME/"
+ln -sb "$dotdir/.functions" "$HOME/"
+ln -sb "$dotdir/.tmux.conf" "$HOME/"
+ln -sb "$dotdir/.vim/.vimrc" "$HOME/"
+ln -sb "$dotdir/.wgetrc" "$HOME/"
+curl -o "$HOME/git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
 # Git
-[ -f ~/dotfiles/configure_git.sh ] && source ~/dotfiles/configure_git.sh
+[ -f "$dotdir/configure_git.sh" ] && source "$dotdir/configure_git.sh"
 
-mkdir -p ~/.oh-my-zsh/custom/plugins
-[ ! -d ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ] && git clone git://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-ln -sb dotfiles/.zprofile .
-ln -sb dotfiles/.zshrc .
-ln -sb dotfiles/.zsh-theme .
+mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
+[ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ] && git clone git://github.com/zsh-users/zsh-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+ln -sb "$dotdir/.zprofile" "$HOME/"
+ln -sb "$dotdir/.zshrc" "$HOME/"
+ln -sb "$dotdir/.zsh-theme" "$HOME/"
 
-echo "Done"
+echo "Configuring Windows environment (Babun distro for Cygwin) done."

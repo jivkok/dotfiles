@@ -29,19 +29,15 @@ else
     return
 fi
 
-cd $HOME
-
 # dotfiles check - Vundle.vim should be included as a submodule
-if [ -d dotfiles/.git ]; then
+if [ -d "$HOME/dotfiles/.git" ]; then
     echo2 'Refreshing dotfiles.'
-    cd dotfiles
-    git pull origin master --recurse-submodules
-    git submodule init
-    git submodule update --remote --recursive
-    cd ..
+    git -C "$HOME/dotfiles" pull origin master --recurse-submodules
+    git -C "$HOME/dotfiles" submodule init
+    git -C "$HOME/dotfiles" submodule update --remote --recursive
 fi
-if [ ! -d $HOME/.vim/bundle/Vundle.vim ]; then
-    git clone https://github.com/gmarik/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
+    git clone https://github.com/gmarik/Vundle.vim.git "$HOME/.vim/bundle/Vundle.vim"
 fi
 
 echo2 'Install & configure Vim plugins.'
@@ -49,17 +45,17 @@ vim +PluginInstall +"helptags ~/.vim/doc" +qall
 
 # YouCompleteMe post-install configuration
 # Refer to https://github.com/Valloric/YouCompleteMe if issues occur
-if [ -d $HOME/.vim/bundle/YouCompleteMe ]; then
+if [ -d "$HOME/.vim/bundle/YouCompleteMe" ]; then
     echo2 'Configuring YouCompleteMe ...'
     if [ "$os" = "Linux" ]; then
         cd $HOME/.vim/bundle/YouCompleteMe
         # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
-        ./install.sh --clang-completer --omnisharp-completer
+        ./install.py --clang-completer --omnisharp-completer
         cd $HOME
     elif [ "$os" = "Darwin" ]; then
         cd $HOME/.vim/bundle/YouCompleteMe
         # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
-        ./install.sh --clang-completer --omnisharp-completer
+        ./install.py --clang-completer --omnisharp-completer
         cd $HOME
     fi
     echo2 'Configuring YouCompleteMe done.'

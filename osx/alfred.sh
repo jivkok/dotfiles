@@ -5,26 +5,24 @@
 function install_alfred_workflow ()
 {
     echo "Installing $1 ..."
-    open $1
+    open "$1"
     sleep 20
 
     return
 }
 
-cd $HOME
+alfred_dir="$HOME/alfred-workflows"
 
 # repo
-if [ -d alfred-workflows/.git ]; then
-    cd alfred-workflows
-    git pull origin master
-    cd ..
+if [ -d "$alfred_dir/.git" ]; then
+    git -C "$alfred_dir" pull origin master
 else
-    if [ -d alfred-workflows ]; then
-        mv alfred-workflows alfred-workflows.old
+    if [ -d "$alfred_dir" ]; then
+        mv "$alfred_dir" "${alfred_dir}.old"
     fi
-    git clone https://github.com/jivkok/alfred-workflows alfred-workflows
+    git clone https://github.com/jivkok/alfred-workflows "$alfred_dir"
 fi
 
-find alfred-workflows -iname "*.alfredworkflow" | while read file; do install_alfred_workflow "$file"; done
+find "$alfred_dir" -iname "*.alfredworkflow" | while read -r file; do install_alfred_workflow "$file"; done
 
 echo "Done."

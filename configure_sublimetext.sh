@@ -20,7 +20,7 @@ mkdir -p "$sublimeInstalledPackagesPath"
 scriptdir="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 settingsDir="$scriptdir/sublimetext"
 
-cp -f $settingsDir/*.sublime-settings "$sublimeUserDataPath"
+cp -f "$settingsDir"/*.sublime-settings "$sublimeUserDataPath"
 cp -f "$settingsDir/Default ($os).sublime-keymap" "$sublimeUserDataPath"
 
 curl -o "$sublimeInstalledPackagesPath/Package Control.sublime-package" https://packagecontrol.io/Package%20Control.sublime-package

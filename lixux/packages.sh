@@ -19,6 +19,7 @@ sudo apt-get install -y python-pip
 sudo apt-get install -y python-pygments # colorize
 sudo apt-get install -y rlwrap
 sudo apt-get install -y silversearcher-ag
+sudo apt-get install -y shellcheck
 sudo apt-get install -y tmux
 sudo apt-get install -y tree
 sudo apt-get install -y vim
