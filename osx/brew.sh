@@ -103,18 +103,5 @@ brew install lsof
 brew install macvim --with-cscope --with-luajit
 brew linkapps macvim
 
-# Install Node.js. Note: this installs `npm` too, using the recommended installation method.
-brew install node
-npm install -g grunt-cli
-npm install -g http-server
-npm install -g express
-npm install -g express-generator
-npm install -g yo
-npm install -g generator-angular
-npm install -g bower
-npm install -g nodemon
-npm install -g typescript
-npm cache clean
-
 # Remove outdated versions from the cellar.
 brew cleanup

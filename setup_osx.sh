@@ -67,6 +67,8 @@ ask_and_run "$dotdir/configure_zsh.sh" "Would you like to configure Zsh?"
 
 ask_and_run "$dotdir/configure_python.sh" "Would you like to configure Python (plus packages)?"
 
+ask_and_run "$dotdir/configure_nodejs.sh" "Would you like to configure NodeJS (plus packages)?"
+
 ask_and_run "$dotdir/configure_ruby.sh" "Would you like to configure Ruby (plus packages)?"
 
 ask_and_run "$dotdir/configure_vim.sh" "Would you like to configure Vim?"
