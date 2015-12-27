@@ -46,19 +46,38 @@ vim +PluginInstall +"helptags ~/.vim/doc" +qall
 # YouCompleteMe post-install configuration
 # Refer to https://github.com/Valloric/YouCompleteMe if issues occur
 if [ -d "$HOME/.vim/bundle/YouCompleteMe" ]; then
-    echo2 'Configuring YouCompleteMe ...'
-    if [ "$os" = "Linux" ]; then
-        cd $HOME/.vim/bundle/YouCompleteMe
-        # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
-        ./install.py --clang-completer --omnisharp-completer
-        cd $HOME
-    elif [ "$os" = "Darwin" ]; then
-        cd $HOME/.vim/bundle/YouCompleteMe
-        # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
-        ./install.py --clang-completer --omnisharp-completer
-        cd $HOME
+    if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ] ; then
+        echo2 'Configuring YouCompleteMe ...'
+
+        echo "Support for:"
+        local supportC, supportCsharp, supportGo, supportJavascript
+        supportC="--clang-completer"
+        supportCsharp="--omnisharp-completer"
+        echo "- C-family: yes"
+        echo "- C#: yes"
+
+        if command -v go >/dev/null 2>&1 ; then
+            supportGo="--gocode-completer"
+            echo "- Go: yes"
+        else
+            echo "- Go: no"
+        fi
+
+        if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1 ; then
+            supportJavascript="--tern-completer"
+            echo "- JavaScript: yes"
+        else
+            echo "- JavaScript: no"
+        fi
+
+        if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ] ; then
+            # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
+            "$HOME/.vim/bundle/YouCompleteMe/install.py" $supportC $supportCsharp $supportGo $supportJavascript
+        fi
+        echo2 'Configuring YouCompleteMe done.'
+    else
+        echo2 'Warning: Configuring YouCompleteMe for $os not supported yet.'
     fi
-    echo2 'Configuring YouCompleteMe done.'
 fi
 
 echo2 'Configuring Vim done.'
