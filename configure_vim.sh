@@ -33,8 +33,7 @@ fi
 if [ -d "$HOME/dotfiles/.git" ]; then
     echo2 'Refreshing dotfiles.'
     git -C "$HOME/dotfiles" pull origin master --recurse-submodules
-    git -C "$HOME/dotfiles" submodule init
-    git -C "$HOME/dotfiles" submodule update --remote --recursive
+    git -C "$HOME/dotfiles" submodule update --init --recursive
 fi
 if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
     git clone https://github.com/gmarik/Vundle.vim.git "$HOME/.vim/bundle/Vundle.vim"
