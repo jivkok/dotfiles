@@ -1,4 +1,4 @@
 *
 !.gitignore
 !Vundle.vim/
-!Vundle.vim/*/
+!YouCompleteMe/

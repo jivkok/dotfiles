@@ -113,6 +113,7 @@ npm install -g yo
 npm install -g generator-angular
 npm install -g bower
 npm install -g nodemon
+npm install -g typescript
 npm cache clean
 
 # Remove outdated versions from the cellar.
