@@ -12,8 +12,7 @@ dotdir="$HOME/dotfiles"
 
 if [ -d "$dotdir/.git" ]; then
     git -C "$dotdir" pull --prune --recurse-submodules
-    git -C "$dotdir" submodule init
-    git -C "$dotdir" submodule update --remote --recursive
+    git -C "$dotdir" submodule update --init --recursive
 else
     if [ -d "$dotdir" ]; then
         mv "$dotdir" "${dotdir}.old"
