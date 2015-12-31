@@ -109,6 +109,7 @@ if [ "$os" = "Darwin" ]; then
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "FTP-Sync Plus" # FTP/SFTP upload for Brackets
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Indent Guides" # Show indent guides in the code editor
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Interactive Linter" # Interactive linting for Brackets
+    install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Lorem Pixel" # Generate placeholder images for every case
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Markdown Preview" # Live preview of markdown documents
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Numbered Bookmarks" # Bookmark lines in the editor (CTRL+SHIFT+1 ... CTRL+SHIFT+9) as you work so you can quickly jump back to them later (CTRL+1 ... CTRL+9). Delete all: CTRL+SHIFT+DELETE
     # Themes
