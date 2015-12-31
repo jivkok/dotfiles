@@ -30,6 +30,10 @@ shopt -s nocaseglob            # Case-insensitive globbing (used in pathname exp
 shopt -s autocd 2> /dev/null   # * `autocd`, e.g. `**/qux` will enter `./foo/bar/baz/qux`
 shopt -s globstar 2> /dev/null # * Recursive globbing, e.g. `echo **/*.txt`
 
+# key bindings. Note: use 'cat' to easily see the escape sequences
+bind "^[[1;5D" backward-word # ctrl-left
+bind "^[[1;5C" forward-word # ctrl-right
+
 # Enable tab completion for `g` by marking it as an alias for `git`
 if type _git &> /dev/null && [ -f /usr/local/etc/bash_completion.d/git-completion.bash ]; then
     complete -o default -o nospace -F _git g;
@@ -60,7 +64,7 @@ if [ "$OS" = "Linux" ]; then
     #    $ id -u   #gives user ID
     # So: if the group name is the same as the username OR the user id is not greater than 99
     # (i.e. not root or a privileged user), then we are on a local machine, so we set umask 002.
-    if [ "`id -gn`" == "`id -un`" -a `id -u` -gt 99 ]; then
+    if [ "$(id -gn)" == "$(id -un)" -a $(id -u) -gt 99 ]; then
         umask 002
     else
         umask 022
