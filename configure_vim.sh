@@ -41,7 +41,7 @@ if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
 fi
 
 echo2 'Install & configure Vim plugins.'
-vim +PluginInstall +"helptags ~/.vim/doc" +qall
+vim +PluginInstall +PluginUpdate +"helptags ~/.vim/doc" +qall
 
 # YouCompleteMe post-install configuration
 # Refer to https://github.com/Valloric/YouCompleteMe if issues occur
@@ -50,7 +50,7 @@ if [ -d "$HOME/.vim/bundle/YouCompleteMe" ]; then
         echo2 'Configuring YouCompleteMe ...'
 
         echo "Support for:"
-        local supportC, supportCsharp, supportGo, supportJavascript
+        local supportC supportCsharp supportGo supportJavascript
         supportC="--clang-completer"
         supportCsharp="--omnisharp-completer"
         echo "- C-family: yes"
