@@ -52,7 +52,7 @@ Ctrl-W_arrows        - moves between windows
 :tabclose (,tc)
 :tabedit (,te)
 :tabp (F3) - previous tab
-:tabn (F$) - next tab
+:tabn (F4) - next tab
 
 === Searching
 /

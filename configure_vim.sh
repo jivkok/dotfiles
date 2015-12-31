@@ -24,6 +24,7 @@ elif [ "$os" = "Darwin" ]; then
     brew install cmake
     # brew install llvm --with-clang
     brew install vim --override-system-vi
+    brew install macvim --HEAD --with-cscope --with-lua --with-override-system-vim --with-luajit --with-python
 else
     echo2 "Unsupported OS: $os"
     return
