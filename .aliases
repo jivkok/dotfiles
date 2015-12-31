@@ -122,7 +122,7 @@ elif [ "$os" = "Darwin" ]; then
     alias cask="brew cask"
 
     # Get OS X Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
-    alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; vim +PluginUpdate +qall'
+    alias osx_update='sudo softwareupdate -i -a; command -v sys_update >/dev/null 2>&1 && sys_update'
 
     # Flush Directory Service cache
     alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
