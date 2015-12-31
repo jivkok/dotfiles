@@ -14,6 +14,7 @@ sudo apt-get install -y gitk
 sudo apt-get install -y gitstats
 sudo apt-get install -y jq
 sudo apt-get install -y libwww-perl
+sudo apt-get install -y lnav
 sudo apt-get install -y ngrep
 sudo apt-get install -y python-pip
 sudo apt-get install -y python-pygments # colorize

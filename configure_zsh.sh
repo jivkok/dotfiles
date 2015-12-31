@@ -17,6 +17,7 @@ fi
 curl -L http://install.ohmyz.sh | sh
 
 mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
+git clone https://github.com/zsh-users/zsh-completions "$HOME/.oh-my-zsh/custom/plugins/zsh-completions"
 git clone git://github.com/zsh-users/zsh-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
 
 dotdir="$HOME/dotfiles"
