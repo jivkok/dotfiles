@@ -1,5 +1,14 @@
 [
     {
+        "keys": ["ctrl+~"],
+        "command": "show_panel",
+        "args":
+        {
+            "panel": "console",
+            "toggle": true
+        }
+    },
+    {
         "keys": ["alt+shift+left"],
         "command": "set_layout",
         "args":
@@ -20,12 +29,21 @@
         }
     },
     {
-        "keys": ["alt+m"],
+        "keys": ["ctrl+alt+m"],
         "command": "markdown_preview",
         "args":
         {
             "target": "browser",
             "parser":"markdown"
         }
-    }
+    },
+    {
+      "keys": ["ctrl+shift+r"], "command": "browser_refresh", "args":
+      {
+        "auto_save": true,
+        "delay": 0.0,
+        "activate": true,
+        "browsers" : ["chrome"]
+      }
+    },
 ]

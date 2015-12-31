@@ -9,6 +9,8 @@
         "BracketHighlighter",
         "CodeFormatter",
         "Color Highlighter",
+        "ColorPicker",
+        "DocBlockr",
         "EasyMotion",
         "Emmet",
         "ExportHtml",
@@ -30,7 +32,9 @@
         "StringEncode",
         "SublimeCodeIntel",
         "SublimeLinter",
+        "SublimeREPL",
         "Theme - Soda",
+        "Theme - So​Da​Reloaded",
         "TrailingSpaces"
     ]
 }
