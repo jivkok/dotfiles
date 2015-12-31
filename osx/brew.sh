@@ -79,6 +79,7 @@ brew install git-extras
 brew install fzf
 [ -f /usr/local/opt/fzf/install ] && /usr/local/opt/fzf/install --key-bindings --completion --no-update-rc
 brew install imagemagick --with-webp
+brew install lnav
 brew install lua
 brew install lynx
 brew install p7zip
@@ -100,7 +101,7 @@ brew install iftop
 brew install lsof
 
 # Install MacVim
-brew install macvim --with-cscope --with-luajit
+brew install macvim --HEAD --with-cscope --with-lua --with-override-system-vim --with-luajit --with-python
 brew linkapps macvim
 
 # Remove outdated versions from the cellar.
