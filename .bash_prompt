@@ -1,4 +1,4 @@
-# Shell prompt based on the Solarized Dark theme.
+
 # iTerm → Profiles → Text → use 12pt Monaco with 1.1 vertical spacing.
 
 if [ -f ~/git-prompt.sh ]; then
