@@ -45,6 +45,7 @@ ln -sf "$dotdir/.tmux.conf" "$HOME/"
 ln -sf "$dotdir/.vim/.vimrc" "$HOME/"
 ln -sf "$dotdir/.wgetrc" "$HOME/"
 ln -sf "$dotdir/osx/.duti" "$HOME/"
+ln -sf "$dotdir/osx/.slate" "$HOME/"
 curl -o "$HOME/git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
 # Command-line tools (must be first since it installs gcc)
@@ -82,5 +83,9 @@ ask_and_run "$dotdir/osx/.osx" "Would you like to set sensible OSX defaults?"
 ask_and_run "$dotdir/osx/alfred.sh" "Would you like to configure Alfred?"
 
 ask_and_run "$dotdir/osx/dotnet.sh" "Would you like to configure DotNet?"
+
+# Karabiner
+[ -f "$HOME/Library/Application Support/Karabiner/private.xml" ] && cp -f "$HOME/Library/Application Support/Karabiner/private.xml" "$HOME/Library/Application Support/Karabiner/private.xml.backup"
+[ -f "$dotdir/osx/karabiner.private.xml" ] && cp -f "$dotdir/osx/karabiner.private.xml" "$HOME/Library/Application Support/Karabiner/private.xml"
 
 echo "Configuring OSX environment done."
