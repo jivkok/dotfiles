@@ -96,22 +96,29 @@ if [ "$os" = "Darwin" ]; then
     echo "Downloading Brackets extensions registry   https://s3.amazonaws.com/extend.brackets/registry.json   to   $extensionsRegistryPath"
     curl -H "Accept-Encoding: gzip, deflate" https://s3.amazonaws.com/extend.brackets/registry.json | gunzip - > "$extensionsRegistryPath"
 
+    install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "AngularJS for Brackets" # QuickEdit for directives, controllers, and services
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Autoprefixer" # Parse CSS and add vendor prefixes automatically
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Autosave Files on Window Blur" # Autosave all open files when switching applications
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Beautify" # Format JavaScript, HTML, and CSS files
+    install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Bootstrap Skeleton" # Add a Bootstrap Skeleton to your page.
+    install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Brackets Bower" # Manage your application's front-end dependencies using Bower
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Brackets Git" # Integration of Git into Brackets
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Brackets Icons" # File icons in Brackets' file tree
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Brackets Snippets (by edc)" # Imitate Sublime Text's behavior of snippets, and bring it to Brackets
+    install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "CanIUse" # Add a panel that renders CanIUse.com data
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Display Shortcuts" # Display current shortcuts in a bottom panel that can be sorted and filtered. Add and disable shortcuts from context menu
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "EditorConfig" # Supporting EditorConfig features
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Emmet" # High-speed HTML and CSS workflow
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "File Tree Exclude" # Excludes folders from the Brackets file system to avoid the 30,000 file limit
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "FTP-Sync Plus" # FTP/SFTP upload for Brackets
+    install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "FuncDocr" # Generates JSDoc, PHPDoc annotations for your functions
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Indent Guides" # Show indent guides in the code editor
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Interactive Linter" # Interactive linting for Brackets
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Lorem Pixel" # Generate placeholder images for every case
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Markdown Preview" # Live preview of markdown documents
+    install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Minimap" # Minimap like in Sublime Text
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Numbered Bookmarks" # Bookmark lines in the editor (CTRL+SHIFT+1 ... CTRL+SHIFT+9) as you work so you can quickly jump back to them later (CTRL+1 ... CTRL+9). Delete all: CTRL+SHIFT+DELETE
+    install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "QuickDocsJS" #
     # Themes
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "Monokai Dark Soda" # Dark theme based on Dark Soda and Monokai color schemes
     # install_extension "" $bracketsUserExtensionsPath/"
