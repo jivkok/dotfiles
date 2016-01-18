@@ -50,6 +50,7 @@ brew cask install evernote # notes sync
 brew cask install firefox # browser
 brew cask install flux # color adjustments
 brew cask install hermes # Pandora.com
+brew cask install karabiner # keyboard customization (together with seil)
 brew cask install keepassx # passwords sync
 brew cask install kindle # books
 brew cask install loading # shows network activity per app
@@ -58,7 +59,9 @@ brew cask install pacifist # OSX package files extractor
 brew cask install packet-peeper # network monitor
 brew cask install private-eye # network monitor
 brew cask install remote-desktop-connection # Windows connectivity
+brew cask install seil # keyboard customization (together with karabiner)
 brew cask install skype # chat
+brew cask install slate # window management
 brew cask install spectacle # window management
 brew cask install superduper # disk duplication
 # brew cask install teamviewer # remote sharing
