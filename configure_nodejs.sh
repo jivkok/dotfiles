@@ -25,6 +25,7 @@ if [ "$os" = "Linux" ]; then
     sudo npm install -g bower
     sudo npm install -g nodemon
     sudo npm install -g typescript
+    sudo npm install -g generator-webapp
 
     sudo npm cache clean
 elif [ "$os" = "Darwin" ]; then
@@ -40,6 +41,7 @@ elif [ "$os" = "Darwin" ]; then
     npm install -g bower
     npm install -g nodemon
     npm install -g typescript
+    npm install -g generator-webapp
 
     npm cache clean
 else
