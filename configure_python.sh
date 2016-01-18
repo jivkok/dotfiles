@@ -8,6 +8,7 @@ if [ "$os" = "Linux" ]; then
     # Packages
     sudo pip install --upgrade glances # system stats
     sudo pip install --upgrade httpie # curl-like with colorized output
+    sudo pip install --upgrade jsbeautifier # reformat and reindent JavaScript code. jsbeautifier.org. Use with 'js-beautify somefile.js'
     sudo pip install --upgrade Pygments # syntax highlighter
 elif [ "$os" = "Darwin" ]; then
     brew install python
@@ -15,6 +16,7 @@ elif [ "$os" = "Darwin" ]; then
     # Packages
     pip install --upgrade glances # system stats
     pip install --upgrade httpie # curl-like with colorized output
+    pip install --upgrade jsbeautifier # reformat and reindent JavaScript code. jsbeautifier.org. Use with 'js-beautify somefile.js'
     pip install --upgrade mitmproxy # http traffic interception
     pip install --upgrade Pygments # syntax highlighter (colorize)
 else

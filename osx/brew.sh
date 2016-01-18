@@ -94,6 +94,8 @@ brew install tree
 brew install webkit2png
 brew install zopfli
 brew install duti
+brew install dos2unix
+brew install unix2dos
 
 # Security-related
 brew install htop
