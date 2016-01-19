@@ -5,12 +5,14 @@ $env:EDITOR = "Notepad"
 
 function .. { Push-Location .. }
 function ... { Push-Location ..\.. }
+function .... { Push-Location ..\..\.. }
 function l { Get-ChildItem -Name $args }
 function ll { Get-ChildItem -Force $args }
 function n { notepad $args }
-function nn { & "${Env:ProgramW6432}\Sublime Text 3\sublime_text.exe" $args }
+function e { & "${Env:ProgramW6432}\Sublime Text 3\sublime_text.exe" $args }
 function qg { start http://www.google.com/#q=$args }
 function b { msbuild $args }
+Set-Alias x exit
 Set-Alias g git
 
 function fs

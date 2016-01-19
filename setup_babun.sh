@@ -12,14 +12,15 @@ dotdir="$HOME/dotfiles"
 
 if [ -d "$dotdir/.git" ]; then
     git -C "$dotdir" pull --prune --recurse-submodules
-    git -C "$dotdir" submodule update --init --recursive
 else
     if [ -d "$dotdir" ]; then
         mv "$dotdir" "${dotdir}.old"
     fi
     git clone --recursive https://github.com/jivkok/dotfiles.git "$dotdir"
 fi
+git -C "$dotdir" submodule update --init --recursive
 
+[ -d "$HOME/.vim" ] && mv "$HOME/.vim" "$HOME/.vim~"
 ln -sf "$dotdir/.vim" "$HOME/"
 ln -sb "$dotdir/.aliases" "$HOME/"
 ln -sb "$dotdir/.bash_profile" "$HOME/"
@@ -41,5 +42,8 @@ mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
 ln -sb "$dotdir/.zprofile" "$HOME/"
 ln -sb "$dotdir/.zshrc" "$HOME/"
 ln -sb "$dotdir/.zsh-theme" "$HOME/"
+
+source "$HOME/.zprofile"
+source "$HOME/.zshrc"
 
 echo "Configuring Windows environment (Babun distro for Cygwin) done."
