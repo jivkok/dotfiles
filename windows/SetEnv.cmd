@@ -8,19 +8,21 @@ DOSKEY ~=cd /d %USERPROFILE%
 DOSKEY cd=cd $*$Tdir
 DOSKEY ..=pushd ..
 DOSKEY ...=pushd ..\..
+DOSKEY ....=pushd ..\..\..
 DOSKEY l=dir /a /ogn /w $*
 DOSKEY ll=dir /a /ogn $*
 DOSKEY n=notepad.exe $*
 DOSKEY ds=dir /s/b $*
 DOSKEY fs=findstr /spin $1 $2
 DOSKEY b=msbuild $*
+DOSKEY x=exit
 
 rem Apps
 if exist "%ProgramW6432%\Sublime Text 3\sublime_text.exe" (
-    DOSKEY nn=start "" /B "%ProgramW6432%\Sublime Text 3\sublime_text.exe" $*
+    DOSKEY e=start "" /B "%ProgramW6432%\Sublime Text 3\sublime_text.exe" $*
 )
-if exist "%ProgramFiles(x86)%\Git\bin\git.exe" (
-    DOSKEY g="%ProgramFiles(x86)%\Git\bin\git.exe" $*
+if exist "%ProgramW6432%\Git\bin\git.exe" (
+    DOSKEY g="%ProgramW6432%\Git\bin\git.exe" $*
 )
 
 rem VS
