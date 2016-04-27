@@ -38,5 +38,9 @@ sudo apt-get install -y nethogs
 sudo apt-get install -y secure-delete
 sudo apt-get install -y strace
 
+# TaskWarrior
+sudo apt-get install -y task
+sudo apt-get install -y vit
+
 sudo apt-get clean
 sudo apt-get autoremove

@@ -33,7 +33,7 @@ fi
 # dotfiles check - Vundle.vim should be included as a submodule
 if [ -d "$HOME/dotfiles/.git" ]; then
     echo2 'Refreshing dotfiles.'
-    git -C "$HOME/dotfiles" pull origin master --recurse-submodules
+    git -C "$HOME/dotfiles" pull --prune --recurse-submodules
     git -C "$HOME/dotfiles" submodule update --init --recursive
 fi
 if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
@@ -76,7 +76,7 @@ if [ -d "$HOME/.vim/bundle/YouCompleteMe" ]; then
         fi
         echo2 'Configuring YouCompleteMe done.'
     else
-        echo2 'Warning: Configuring YouCompleteMe for $os not supported yet.'
+        echo2 "Warning: Configuring YouCompleteMe for $os not supported yet."
     fi
 fi
 
