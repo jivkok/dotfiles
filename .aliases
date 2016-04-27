@@ -83,7 +83,9 @@ alias reload="exec $SHELL -l"
 # Make Grunt print stack traces by default
 command -v grunt > /dev/null && alias grunt="grunt --stack"
 
+# Misc
 os=$(uname -s)
+alias help="command -V"
 
 if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ]; then
 

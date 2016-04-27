@@ -102,9 +102,13 @@ brew install htop
 brew install iftop
 brew install lsof
 
-# Install MacVim
+# MacVim
 brew install macvim --HEAD --with-cscope --with-lua --with-override-system-vim --with-luajit --with-python
 brew linkapps macvim
+
+# TaskWarrior
+brew install task
+brew install vit
 
 # Remove outdated versions from the cellar.
 brew cleanup
