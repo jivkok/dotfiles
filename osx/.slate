@@ -88,7 +88,7 @@ layout 2monitors 'Console':REPEAT            ${full}        ${mon-laptop}
 
 ## Default Layouts
 #default 1monitor  resolutions:${mon-laptop}
-#default 2monitors resolutions:${mon-laptop};${mon-thunderbolt}
+#default 2monitors resolutions:${mon-laptop};${mon-4k}
 default 1monitor count:1
 default 2monitors count:2
 
@@ -132,11 +132,13 @@ bind ]:${hyper}  throw next # move to next screen
 # These are laid out on the left hand
 bind z:${hyper}     focus ${terminal}
 bind space:${hyper} focus ${editor}
-bind f:${hyper}     focus ${browser}
+bind c:${hyper}     focus ${browser}
+bind f:${hyper}     focus 'Finder'
+bind i:${hyper}     focus 'Safari'
 bind x:${hyper}     focus 'Xcode'
 
 # Window Hints
 bind esc:${hyper} hint
 
 # Grid
-bind g:${hyper} grid padding:5 0:6,2 1:4,2
+bind g:${hyper} grid padding:5 0:6,2 1:6,2

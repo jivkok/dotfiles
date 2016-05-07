@@ -65,8 +65,10 @@ brew cask install slate # window management
 brew cask install spectacle # window management
 brew cask install superduper # disk duplication
 # brew cask install teamviewer # remote sharing
-brew cask install xquartz # X11
+brew cask install tunnelblick # OpenVPN client
+brew cask install vlc # media player
 brew cask install wireshark # network monitor, depends on xquartz
+brew cask install xquartz # X11
 
 # Remove outdated versions from the cellar.
 brew cleanup
