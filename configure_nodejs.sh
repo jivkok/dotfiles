@@ -16,32 +16,38 @@ if [ "$os" = "Linux" ]; then
     sudo npm install -g npm@latest
 
     # Packages
-    sudo npm install -g grunt-cli
-    sudo npm install -g http-server
+    sudo npm install -g bower
+    sudo npm install -g coffee-script
     sudo npm install -g express
     sudo npm install -g express-generator
-    sudo npm install -g yo
     sudo npm install -g generator-angular
-    sudo npm install -g bower
+    sudo npm install -g generator-webapp
+    sudo npm install -g grunt-cli
+    sudo npm install -g http-server
+    sudo npm install -g jshint
+    sudo npm install -g less
     sudo npm install -g nodemon
     sudo npm install -g typescript
-    sudo npm install -g generator-webapp
+    sudo npm install -g yo
 
     sudo npm cache clean
 elif [ "$os" = "Darwin" ]; then
     brew install node
 
     # Packages
-    npm install -g grunt-cli
-    npm install -g http-server
+    npm install -g bower
+    npm install -g coffee-script
     npm install -g express
     npm install -g express-generator
-    npm install -g yo
     npm install -g generator-angular
-    npm install -g bower
+    npm install -g generator-webapp
+    npm install -g grunt-cli
+    npm install -g http-server
+    npm install -g jshint
+    npm install -g less
     npm install -g nodemon
     npm install -g typescript
-    npm install -g generator-webapp
+    npm install -g yo
 
     npm cache clean
 else
