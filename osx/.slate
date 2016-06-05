@@ -135,6 +135,7 @@ bind space:${hyper} focus ${editor}
 bind c:${hyper}     focus ${browser}
 bind f:${hyper}     focus 'Finder'
 bind i:${hyper}     focus 'Safari'
+bind v:${hyper}     focus 'MacVim'
 bind x:${hyper}     focus 'Xcode'
 
 # Window Hints

@@ -1,6 +1,8 @@
 # OSX, Linux, and Windows machine configuration scripts
 
-Details:
+[TOC]
+
+## OS Details
 * [OSX](www.apple.com/osx/) - OSX [Snow Leopard](www.apple.com/support/snowleopard/) (10.5) onward.
 * [Linux](www.linux.com/) - [Debian](www.debian.org/) distros ([Ubuntu](www.ubuntu.com/), etc.).
 * [Windows](www.microsoft.com/en-us/windows/) - [babun](http://babun.github.io) shell (pre-configured [Cygwin](www.cygwin.com/) with [Zsh](www.zsh.org/)), [DOS](https://technet.microsoft.com/en-us/library/cc754340.aspx), and [Powershell](https://technet.microsoft.com/library/hh857337.aspx)
@@ -27,6 +29,7 @@ Details:
 * [OSX software](https://github.com/jivkok/dotfiles/blob/master/osx/software.sh)
 * [OSX tweaks](https://github.com/jivkok/dotfiles/blob/master/osx/.osx)
 * [Alfred workflows](https://github.com/jivkok/alfred-workflows)
+
 
 ### Installation
 The setup script will configure shell options, theme, aliases, and functions.
@@ -66,6 +69,21 @@ git clone https://github.com/jivkok/dotfiles.git dotfiles
 source dotfiles/setup_babun.sh
 ```
 
+
+### Individual Configuration Scripts
+* **configure_brackets.sh**: text editor for web development
+* **configure_databases.sh**: MySQL, PostgreSQL, MongoDB, Redis, and ElasticSearch
+* **configure_dotnet.sh**: .Net framework
+* **configure_git.sh**: Git DVCS
+* **configure_nodejs.sh**: NodeJS runtime environment
+* **configure_python.sh**: Python programming language
+* **configure_ruby.sh**: Ruby programming language
+* **configure_sublimetext.sh**: multi-purpose text editor
+* **configure_vim.sh**: highly configurable text editor
+* **configure_zsh.sh**: Z shell
+
+
+
 ### Customizations
 
 #### Specify the `$PATH`
@@ -79,6 +97,28 @@ export PATH="/usr/local/bin:$PATH"
 #### Custom commands without creating a new fork
 If `~/.profile.local` exists, it will be sourced along with the other files. You can use this to add custom commands without the need to fork this entire repository, or to add commands you don’t want to commit to a public repository.
 Since `~/.profile.local` is sourced at the end, it allows for overriding of existing settings, functions, and aliases.
+
+#### OSX: System Preferences
+* Security & Privacy:
+    * General:
+        * Require password immediately after sleep or screen saver begins.
+        * Show contact info when screen is locked.
+        * Allow apps downloaded from App Store and identified developers.
+    * FileVault:
+        * Enable FileVault and save the recovery key in a secure location.
+    * Firewall:
+        * Enable it.
+        * Automatically allow signed software.
+        * Enable stealth mode.
+    * Privacy:
+        * Apps like Alfred, Dropbox, etc. will need to be enabled for accessibility.
+* Printers & Scanners:
+    * Add them.
+* iCloud:
+    * Enable Find My Mac.
+* Users & Groups:
+    * Update avatar.
+
 
 ### Upgrade
 ```sh
