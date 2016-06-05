@@ -26,7 +26,6 @@ alias ducks='du -cks * | sort -n -r | head -n 30'
 alias g="git"
 alias h="history"
 alias j="jobs"
-alias s="subl"
 alias e="subl"
 if [ "$(uname -s)" = "Darwin" ]; then
     alias v="gvim"
@@ -107,24 +106,26 @@ fi
 if [ "$os" = "Linux" ]; then
 
     # Packages
-    alias pkgfind="sudo apt-cache search"
-    alias pkgget="sudo apt-get install"
+    alias pkgsearch="apt-cache search"
+    alias pkginstall="sudo apt-get install -y"
     alias pkgremove="sudo apt-get remove"
-    alias pkglist="sudo apt-cache pkgnames"
-    alias pkgupd="sudo apt-get update --fix-missing && sudo apt-get dist-upgrade && sudo apt-get clean && sudo apt-get autoremove"
+    alias pkglist="apt-cache pkgnames"
+    alias pkgshow="apt-cache show"
+    alias pkgupdate="sudo apt-get update --fix-missing && sudo apt-get dist-upgrade && sudo apt-get clean && sudo apt-get autoremove"
 
 elif [ "$os" = "Darwin" ]; then
 
     # Packages
-    alias pkgfind="brew search"
-    alias pkgget="brew install"
+    alias pkgsearch="brew search"
+    alias pkginstall="brew install"
     alias pkgremove="brew uninstall"
     alias pkglist="brew list"
-    alias pkgupd="brew update && brew upgrade && brew cleanup && brew doctor"
+    alias pkgshow="brew info"
+    alias pkgupdate="brew update && brew upgrade --all && brew cleanup && brew doctor"
     alias cask="brew cask"
 
     # Get OS X Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
-    alias osx_update='sudo softwareupdate -i -a; command -v sys_update >/dev/null 2>&1 && sys_update'
+    alias osx_update='sudo softwareupdate --install --all --verbose; command -v sys_update >/dev/null 2>&1 && sys_update'
 
     # Flush Directory Service cache
     alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
