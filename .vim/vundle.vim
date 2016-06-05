@@ -36,6 +36,7 @@ Plugin 'easymotion/vim-easymotion' " motions - mark all words on a screen and th
 Plugin 'tpope/vim-surround' " surroundings: parentheses, brackets, quotes, XML tags, and more
 Plugin 'tpope/vim-repeat' " enable repeating supported plugin maps with '.'
 Plugin 'mattn/emmet-vim' " HTML/CSS high-speed coding
+Plugin 'editorconfig/editorconfig-vim' " standardized editing styles
 "Plugin 'davidhalter/jedi-vim' " Python autocompletion
 
 " Buffers/files

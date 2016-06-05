@@ -142,6 +142,7 @@ try {
   CreateFileSymlink '.bash_prompt' $dotfiles $destPath
   CreateFileSymlink '.bashrc' $dotfiles $destPath
   CreateFileSymlink '.curlrc' $dotfiles $destPath
+  CreateFileSymlink '.editorconfig' $dotfiles $destPath
   CreateFileSymlink '.exports' $dotfiles $destPath
   CreateFileSymlink '.functions' $dotfiles $destPath
   CreateFileSymlink '.tmux.conf' $dotfiles $destPath
