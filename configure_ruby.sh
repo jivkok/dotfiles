@@ -13,7 +13,8 @@ if [ "$os" = "Linux" ]; then
     # echo [[ -s "\$HOME/.rvm/scripts/rvm" ]] && source "\$HOME/.rvm/scripts/rvm">>$HOME/.profile_extra
     sudo apt-get install rubygems-integration
 elif [ "$os" = "Darwin" ]; then
-    # installed by default
+    brew install ruby-build
+    brew install rbenv
     # Packages
     sudo gem install cocoapods
 else
