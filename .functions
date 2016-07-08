@@ -73,8 +73,11 @@ function sys_update() {
         echo -e "\nUpdating Homebrew packages ...\n"
         brew update
         brew upgrade
+        brew prune
         brew cleanup
         brew doctor
+        cask cleanup
+        cask doctor
         echo -e "\nUpdating Homebrew packages done.\n"
     fi
 
@@ -105,11 +108,7 @@ function sys_update() {
 
     if command -v pip >/dev/null 2>&1 ; then
         echo -e "\nUpdating Python packages ...\n"
-        if [ "$os" = "Darwin" ]; then
-            pip list --outdated | cut -d ' ' -f 1 | xargs -n 1 pip install --upgrade
-        else
-            pip list --outdated | cut -d ' ' -f 1 | xargs -n 1 sudo pip install --upgrade
-        fi
+        pip list --outdated | cut -d ' ' -f 1 | xargs -n 1 sudo -H pip install --upgrade
         echo -e "\nUpdating Python packages done.\n"
     fi
 
