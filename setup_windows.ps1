@@ -105,7 +105,7 @@ try {
   if ((Get-Command $git_exe -ErrorAction SilentlyContinue) -eq $null) {
     if (Test-Path "${Env:ProgramW6432}\Git\bin\git.exe") {
       $git_exe = "${Env:ProgramW6432}\Git\bin\git.exe"
-    } else if (Test-Path "${Env:ProgramFiles(x86)}\Git\bin\git.exe") {
+    } elseif (Test-Path "${Env:ProgramFiles(x86)}\Git\bin\git.exe") {
       $git_exe = "${Env:ProgramFiles(x86)}\Git\bin\git.exe"
     } else {
       throw 'Could not find git.exe'
@@ -150,6 +150,9 @@ try {
   CreateFileSymlink '.wgetrc' $dotfiles $destPath
   echo "Git prompt: https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh ==> $Home\git-prompt.sh"
   (New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh', "$Home\git-prompt.sh")
+
+  echo 'Windows symlinks'
+  CreateFileSymlink 'AutoHotkey.ahk' $windowsPath "$Home\Documents"
 
   # System configuration
   Import-Module (Join-Path $windowsPath BoxStarter.psm1)
