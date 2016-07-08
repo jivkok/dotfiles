@@ -35,6 +35,7 @@ brew install bash-completion
 brew install wget --with-iri
 brew install vim --override-system-vi
 brew install homebrew/dupes/grep
+brew install homebrew/dupes/rsync
 brew install homebrew/php/php55 --with-gmp
 
 # Packages
@@ -87,6 +88,7 @@ brew install shellcheck
 brew install socat
 brew install speedtest_cli
 brew install sqlmap
+brew install ssh-copy-id
 brew install tcpflow
 brew install tcpreplay
 brew install tcptrace
