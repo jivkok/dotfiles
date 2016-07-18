@@ -28,7 +28,7 @@ alias mon-4k        3840x2160
 ## Application aliases
 alias browser   'Google Chrome'
 alias editor    'Sublime Text'
-alias terminal  'iTerm'
+alias terminal  'iTerm2'
 
 ## Position aliases
 alias full                  move screenOriginX;screenOriginY                                screenSizeX;screenSizeY
@@ -70,8 +70,8 @@ layout 1monitor 'Activity Monitor':REPEAT   ${full}
 layout 1monitor 'Console':REPEAT            ${full}
 
 ## 2monitors
-layout 2monitors ${terminal}:REPEAT          ${leftthird}
-layout 2monitors 'Finder':REPEAT             ${leftthird}
+layout 2monitors ${terminal}:REPEAT          ${bottom_leftthird}
+layout 2monitors 'Finder':REPEAT             ${top_leftthird}
 layout 2monitors 'SourceTree':REPEAT         ${leftthird}
 layout 2monitors ${editor}:REPEAT            ${middlethird}
 layout 2monitors 'Brackets':REPEAT           ${middlethird}
