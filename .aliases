@@ -187,4 +187,8 @@ elif [ "$os" = "Darwin" ]; then
     if [ -f "/Applications/p4merge.app/Contents/Resources/launchp4merge" ]; then
         alias p4diff="/Applications/p4merge.app/Contents/Resources/launchp4merge $*"
     fi
+
+    if [ -f "$HOME/.m-cli/m" ]; then
+        alias m="$HOME/.m-cli/m $*"
+    fi
 fi
