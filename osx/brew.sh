@@ -119,3 +119,6 @@ brew install vit
 
 # Remove outdated versions from the cellar.
 brew cleanup
+
+# m-cli
+INSTALL_DIR=$HOME/.m-cli sh <(curl -fsSL https://raw.githubusercontent.com/rgcr/m-cli/master/install.sh)
