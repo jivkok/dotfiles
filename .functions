@@ -74,8 +74,17 @@ function fp() {
 }
 
 # system update
-function sys_update() {
+function os_update() {
     echo -e "\nUpdating system ...\n"
+
+    # dotfiles
+    local dotdir="$HOME/dotfiles"
+    if [ -d "$dotdir/.git" ]; then
+        echo -e "\nUpdating dotfiles ...\n"
+        git -C "$dotdir" pull --prune
+        # git -C "$dotdir" pull --prune --recurse-submodules
+        # git -C "$dotdir" submodule update --init --recursive
+    fi
 
     if command -v brew >/dev/null 2>&1 ; then
         echo -e "\nUpdating Homebrew packages ...\n"
@@ -90,7 +99,7 @@ function sys_update() {
     fi
 
     if command -v apt-get >/dev/null 2>&1 ; then
-        echo -e "\nUpdating system packages ...\n"
+        echo -e "\nUpdating apt-get packages ...\n"
         sudo apt-get update --fix-missing
         sudo apt-get dist-upgrade
         sudo apt-get clean
