@@ -21,6 +21,7 @@ alias dud2="du $dushow -d 2 | sort $dusort -r"
 alias dud3="du $dushow -d 3 | sort $dusort -r"
 alias dud4="du $dushow -d 4 | sort $dusort -r"
 alias ducks='du -cks * | sort -n -r | head -n 30'
+alias path='echo -e ${PATH//:/\\n}'
 
 # Shortcuts
 alias g="git"
@@ -84,7 +85,6 @@ command -v grunt > /dev/null && alias grunt="grunt --stack"
 
 # Misc
 os=$(uname -s)
-alias help="command -V"
 
 if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ]; then
 
