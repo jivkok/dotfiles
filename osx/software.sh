@@ -18,6 +18,7 @@ brew cask install firefox
 # development
 brew cask install atom # code/text editor
 brew cask install brackets # code/text editor
+brew cask install bwana # browser as man pager
 brew cask install ccmenu # CI server status
 brew cask install dash # documentation sets
 brew cask install gimp # imaging
