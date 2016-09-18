@@ -1,13 +1,16 @@
 #!/bin/bash
 # Packages
 
-# Common
+sudo add-apt-repository ppa:aacebedo/fasd
 sudo apt-get update
+
+# Common
 sudo apt-get install -y cifs-utils
 sudo apt-get install -y collectl
 sudo apt-get install -y curl
 sudo apt-get install -y dstat
 sudo apt-get install -y exuberant-ctags
+sudo apt-get install -y fasd
 sudo apt-get install -y git
 sudo apt-get install -y git-extras
 sudo apt-get install -y gitk

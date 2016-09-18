@@ -93,8 +93,8 @@ elif [ "$OS" = "Darwin" ]; then
 
 fi
 
-# Load the shell dotfiles, (~/.bash_extra can be used for any local settings you don’t want to commit)
-for file in ~/{.bash_prompt,.aliases,.functions,.bash_extra,dotfiles/submodules/z/z.sh,.fzf.zsh}; do
+# Load the shell dotfiles, (~/.profile.local can be used for any local settings you don’t want to commit)
+for file in ~/{.bash_prompt,.aliases,.functions,.fzf.bash,.profile.local}; do
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;

@@ -10,8 +10,8 @@ sudo -v
 # Keep-alive: update existing `sudo` time stamp until the script has finished.
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
-brew update
 brew upgrade
+brew update
 
 # Install GNU core utilities (those that come with OS X are outdated).
 # Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
@@ -53,6 +53,7 @@ brew install dns2tcp
 brew install dos2unix
 brew install duti
 # brew install exiv2
+brew install fasd
 brew install fcrackzip
 brew install ffmpeg
 brew install foremost
