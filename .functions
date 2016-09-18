@@ -30,7 +30,7 @@ function lsd() {
 }
 
 function ff() {
-    if [ "$1" == "" ]; then
+    if [ -z "$1" ]; then
         echo "Find Files (or directories)"
         echo "Usage: ff file_pattern [directory]"
         return
@@ -38,7 +38,7 @@ function ff() {
 
     file_pattern="$1"
     directory="$2"
-    if [ "$directory" == "" ]; then
+    if [ -z "$directory" ]; then
         directory='.'
     fi
 
@@ -46,7 +46,7 @@ function ff() {
 }
 
 function fs() {
-    if [ "$1" == "" ]; then
+    if [ -z "$1" ]; then
         echo "Find Strings in files"
         echo "Usage: fs string_pattern [file_pattern] [directory]"
         return
@@ -55,14 +55,22 @@ function fs() {
     string_pattern="$1"
     file_pattern="$2"
     directory="$3"
-    if [ "$file_pattern" == "" ]; then
+    if [ -z "$file_pattern" ]; then
         file_pattern='*'
     fi
-    if [ "$directory" == "" ]; then
+    if [ -z "$directory" ]; then
         directory='.'
     fi
 
-    find "$directory" -type f -iname "$file_pattern" -exec grep -I -l -i "$string_pattern" {} \; -exec grep -I -n -i "$string_pattern" {} \;
+    # find "$directory" -type f -iname "$file_pattern" -exec grep -I -l -i "$string_pattern" {} \; -exec grep -I -n -i "$string_pattern" {} \;
+    # ack
+    # ag
+    grep -Hrn "$string_pattern" "$directory" --include "$file_pattern"
+}
+
+# find and list processes matching a case-insensitive partial-match string
+function fp() {
+    ps Ao pid,comm|awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}'|grep -i $1|grep -v grep
 }
 
 # system update
@@ -152,6 +160,24 @@ function ex() {
     fi
 }
 
+# ls for archives (inspired by `extract`)
+lsz() {
+    if [ $# -ne 1 ]
+    then
+        echo "lsz filename.[tar,tgz,gz,zip,etc]"
+        return 1
+    fi
+    if [ -f $1 ] ; then
+        case $1 in
+            *.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz) tar tvf $1;;
+            *.zip)  unzip -l $1;;
+            *)      echo "'$1' unrecognized." ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
 # Simple calculator
 function calc() {
     local result="";
@@ -215,7 +241,7 @@ function dataurl() {
 function git_pull_all() {
     dir="${1:-.}"
     for i in $(find "$dir" -type d -depth 1); do
-        [ -d "$i/.git" ] && echo "Repo: $i" && git -C "$i" pull --prune;
+        [ -d "$i/.git" ] && echo -e "\nRepo: $i" && git -C "$i" pull --prune;
     done
 }
 
@@ -278,6 +304,18 @@ function unidecode() {
     fi;
 }
 
+# encode a given image file as base64 and output css background property to clipboard
+function img2base64() {
+    openssl base64 -in $1 | awk -v ext="${1#*.}" '{ str1=str1 $0 }END{ print "background:url(data:image/"ext";base64,"str1");" }'|pbcopy
+    echo "$1 encoded to clipboard"
+}
+
+# encode a given font file as base64 and output css src property to clipboard
+function 64font() {
+    openssl base64 -in $1 | awk -v ext="${1#*.}" '{ str1=str1 $0 }END{ print "src:url(\"data:font/"ext";base64,"str1"\")  format(\"woff\");" }'|pbcopy
+    echo "$1 encoded as font and copied to clipboard"
+}
+
 # Get a character’s Unicode code point
 function codepoint() {
     perl -e "use utf8; print sprintf('U+%04X', ord(\"$@\"))";
@@ -327,6 +365,118 @@ function getcertnames() {
 # small enough for one screen.
 function tre() {
     tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+}
+
+# colorized man
+function man() {
+    env \
+        LESS_TERMCAP_md=$'\e[1;36m' \
+        LESS_TERMCAP_me=$'\e[0m' \
+        LESS_TERMCAP_se=$'\e[0m' \
+        LESS_TERMCAP_so=$'\e[1;40;92m' \
+        LESS_TERMCAP_ue=$'\e[0m' \
+        LESS_TERMCAP_us=$'\e[1;32m' \
+        man "$@"
+}
+
+# Helps identifying the source/content of a command
+function help() {
+    local cmd=$1
+    if [ -z "$cmd" ]; then
+        echo "Helps identifying the source/content of a command"
+        echo "Usage: help command"
+        return
+    fi
+
+    local DEFAULT="\033[0;39m" RED="\033[0;31m" GREEN="\033[0;32m"
+    local hasPygmentize=0
+    command -v pygmentize >/dev/null 2>&1 && hasPygmentize=1
+
+    local cmdtest=$(type $cmd) # command -V, which
+
+    # alias
+    if [[ $cmdtest == *"is an alias for"* ]]; then
+        echo -e "${GREEN}Alias${DEFAULT}"
+        if [[ $hasPygmentize == 1 ]]; then
+            alias $cmd | pygmentize -l sh
+        else
+            alias $cmd
+        fi
+        return
+    fi
+
+    # function
+    if [[ $cmdtest == *"is a shell function"* ]]; then
+        echo -e "${GREEN}${cmdtest}${DEFAULT}"
+        if [[ $hasPygmentize == 1 ]]; then
+            which $cmd | pygmentize -l sh
+        else
+            which $cmd
+        fi
+        return
+    fi
+
+    # file
+    local f=$(echo $cmdtest | sed -r 's/.+\ is\ (.*)/\1/')
+    if [ -f "$f" ]; then
+        echo -e "${GREEN}${cmdtest}${DEFAULT}"
+        file $f
+        return
+    fi
+
+    # man
+    man $cmd >/dev/null 2>&1
+    if [[ $? == 0 ]]; then
+        echo -e "${GREEN}Found man entry for: ${cmd}${DEFAULT}"
+        man $cmd
+        return
+    fi
+
+    # whatis
+    local mantest=$(man -f $cmd -P cat)
+    if [[ $mantest != *"nothing appropriate"* ]]; then
+        echo -e "${GREEN}Found whatis entries for: ${cmd}${DEFAULT}"
+        man -f $cmd
+        return
+    fi
+
+    # apropos
+    mantest=$(man -k $cmd -P cat)
+    if [[ $mantest != *"nothing appropriate"* ]]; then
+        echo -e "${GREEN}Found whatis strings for: ${cmd}${DEFAULT}"
+        man -k $cmd
+        return
+    fi
+
+    echo -e "${RED}Could not find anything for: ${cmd}${DEFAULT}"
+    return 1
+}
+
+function psa () {
+    if [ -z "$1" ]; then
+        ps aux
+    else
+        ps aux | grep -i $1
+    fi
+}
+
+# Tails the system log
+function sys_log () {
+    if [ "$os" = "Linux" ]; then
+        syslog=/var/log/syslog
+    elif [ "$os" = "Darwin" ]; then
+        syslog=/var/log/system.log
+    else
+        echo "Unsupported OS: $os"
+        return
+    fi
+
+    if [[ $# > 0 ]]; then
+        query=$(echo "$*"|tr -s ' ' '|')
+        tail -f $syslog|grep -i --color=auto -E "$query"
+    else
+        tail -f $syslog
+    fi
 }
 
 os=$(uname -s)
