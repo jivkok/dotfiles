@@ -93,6 +93,9 @@ git config --global alias.remotes 'remote -v show'
 git config --global alias.st 'status -sb'
 git config --global alias.stats 'diff --stat'
 git config --global alias.undo 'reset HEAD~'
+git config --global alias.undohard '!f() { \
+    git reset --hard $(git rev-parse --abbrev-ref HEAD)@{${1-1}}; \
+}; f'
 git config --global alias.unstage 'reset HEAD'
 git config --global alias.vimdiff 'difftool --tool=vimdiff --no-prompt'
 git config --global alias.wdiff 'diff --word-diff'
