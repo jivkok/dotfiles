@@ -73,7 +73,7 @@ bindkey "^[[1;5C" forward-word # ctrl-right
 
 # Load the shell dotfiles
 #   ~/.profile.local can be used for any local settings you don’t want to commit
-for file in ~/{.zsh-theme,.aliases,.functions,.fzf.zsh,.profile.local}; do
+for file in ~/{.zsh-theme,.aliases,.functions,.fzf.zsh,.marks.sh,.profile.local}; do
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
