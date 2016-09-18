@@ -12,3 +12,6 @@ PROMPT='%(?, ,%{$fg[red]%}errcode: $?%{$reset_color%}
 %_$(prompt_char) '
 
 RPROMPT='$(git_prompt_info)'
+if [[ ! -z "$SSH_CLIENT" ]]; then
+    RPROMPT="$RPROMPT ⇄" # ssh icon
+fi
