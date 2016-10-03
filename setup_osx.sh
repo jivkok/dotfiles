@@ -48,6 +48,14 @@ ln -sf "$dotdir/.vim/.vimrc" "$HOME/"
 ln -sf "$dotdir/.wgetrc" "$HOME/"
 ln -sf "$dotdir/osx/.duti" "$HOME/"
 ln -sf "$dotdir/osx/.slate" "$HOME/"
+
+nvimdir="$HOME/.config/nvim"
+mkdir -p "$nvimdir"
+ln -sf "$dotdir/.vim/.vimrc" "$nvimdir/init.vim"
+for dir in $(find "$dotdir/.vim" -type d -depth 1); do
+    ln -sF "$dir" "$nvimdir"
+done;
+
 curl -o "$HOME/git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
 # Command-line tools (must be first since it installs gcc)

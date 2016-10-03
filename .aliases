@@ -28,7 +28,9 @@ alias g="git"
 alias h="history"
 alias j="jobs"
 alias e="subl"
-if [ "$(uname -s)" = "Darwin" ]; then
+if command -v nvim >/dev/null 2>&1; then
+    alias v="nvim"
+elif command -v gvim >/dev/null 2>&1; then
     alias v="gvim"
 else
     alias v="vim"
@@ -125,7 +127,7 @@ elif [ "$os" = "Darwin" ]; then
     alias cask="brew cask"
 
     # Get OS X Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
-    alias osx_update='sudo softwareupdate --install --all --verbose; command -v sys_update >/dev/null 2>&1 && sys_update'
+    alias osx_update='sudo softwareupdate --install --all --verbose; command -v os_update >/dev/null 2>&1 && sys_update'
 
     # Flush Directory Service cache
     alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
