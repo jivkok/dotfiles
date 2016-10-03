@@ -1,5 +1,3 @@
-" keys.vim
-
 " Custom mapleader
 let mapleader=","
 

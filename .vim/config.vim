@@ -1,5 +1,3 @@
-" config.vim
-
 " Basic -------------------------------------------------------------
 syntax on                 " Enable syntax highlighting
 set encoding=utf-8 nobomb " Use UTF-8 without BOM
