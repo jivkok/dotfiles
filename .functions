@@ -461,7 +461,7 @@ function help() {
     fi
 
     # whatis
-    local mantest=$(man -f $cmd -P cat)
+    local mantest=$(man -f $cmd)
     if [[ $mantest != *"nothing appropriate"* ]]; then
         echo -e "${GREEN}Found whatis entries for: ${cmd}${DEFAULT}"
         man -f $cmd
@@ -469,7 +469,7 @@ function help() {
     fi
 
     # apropos
-    mantest=$(man -k $cmd -P cat)
+    mantest=$(man -k $cmd)
     if [[ $mantest != *"nothing appropriate"* ]]; then
         echo -e "${GREEN}Found whatis strings for: ${cmd}${DEFAULT}"
         man -k $cmd

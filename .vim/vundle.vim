@@ -27,7 +27,6 @@ Plugin 'nathanaelkane/vim-indent-guides' "displays indent levels
 
 " Editing
 Plugin 'msanders/snipmate.vim' " snippets mgmt for various languages
-Plugin 'Valloric/YouCompleteMe' " code-completion engine
 Plugin 'dhruvasagar/vim-table-mode' " tables creation
 Plugin 'godlygeek/tabular' " text alignment
 Plugin 'vim-scripts/ZoomWin' " Zoom in/out of windows (toggle between one window and multi-window)
@@ -51,6 +50,14 @@ Plugin 'majutsushi/tagbar' " class outline viewer
 
 " Misc
 Plugin 'rking/ag.vim' " Vim plugin for the_silver_searcher 'ag' - code-searching tool
+Plugin 'junegunn/fzf.vim' " fuzzy file finder
+
+if has('nvim')
+  Plugin 'Shougo/deoplete.nvim' " code-completion engine
+else
+  Plugin 'Valloric/YouCompleteMe' " code-completion engine
+  " Plugin 'Shougo/neocomplete' " code-completion engine
+endif
 
 " No plugins below this line --------------------------------------------------
 call vundle#end()

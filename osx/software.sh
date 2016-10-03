@@ -82,5 +82,7 @@ brew prune
 brew cleanup
 
 echo Install these apps from the AppStore:
+echo * Converto
 echo * Dr. CLeaner
+echo * Memory Clean
 echo * Microsoft Remote Desktop

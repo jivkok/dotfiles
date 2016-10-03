@@ -16,13 +16,16 @@ set cursorline            " Highlight the line the cursor is on
 set showcmd               " Show the (partial) command as it’s being typed
 set showmode              " Show the current mode
 set showmatch             " Briefly jump to matching bracket when inserted
-set number                " Enable line numbers
+set relativenumber number " Enable line numbers
 set laststatus=2          " Always show status line
 set ruler                 " Show the cursor position
 set nowrap                " Do not wrap long lines
 set shortmess=atI         " Don’t show the intro message when starting Vim
 set lcs=tab:▸\ ,trail:·,nbsp:_ " Show “invisible” characters. set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
 set list
+if $TERM_PROGRAM =~ "iTerm"
+  set termguicolors
+endif
 
 " Behaviors --------------------------------------------------------------------
 set wildmenu              " Turn on menu-based tab completion for commands

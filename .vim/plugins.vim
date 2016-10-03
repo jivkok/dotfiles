@@ -79,3 +79,11 @@ let g:tagbar_show_visibility = 1
 " Expand tag folds until the current tag is visible
 let g:tagbar_autoshowtag = 1
 
+if has('nvim')
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Deoplete
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:deoplete#enable_at_startup = 1
+
+endif

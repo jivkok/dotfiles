@@ -12,10 +12,17 @@ echo2 'Configuring Vim ...'
 os=$(uname -s)
 
 if [ "$os" = "Linux" ]; then
+    sudo add-apt-repository ppa:neovim-ppa/unstable
+    sudo apt-get update
+
     sudo apt-get install build-essential
     sudo apt-get install cmake
-    sudo apt-get install python-dev
+    sudo apt-get install python-dev python-pip python3-dev python3-pip
     sudo apt-get install vim
+    sudo apt-get install neovim
+
+    sudo pip2 install --upgrade neovim
+    sudo pip3 install --upgrade neovim
 elif [ "$os" = "Darwin" ]; then
     xcode-select -p
     if [ $? != 0 ]; then
@@ -23,8 +30,12 @@ elif [ "$os" = "Darwin" ]; then
     fi
     brew install cmake
     # brew install llvm --with-clang
-    brew install vim --override-system-vi
+    brew install vim --override-system-vi --with-lua
     brew install macvim --HEAD --with-cscope --with-lua --with-override-system-vim --with-luajit --with-python
+    brew install neovim/neovim/neovim
+
+    pip2 install --upgrade neovim
+    pip3 install --upgrade neovim
 else
     echo2 "Unsupported OS: $os"
     return
