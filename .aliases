@@ -35,7 +35,7 @@ elif command -v gvim >/dev/null 2>&1; then
 else
     alias v="vim"
 fi
-alias vimupd="vim +PluginUpdate +qall"
+alias vimupd="v +PlugUpdate +qall"
 alias em='emacs -nw'     # No X11 windows
 alias eqq='emacs -nw -Q' # No config and no X11
 alias x='exit'
@@ -127,7 +127,7 @@ elif [ "$os" = "Darwin" ]; then
     alias cask="brew cask"
 
     # Get OS X Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
-    alias osx_update='sudo softwareupdate --install --all --verbose; command -v os_update >/dev/null 2>&1 && sys_update'
+    alias osx_update='sudo softwareupdate --install --all --verbose; command -v os_update >/dev/null 2>&1 && os_update'
 
     # Flush Directory Service cache
     alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"

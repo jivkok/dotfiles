@@ -265,6 +265,22 @@ similar to CSS selectors, into HTML code:   div#page>div.logo+ul#navigation>li*5
 Note: too much to list, just go to the help
 :h emmet
 
+=== EditorConfig
+EditorConfig plugin for vim
+:h EditorConfig
+Commands:
+:EditorConfigReload
+Settings: see help
+
+=== Deoplete
+Provides asynchronous keyword completion system in the
+current buffer
+:h deoplete
+Settings:
+g:deoplete#enable_at_startup = 1
+g:deoplete#enable_smart_case = 1
+... manu more, look at the help
+
 
 === Buffers/files
 
@@ -403,6 +419,7 @@ Mappings:
 === ag.vim
 Plugin for the_silver_searcher 'ag' - code-searching tool
 :h ag.txt
+Commands:
 :Ag[!] [options] {pattern} [{directory}]
 :AgBuffer[!] [options] {pattern}
 :AgFile [options] {pattern} [{directory}]
@@ -418,6 +435,34 @@ H - open in horizontal split silently.
 v - open in vertical split.
 gv- open in vertical split silently.
 q - close the quickfix window.
+
+=== fzf-vim
+fzf is a general-purpose command-line fuzzy finder. This plugin is a bundle of fzf-based commands and mappings
+:h fzf
+Commands:
+:Files [PATH]    | Files (similar to `:FZF`)
+:GFiles [OPTS]   | Git files (git ls-files)
+:GFiles?         | Git files (git status)
+:Buffers         | Open buffers
+:Colors          | Color schemes
+:Ag [PATTERN]    | {ag} search result (ALT-A to select all, ALT-D to deselect all)
+:Lines [QUERY]   | Lines in loaded buffers
+:BLines [QUERY]  | Lines in the current buffer
+:Tags [QUERY]    | Tags in the project (`ctags -R`)
+:BTags [QUERY]   | Tags in the current buffer
+:Marks           | Marks
+:Windows         | Windows
+:Locate PATTERN  | `locate` command output
+:History         | `v:oldfiles` and open buffers
+:History:        | Command history
+:History/        | Search history
+:Snippets        | Snippets ({UltiSnips})
+:Commits         | Git commits (requires {fugitive.vim})
+:BCommits        | Git commits for the current buffer
+:Commands        | Commands
+:Maps            | Normal mode mappings
+:Helptags        | Help tags [1]
+:Filetypes       | File types
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:

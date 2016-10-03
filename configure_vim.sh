@@ -7,6 +7,13 @@ function echo2 ()
     echo -e "\n$1\n"
 }
 
+# dotfiles refresh
+if [ -d "$HOME/dotfiles/.git" ]; then
+    echo2 'Refreshing dotfiles.'
+    git -C "$HOME/dotfiles" pull --prune --recurse-submodules
+    git -C "$HOME/dotfiles" submodule update --init --recursive
+fi
+
 echo2 'Configuring Vim ...'
 
 os=$(uname -s)
@@ -41,22 +48,16 @@ else
     return
 fi
 
-# dotfiles check - Vundle.vim should be included as a submodule
-if [ -d "$HOME/dotfiles/.git" ]; then
-    echo2 'Refreshing dotfiles.'
-    git -C "$HOME/dotfiles" pull --prune --recurse-submodules
-    git -C "$HOME/dotfiles" submodule update --init --recursive
-fi
-if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
-    git clone https://github.com/gmarik/Vundle.vim.git "$HOME/.vim/bundle/Vundle.vim"
-fi
+echo2 'Downloading VimPlug'
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 echo2 'Install & configure Vim plugins.'
-vim +PluginInstall +PluginUpdate +"helptags ~/.vim/doc" +qall
+v +PlugInstall +PlugUpdate +PlugUpgrade +"helptags ~/.vim/doc" +qall
 
 # YouCompleteMe post-install configuration
 # Refer to https://github.com/Valloric/YouCompleteMe if issues occur
-if [ -d "$HOME/.vim/bundle/YouCompleteMe" ]; then
+ycmdir="$HOME/.vim/plugins/YouCompleteMe"
+if [ -d "$ycmdir" ]; then
     if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ] ; then
         echo2 'Configuring YouCompleteMe ...'
 
@@ -83,7 +84,7 @@ if [ -d "$HOME/.vim/bundle/YouCompleteMe" ]; then
 
         if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ] ; then
             # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
-            "$HOME/.vim/bundle/YouCompleteMe/install.py" $supportC $supportCsharp $supportGo $supportJavascript
+            "$ycmdir/install.py" $supportC $supportCsharp $supportGo $supportJavascript
         fi
         echo2 'Configuring YouCompleteMe done.'
     else
