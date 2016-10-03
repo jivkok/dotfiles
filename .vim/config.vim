@@ -5,10 +5,11 @@ set visualbell t_vb=      " Turn off bell: most annoying default ever created
 
 " UI ---------------------------------------------------------------
 set background=dark
-if filereadable(expand("~/.vim/colors/solarized.vim"))
-    let g:solarized_termtrans=1
-    colorscheme solarized
-endif
+colorscheme OceanicNext
+" if filereadable(expand("~/.vim/colors/solarized.vim"))
+"     let g:solarized_termtrans=1
+"     colorscheme solarized
+" endif
 set title                 " Show the filename in the window titlebar
 set cursorline            " Highlight the line the cursor is on
 set showcmd               " Show the (partial) command as it’s being typed
@@ -44,6 +45,7 @@ set noerrorbells          " Disable error bells
 set scrolloff=3           " Start scrolling three lines before the horizontal window border
 set exrc                  " Enable per-directory .vimrc files
 set secure                " Disable unsafe commands in .vimrc files
+set hidden                " hides buffers instead of closing them. This means that you can have unwritten changes to a file and open a new file using :e, without being forced to write or undo your changes first
 
 " Tabs and spaces --------------------------------------------------------------
 set shiftwidth=4          " Spaces to use for each indent step (>>, <<, etc.)

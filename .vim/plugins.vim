@@ -19,9 +19,12 @@ endif
 call plug#begin('~/.vim/plugins')
 
 " UI
+Plug 'ryanoasis/vim-devicons' " status line
 Plug 'mhinz/vim-startify' " Start screen with MRUs, sessions, bookmarks, etc.
 Plug 'benmills/vimux' " tmux integration, runs shell commands
-Plug 'bling/vim-airline' " status line
+Plug 'vim-airline/vim-airline' " status line
+Plug 'vim-airline/vim-airline-themes' " status line
+Plug 'mhartington/oceanic-next' " color scheme
 Plug 'airblade/vim-gitgutter' " git diff in the gutter and stages/reverts hunks
 Plug 'tpope/vim-fugitive' " Git wrapper
 Plug 'sheerun/vim-polyglot' " collection of language packs - syntax, indent, ftdetect
@@ -57,7 +60,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.vim/plugins/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim' " fuzzy file finder integration
 
 if has('nvim')
-  Plug 'Shougo/deoplete.nvim' " code-completion engine
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } " code-completion engine
 else
   Plug 'Valloric/YouCompleteMe' " code-completion engine
   " Plug 'Shougo/neocomplete' " code-completion engine
