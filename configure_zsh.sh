@@ -27,5 +27,5 @@ ln $_lnflags "$dotdir/.zsh-theme" "$HOME/"
 
 _zsh=$(which zsh)
 [ -z "$(grep $_zsh /etc/shells)" ] && sudo -s "echo $_zsh >> /etc/shells"
-chsh -s $_zsh
+chsh -s "$_zsh"
 unset _lnflags _zsh

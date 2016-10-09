@@ -34,11 +34,15 @@ else
     git clone --recursive https://github.com/jivkok/dotfiles.git "$dotdir"
 fi
 
+mkdir -p "$HOME/.config"
+
 ln -sF "$dotdir/.vim" "$HOME/"
+ln -sF "$dotdir/.vim" "$HOME/.config/nvim"
 ln -sf "$dotdir/.aliases" "$HOME/"
 ln -sf "$dotdir/.bash_profile" "$HOME/"
 ln -sf "$dotdir/.bash_prompt" "$HOME/"
 ln -sf "$dotdir/.bashrc" "$HOME/"
+ln -sf "$dotdir/.curlrc" "$HOME/"
 ln -sf "$dotdir/.editorconfig" "$HOME/"
 ln -sf "$dotdir/.exports" "$HOME/"
 ln -sf "$dotdir/.functions" "$HOME/"
@@ -48,13 +52,6 @@ ln -sf "$dotdir/.vim/.vimrc" "$HOME/"
 ln -sf "$dotdir/.wgetrc" "$HOME/"
 ln -sf "$dotdir/osx/.duti" "$HOME/"
 ln -sf "$dotdir/osx/.slate" "$HOME/"
-
-nvimdir="$HOME/.config/nvim"
-mkdir -p "$nvimdir"
-ln -sf "$dotdir/.vim/.vimrc" "$nvimdir/init.vim"
-for dir in $(find "$dotdir/.vim" -type d -depth 1); do
-    ln -sF "$dir" "$nvimdir"
-done;
 
 curl -o "$HOME/git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
