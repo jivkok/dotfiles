@@ -30,7 +30,6 @@ endif
 set wildmenu              " Turn on menu-based tab completion for commands
 set autoread              " Read file if it has changed outside of Vim
 set splitbelow splitright " More intuitive than default split behavior
-set noswapfile            " Not much need for swapfiles in the 21st century
 set nojoinspaces          " Use only one space after period when joining lines
 set ttyfast               " Optimize for fast terminal connections
 set mouse=a               " Enable mouse in all modes
@@ -45,7 +44,6 @@ set noerrorbells          " Disable error bells
 set scrolloff=3           " Start scrolling three lines before the horizontal window border
 set exrc                  " Enable per-directory .vimrc files
 set secure                " Disable unsafe commands in .vimrc files
-set hidden                " hides buffers instead of closing them. This means that you can have unwritten changes to a file and open a new file using :e, without being forced to write or undo your changes first
 
 " Tabs and spaces --------------------------------------------------------------
 set shiftwidth=4          " Spaces to use for each indent step (>>, <<, etc.)
@@ -67,7 +65,11 @@ set incsearch             " Show first search result as query is typed
 set gdefault              " Add the g flag to search/replace by default
 
 " Files and buffers ------------------------------------------------------------
+filetype on               " Enable file type detection
 set hidden                " Allows switching between buffers while they are unsaved
+set nobackup
+set swapfile
+set undofile
 
 " Folding ----------------------------------------------------------------------
 set foldmethod=syntax
@@ -90,13 +92,3 @@ if exists("&undodir")
     set undodir=~/.vim/undo
 endif
 set backupskip=/tmp/*,/private/tmp/* " Don’t create backups when editing files in certain directories
-
-" Automatic commands
-if has("autocmd")
-    " Enable file type detection
-    filetype on
-    " Treat .json files as .js
-    autocmd BufNewFile,BufRead *.json setfiletype json syntax=javascript
-    " Treat .md files as Markdown
-    autocmd BufNewFile,BufRead *.md setlocal filetype=markdown
-endif

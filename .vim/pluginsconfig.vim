@@ -8,7 +8,9 @@ nmap <F5> :NERDTreeToggle<cr>
 map <leader>nt :NERDTreeToggle<cr>
 let g:NERDTreeShowBookmarks=1
 let g:NERDTreeMinimalUI=1
-let g:NERDTreeIgnore=['\.so$', '\.class$', '\.swp']
+let g:NERDTreeShowHidden=1
+let g:NERDTreeQuitOnOpen=1
+let g:NERDTreeIgnore=['\.git$', '\.so$', '\.class$', '\.swp']
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-airline
@@ -57,6 +59,8 @@ if executable('ag')
   " let g:ctrlp_use_caching = 0
 endif
 
+nmap <leader>t :CtrlPTag<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ag.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -98,6 +102,40 @@ nmap <leader>6 <Plug>AirlineSelectTab6
 nmap <leader>7 <Plug>AirlineSelectTab7
 nmap <leader>8 <Plug>AirlineSelectTab8
 nmap <leader>9 <Plug>AirlineSelectTab9
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" FZF
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap <leader>o :FZF<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" unite
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:unite_prompt='❯ '
+let g:unite_source_rec_async_command=['ag', '--follow', '--nocolor', '--nogroup','--hidden', '-g', '', '--ignore', '.git', '--ignore', '*.png', '--ignore', 'lib']
+nnoremap <C-l> :Unite -auto-resize -start-insert -direction=botright file_rec buffer<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Neomake
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" autocmd! BufEnter,BufWritePost * Neomake " too slow
+nmap <leader>mk :Neomake<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-autoformat
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+noremap <leader>f :Autoformat<CR> " may require formatters: read the docs
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-expand-region
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+vmap v <Plug>(expand_region_expand)
+vmap <C-v> <Plug>(expand_region_shrink)
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-session
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:session_autosave = 'no'
 
 
 if has('nvim')
