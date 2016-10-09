@@ -25,54 +25,172 @@ COMMANDS                                                  *jkvim-commands*
 
 Lists frequently used commands and shortcuts.
 NOTE: custom shortcuts are shown as surrounded with parentheses.
-Leader key: comma (,)
+Leader key: space ( )
 
 === Misc
 :h :help some_topic
 :q :quit Ctrl-W_q - quits current window
-(,ss) - strip trailing whitespace
+( ss) - strip trailing whitespace
 
 === Buffers/Files
-:e :edit            - opens file for editing
-:w :write (,w)      - writes buffer to file
-(,W)                - save file as root
-:bp :bprevious (F3) - previous buffer
-:bn :bnext (F4)     - next buffer
+:e :edit                    - open file for editing
+:w :write ( w)              - write buffer to file
+( W)                        - save file as root
+:bn :bnext (F4) ( bn)       - next buffer
+:bp :bprevious (F3) ( bp)   - previous buffer
+:bd ( bd)                   - close buffer
 
 === Windows - Ctrl-W
-:new Ctrl-W_n        - creates new window and starts editing empty file
-:c :close Ctrl-W_q   - closes current window
+:new Ctrl-W_n        - create new window and starts editing empty file
+:c :close Ctrl-W_q   - close current window
 :sp :split Ctrl-W_s  - split current window in two, horizontally
 :vs :vsplit Ctrl-W_v - split current window in two, vertically
-Ctrl-W_arrows        - moves between windows
-(,cd)                - Switch CWD to the directory of the open buffer
+:split <file>        - split current window with horizontal bar, opens <file> in new window
+:vsplit <file>        - split current window with vertical bar, opens <file> in new window
+Ctrl-W arrows        - move between windows
+Ctrl-W h/j/k/l       - move between windows
+Ctrl-W +/-           - increase/decrease window with 1 line
+Ctrl-W <number>+/-   - increase/decrease window with <number> lines
+( cd)                - Switch CWD to the directory of the open buffer
 
 === Tabs
-:tabnew (,tn)
-:tabclose (,tc)
-:tabedit (,te)
-:tabp (F3) - previous tab
-:tabn (F4) - next tab
+:tabnew ( tn)
+:tabclose ( tc)
+:tabedit ( te)
+:tabp (F11) - previous tab
+:tabn (F12) - next tab
 
-=== Searching
+=== Sessions
+:mksession <session_filename> - store current session to a file
+:source <session_filename> - open stored session
+:SaveSession <session_name> - save current session (requires vim-session)
+:OpenSession <session_name> - open stored session (requires vim-session)
+:RestartVim - save current session, restart Vim, restore session
+vim --servername some_session_name - this can be used to automatically load/save sessions
+
+=== Editing
+:registers - see registers content
+
+=== Linting, syntax-coloring, and auto-formatting
+:Neomake ( mk) - maker/linter
+:Autoformat ( f) - auto-format text, according to the filetype, indent settings, and formatters
+Manually autoindent, retab or remove trailing whitespace by
+    gg=G
+    :retab
+    :RemoveTrailingSpaces
+
+=== Visual mode
+v - in visual mode, this, as pressed multiple times, continues to expand the selection
+C-v - shrink previously expanded selection
+
+=== Fuzzy text finders
+:FZF ( o) - list of files in in current directory and subs. Use these keys to open the new file:
+    - enter - current window
+    - C-t - new tab
+    - C-x - horizontal split
+    - C-v - vertical split
+<C-p> - CtrlP
+<C-l> - Unite with the following sources: file_rec buffer
+
+=== Search & Replace
 /
 n - next match
 N - previous match
-:%s/SSS/RRR/g - searches SSS and replaces it with RRR
-(*) (#) - searches for current selection and highlights matches
-(,) - un-highlights previous matches
+:%s/SSS/RRR/g - search SSS and replace it with RRR
+:%s/SSS/RRR/gc - Change each 'SSS' to 'RRR', but ask for confirmation first.
+(*) (#) - search for current selection and highlight matches
+<space><enter> - un-highlight search highlights
+do /, type the searched string, <CR>, cgn, type replacement, . to repeat the replacement consecutively through all selections; or n to skip a selection
+Instead of searching for the string - use * to search for the current word under the cursor, then continue with cgn
+Note: cgN, dgn, dgN work appropriately as well.
+:Ag [pattern] - search recursively files for text pattern (requires fzf-vim)
+C-n - multiple cursors selection (requires vim-multiple-cursors). Change text by C-n, c, text
+
+=== Marks
+:h mark-motions
+:marks - show all marks
+:marks aB - show marks a and B
+:Marks - show/search all marks (requires fzf-vim)
+ma - store the current position in the a mark. Lowercase a-z letters are local marks - they work within a file. Upper-case A-Z letters are global marks - they work across multiple files
+`a - go to the line and column for mark a.
+'a - go to the beginning of the line where mark a is set
+]' - jump to next line with lowercase mark
+[' - jump to previous line with a lowercase mark
+]` - jump to next lowercase mark
+[` - jump to previous lowercase mark
+'' - jump back (to line in current buffer where jumped from)
+`` - jump back (to position in current buffer where jumped from)
+`. - moves the cursor to the line and column where the last edit was made
+'. - moves the cursor to the line where the last edit was made
+`" - jump to position where last exited current buffer
+`0 - jump to position in last file edited (when exited Vim)
+:delmarks a - delete mark a
+:delmarks a-d - delete marks a, b, c, d
+:delmarks abxy - delete marks a, b, x, y
+:delmarks aA - delete marks a, A
+:delmarks! - delete all lowercase marks for the current buffer (a-z)
+vim-signature commands:
+  mx           Toggle mark 'x' and display it in the leftmost column
+  dmx          Remove mark 'x' where x is a-zA-Z
+  m,           Place the next available mark
+  m.           If no mark on line, place the next available mark. Otherwise, remove (first) existing mark.
+  m-           Delete all marks from the current line
+
+=== Tags
+:tag <ttt> - search for the ttt tag
+:CtrlPTag ( t) - search tags (requires CtrlP)
+:Tags - show tags (requires fzf-vim)
+:BTags - show tags in the current buffer (requires fzf-vim)
+F8 - toggles Tagbar
+:tnext :tn ( ]t) - go to the next definition for the last searched tag
+:tprevious :tp ( [p) - go to the previous definition for the last searched tag
+:tfirst :tf ( [T) - go to the first definition for the last searched tag
+:tlast :tl ( ]T) - go to the last definition for the last searched tag
+:tselect :ts ( ts) - list all definitions for the last searched tag
+^] - Jump to definition for text under the cursor
+^t - Jump back from definition
+^W} - Preview definition for text under the cursor
+g] - See all definitions for text under the cursor
+
+=== Quickfix & Location
+( ]q) - next Quickfix entry
+( [q) - previous Quickfix entry
+( [Q) - first Quickfix entry
+( ]Q) - last Quickfix entry
+( qo) - open Quickfix window
+( qc) - close Quickfix window
+( ]l) - next Locations entry
+( [l) - previous Locations entry
+( [L) - first Locations entry
+( ]L) - last Locations entry
+( lo) - open Locations window
+( lc) - close Locations window
+
+=== Key mappings
+:nmap,vmap,imap - show key mappings for normal,visual,insert mode
+:Unite mapping - show all key mappings (requires Unite)
 
 === Folding
-zc - close a fold
-zo - open a fold
-za - toggle a fold
-zC, zO, zA - same as above but operating on all folding levels
-zr - open one more level of folds throughout the buffer
-zR - open all folds
-zm - close one more lovel of folds throughout the buffer
-zM - close all folds
-zx - fixup current fold if it is broken for some reason
-zX - fixup all folds
+( zc) - close a fold
+( zo) - open a fold
+( za) - toggle a fold
+( zC) ( zO) ( zA) - same as above but operating on all folding levels
+( zr) - open one more level of folds throughout the buffer
+( zR) - open all folds
+( zm) - close one more lovel of folds throughout the buffer
+( zM) - close all folds
+( zx) - fixup current fold if it is broken for some reason
+( zX) - fixup all folds
+
+=== Syntax / colors
+:colorscheme <scheme> - set color scheme
+:Colors - set color scheme (requires fzf)
+:syntax on/off - turn on/off syntax highlighting
+:syntax list - list commands for current filetype
+:set syntax=sh - force desired syntax coloring
+:set filetype=sh - set file type (bash in the example)
+:setf sh - set file type (bash in the example)
+
 
 ==============================================================================
 PLUGINS                                                    *jkvim-plugins*
@@ -80,7 +198,7 @@ PLUGINS                                                    *jkvim-plugins*
 Describes used plugins and their behaviors / shortcuts
 
 
-=== Plugin manager
+=== Plugin managers
 
 === Vundle
 :h vundle
@@ -89,6 +207,15 @@ Describes used plugins and their behaviors / shortcuts
 :PluginInstall! :PluginUpdate - updates plugins
 :PluginSearch foo - searches for foo in Vim Scripts (http://vim-scripts.org/vim/scripts.html)
 :PluginList - Displays a list of installed bundles.
+
+=== VimPlug
+:PlugInstall [name ...] [#threads]   - Install plugins
+:PlugUpdate [name ...] [#threads]    - Install or update plugins
+:PlugClean[!]   - Remove unused directories (bang version will clean without prompt)
+:PlugUpgrade   - Upgrade vim-plug itself
+:PlugStatus   - Check the status of plugins
+:PlugDiff   - Examine changes from the previous update and the pending changes
+:PlugSnapshot[!] [output path]   - Generate script for restoring the current snapshot of the plugins
 
 
 === UI
@@ -257,6 +384,35 @@ Supported plugins:
 Adding support to a plugin is generally as simple as the following command at the end of your map functions.
   silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)
 
+=== vim-unimpaired
+This plugin provides several pairs of bracket maps.
+:h unimpaired
+Mappings:
+[a     :previous
+]a     :next
+[A     :first
+]A     :last
+[b     :bprevious
+]b     :bnext
+[B     :bfirst
+]B     :blast
+[l     :lprevious
+]l     :lnext
+[L     :lfirst
+]L     :llast
+[<C-L> :lpfile
+]<C-L> :lnfile
+[q     :cprevious
+]q     :cnext
+[Q     :cfirst
+]Q     :clast
+[<C-Q> :cpfile (Note that <C-Q> only works in a terminal if you disable
+]<C-Q> :cnfile flow control: stty -ixon)
+[t     :tprevious
+]t     :tnext
+[T     :tfirst
+]T     :tlast
+
 == Emmet
 Emmet is an editor plugin for high-speed HTML, XML, XSL (or any other
 structured code format) coding and editing. The core of this plugin is a
@@ -283,29 +439,6 @@ g:deoplete#enable_smart_case = 1
 
 
 === Buffers/files
-
-=== ctrlp.vim
-Full path fuzzy file, buffer, mru, tag, ... finder
-Basic Usage
-* Run :CtrlP or :CtrlP [starting-directory] to invoke CtrlP in find file mode.
-* Run :CtrlPBuffer or :CtrlPMRU to invoke CtrlP in find buffer or find MRU file mode.
-* Run :CtrlPMixed to search in Files, Buffers and MRU files at the same time.
-* Check :help ctrlp-commands and :help ctrlp-extensions for other commands.
-Once CtrlP is open:
-* Press <F5> to purge the cache for the current directory to get new files, remove deleted files and apply new ignore options.
-* Press <c-f> and <c-b> to cycle between modes.
-* Press <c-d> to switch to filename only search instead of full path.
-* Press <c-r> to switch to regexp mode.
-* Use <c-j>, <c-k> or the arrow keys to navigate the result list.
-* Use <c-t> or <c-v>, <c-x> to open the selected entry in a new tab or in a new split.
-* Use <c-n>, <c-p> to select the next/previous string in the prompt's history.
-* Use <c-y> to create a new file and its parent directories.
-* Use <c-z> to mark/unmark multiple files and <c-o> to open them.
-Run :help ctrlp-mappings or submit ? in CtrlP for more mapping help.
-* Submit two or more dots .. to go up the directory tree by one or multiple levels.
-* End the input string with a colon : followed by a command to execute it on the opening file(s):
-  - Use :25 to jump to line 25.
-  - Use :diffthis when opening multiple files to run :diffthis on the first 4 files.
 
 === nerdtree
 File tree explorer
@@ -357,12 +490,51 @@ go - Open selected file, but leave cursor in the NERDTree
 :NERDTreeMapToggleZoom (A) - Zoom (maximize/minimize) the NERDTree window
 :NERDTreeMapHelp (?) - Toggle the display of the quick help
 
+=== nerdtree-git-plugin
+show git status in NerdTree
+Use this variable to change symbols:
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "✹",
+    \ "Staged"    : "✚",
+    \ "Untracked" : "✭",
+    \ "Renamed"   : "➜",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ "Unknown"   : "?"
+    \ }
+
 === vim-scratch
 Temporary scratch buffers
 :Scratch  - open/edit the scratch buffer
 :Sscratch - open the scratch buffer in a new split window
 
 === Code checking and formatting
+
+=== Neomake
+:Neomake [makers]       Run a make command with the current file as input. If
+                        no makers are specified, the default makers for the
+                        current |filetype| are used. See |neomake-configuration|
+                        for more on makers.
+
+:Neomake! [makers]      Run a make command with no file as input. If no makers
+                        are specified, the default top-level makers will be
+                        used. If no default top-level makers exist, |makeprg|
+                        will be used.
+
+:NeomakeSh {command}    Run {command} in a shell (according to 'shell'). The
+                        command output will be loaded into the quickfix list
+                        when the job is complete. Example: >
+                        :NeomakeSh find . -name '*.pyc'
+<
+
+:NeomakeSh! {command}   Same as |:NeomakeSh|, but does not buffer the output.
+                        Example: >
+                        :NeomakeSh! while true; do date; sleep 1; done
+<
+:lopen                  opens the locations window to see the results from Neomake
+:copen                  opens the quickfix window to see the results from Neomake!
 
 === syntastic
 syntax checking
@@ -414,7 +586,30 @@ Mappings:
 :tagbar_map_close (q) - Close the Tagbar window.
 
 
-=== Misc
+=== Search
+
+=== ctrlp.vim
+Full path fuzzy file, buffer, mru, tag, ... finder
+Basic Usage
+* Run :CtrlP or :CtrlP [starting-directory] to invoke CtrlP in find file mode.
+* Run :CtrlPBuffer or :CtrlPMRU to invoke CtrlP in find buffer or find MRU file mode.
+* Run :CtrlPMixed to search in Files, Buffers and MRU files at the same time.
+* Check :help ctrlp-commands and :help ctrlp-extensions for other commands.
+Once CtrlP is open:
+* Press <F5> to purge the cache for the current directory to get new files, remove deleted files and apply new ignore options.
+* Press <c-f> and <c-b> to cycle between modes.
+* Press <c-d> to switch to filename only search instead of full path.
+* Press <c-r> to switch to regexp mode.
+* Use <c-j>, <c-k> or the arrow keys to navigate the result list.
+* Use <c-t> or <c-v>, <c-x> to open the selected entry in a new tab or in a new split.
+* Use <c-n>, <c-p> to select the next/previous string in the prompt's history.
+* Use <c-y> to create a new file and its parent directories.
+* Use <c-z> to mark/unmark multiple files and <c-o> to open them.
+Run :help ctrlp-mappings or submit ? in CtrlP for more mapping help.
+* Submit two or more dots .. to go up the directory tree by one or multiple levels.
+* End the input string with a colon : followed by a command to execute it on the opening file(s):
+  - Use :25 to jump to line 25.
+  - Use :diffthis when opening multiple files to run :diffthis on the first 4 files.
 
 === ag.vim
 Plugin for the_silver_searcher 'ag' - code-searching tool
@@ -463,6 +658,38 @@ Commands:
 :Maps            | Normal mode mappings
 :Helptags        | Help tags [1]
 :Filetypes       | File types
+
+=== Unite
+:h unite
+:Unite sources - show all supported sources
+
+=== vim-signature
+toggle, display and navigate marks
+:h signature
+Commands:
+  mx           Toggle mark 'x' and display it in the leftmost column
+  dmx          Remove mark 'x' where x is a-zA-Z
+  m,           Place the next available mark
+  m.           If no mark on line, place the next available mark. Otherwise, remove (first) existing mark.
+  m-           Delete all marks from the current line
+  m<Space>     Delete all marks from the current buffer
+  ]`           Jump to next mark
+  [`           Jump to prev mark
+  ]'           Jump to start of next line containing a mark
+  ['           Jump to start of prev line containing a mark
+  `]           Jump by alphabetical order to next mark
+  `[           Jump by alphabetical order to prev mark
+  ']           Jump by alphabetical order to start of next line having a mark
+  '[           Jump by alphabetical order to start of prev line having a mark
+  m/           Open location list and display marks from current buffer
+  m[0-9]       Toggle the corresponding marker !@#$%^&*()
+  m<S-[0-9]>   Remove all markers of the same type
+  ]-           Jump to next line having a marker of the same type
+  [-           Jump to prev line having a marker of the same type
+  ]=           Jump to next line having a marker of any type
+  [=           Jump to prev line having a marker of any type
+  m?           Open location list and display markers from current buffer
+  m<BS>        Remove all markers
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:

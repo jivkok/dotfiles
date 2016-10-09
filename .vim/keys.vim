@@ -1,5 +1,5 @@
 " Custom mapleader
-let mapleader=","
+let mapleader="\<Space>"
 
 " Searching
 " Visual mode pressing * or # searches for the current selection, forward or backward, respectively
@@ -9,15 +9,12 @@ vnoremap <silent> # :call VisualSelection('b')<cr>
 map <silent> <leader><cr> :noh<cr>
 
 " Buffers
-" Fast saving (,w)
-nmap <leader>w :w!<cr>
-" Save a file as root (,W)
-noremap <leader>W :w !sudo tee % > /dev/null<cr>
-nmap <F3> :bp<cr> " Previous (F3)
-nmap <F4> :bn<cr> " Next (F4)
-map <leader>bd :bd<cr> " Close
-" Switch CWD to the directory of the open buffer
-map <leader>cd :cd %:p:h<cr>:pwd<cr>
+nmap <leader>w :w!<cr> " Force-save file
+nmap <leader>W :w !sudo tee % > /dev/null<cr> " Save file as root
+nmap <F3> :bp<cr> " Previous buffer
+nmap <F4> :bn<cr> " Next buffer
+nmap <leader>bd :bd<cr> " Close buffer
+map <leader>cd :cd %:p:h<cr>:pwd<cr> " Switch CWD to the directory of the open buffer
 
 " Tabs
 nmap <Leader>tn :tabnew<cr>
@@ -27,7 +24,28 @@ map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
 nmap <F11> :tabp<cr>
 nmap <F12> :tabn<cr>
 
-" Strip trailing whitespace (,ss)
+" Tags
+nmap <Leader>]t :tnext<CR>
+nmap <Leader>[t :tprevious<CR>
+nmap <Leader>]T :tlast<CR>
+nmap <Leader>[T :tfirst<CR>
+nmap <Leader>ts :tselect<CR>
+
+" Quickfix & Location
+nmap <silent> <Leader>]q :cnext<CR>
+nmap <silent> <Leader>[q :cprevious<CR>
+nmap <silent> <Leader>[Q :cfirst<CR>
+nmap <silent> <Leader>]Q :clast<CR>
+nmap <Leader>qo :copen<CR>
+nmap <Leader>qc :cclose<CR>
+nmap <silent> <Leader>]l :lnext<CR>
+nmap <silent> <Leader>[l :lprevious<CR>
+nmap <silent> <Leader>[L :lfirst<CR>
+nmap <silent> <Leader>]L :llast<CR>
+nmap <Leader>lo :lopen<CR>
+nmap <Leader>lc :lclose<CR>
+
+" Strip trailing whitespace ( ss)
 function! StripWhitespace()
     let save_cursor = getpos(".")
     let old_query = getreg('/')
@@ -68,4 +86,3 @@ function! VisualSelection(direction) range
     let @/ = l:pattern
     let @" = l:saved_reg
 endfunction
-
