@@ -1,0 +1,7 @@
+# Basic options
+--recurse=yes
+--tag-relative=yes
+
+# Excludes
+--exclude=.git
+--exclude=.vim/plugins

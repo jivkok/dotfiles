@@ -10,6 +10,8 @@ sudo -v
 # Keep-alive: update existing `sudo` time stamp until the script has finished.
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
+brew tap universal-ctags/universal-ctags
+
 brew upgrade
 brew update
 
@@ -47,7 +49,6 @@ brew install binwalk
 brew install ccat
 brew install cifer
 brew install cmake
-brew install ctags
 brew install dex2jar
 brew install dns2tcp
 brew install dos2unix
@@ -97,6 +98,7 @@ brew install the_silver_searcher
 brew install tmux
 brew install tree
 brew install ucspi-tcp # `tcpserver` etc.
+brew install --HEAD universal-ctags
 brew install unix2dos
 brew install watch
 brew install webkit2png
