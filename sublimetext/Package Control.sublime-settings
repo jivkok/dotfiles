@@ -6,11 +6,13 @@
     "installed_packages":
     [
         "All Autocomplete",
+        "Anaconda",
         "BracketHighlighter",
         "CodeFormatter",
         "Color Highlighter",
         "ColorPicker",
         "CTags",
+        "DashDoc",
         "DocBlockr",
         "EasyMotion",
         "EditorConfig",
@@ -27,6 +29,8 @@
         "JsFormat",
         "Markdown Preview",
         "MarkdownEditing",
+        "Oceanic Next Color Scheme",
+        "Origami",
         "Package Control",
         "PlainTasks",
         "SFTP",

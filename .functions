@@ -120,8 +120,13 @@ function os_update() {
 
     if command -v vim >/dev/null 2>&1 ; then
         echo -e "\nUpdating Vim plugins ...\n"
-        vim +PluginUpdate +qall
+        vim +PlugUpdate +qall
         echo -e "\nUpdating Vim plugins done.\n"
+    fi
+    if command -v nvim >/dev/null 2>&1 ; then
+        echo -e "\nUpdating NeoVim plugins ...\n"
+        nvim +PlugUpdate +qall
+        echo -e "\nUpdating NeoVim plugins done.\n"
     fi
 
     if command -v pip >/dev/null 2>&1 ; then
@@ -132,8 +137,11 @@ function os_update() {
 
     if command -v npm >/dev/null 2>&1 ; then
         echo -e "\nUpdating Node packages ...\n"
-        npm install npm -g
+        npm install npm@latest -g
         npm update -g
+        n stable
+        npm cache clean
+        bower cache clean
         echo -e "\nUpdating Node packages done.\n"
     fi
 
@@ -251,7 +259,7 @@ function dataurl() {
 # Pull all repos in the current (or specified) directory
 function git_pull_all() {
     dir="${1:-.}"
-    for i in $(find "$dir" -type d -depth 1); do
+    for i in $(find "$dir" -type d -mindepth 1 -maxdepth 1); do
         [ -d "$i/.git" ] && echo -e "\nRepo: $i" && git -C "$i" pull --prune;
     done
 }
