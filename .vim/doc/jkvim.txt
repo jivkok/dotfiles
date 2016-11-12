@@ -31,6 +31,8 @@ Leader key: space ( )
 :h :help some_topic
 :q :quit Ctrl-W_q - quits current window
 ( ss) - strip trailing whitespace
+u - undo
+C-r - redo
 
 === Buffers/Files
 :e :edit                    - open file for editing
@@ -68,8 +70,38 @@ Ctrl-W <number>+/-   - increase/decrease window with <number> lines
 :RestartVim - save current session, restart Vim, restore session
 vim --servername some_session_name - this can be used to automatically load/save sessions
 
-=== Editing
-:registers - see registers content
+=== Registers
+:reg :registers - see registers content
+:h registers
+Access a register with double-quote ".
+There are ten types of registers:
+1. The unnamed register ""
+    Vim fills this register with text deleted with the "d", "c", "s", "x" commands or copied with the yank "y" command, regardless of whether or not a specific register was used. This is like the unnamed register is pointing to the last used register.
+    Note: this is the only register that is always modified on text copy/deletion - even if the operation uses a specific register (e.g. "xy)
+    In contrast, the other registers below are not used if the text operation involves specific register.
+2. 10 numbered registers "0 to "9
+    Vim fills these registers with text from yank and delete commands.
+    Numbered register 0 contains the text from the most recent yank command.
+    Numbered register 1 contains the text deleted by the most recent delete or change command.
+    With each successive deletion or change, Vim shifts the previous contents of register 1 into register 2, 2 into 3, and so forth.
+3. The small delete register "-
+    This register contains text from commands that delete less than one line,
+4. 26 named registers "a to "z or "A to "Z
+    Vim fills these registers only when you say so. Specify them as lowercase letters to replace their previous contents or as uppercase letters to append to their previous contents.
+5. three read-only registers ":, "., "%
+    ". Contains the last inserted text
+    "% Contains the name of the current file.
+    ": Contains the most recent executed command-line.
+6. alternate buffer register "#
+    Contains the name of the alternate file for the current window.
+7. the expression register "=
+    This is not really a register that stores text, but is a way to use an expression in commands which use a register.
+8. The selection and drop registers "*, "+ and "~
+    Use these registers for storing and retrieving the selected text for the GUI.
+9. The black hole register "_
+    When writing to this register, nothing happens. This can be used to delete text without affecting the normal registers. When reading from this register, nothing is returned.
+10. Last search pattern register "/
+    Contains the most recent search-pattern.
 
 === Linting, syntax-coloring, and auto-formatting
 :Neomake ( mk) - maker/linter
