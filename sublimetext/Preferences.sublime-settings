@@ -1,14 +1,10 @@
 {
+    "bold_folder_labels": true,
     "draw_white_space": "all",
-    "font_size": 10,
+    "font_size": 11,
     "highlight_line": true,
-    "ignored_packages":
-    [
-        "Vintage"
-    ],
-    "soda_classic_tabs": true,
+    "highlight_modified_tabs": true,
     "tab_size": 4,
-    "theme": "Soda Dark 3.sublime-theme",
     "translate_tabs_to_spaces": true,
     "trim_trailing_white_space_on_save": true
 }

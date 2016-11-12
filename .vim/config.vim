@@ -92,3 +92,9 @@ if exists("&undodir")
     set undodir=~/.vim/undo
 endif
 set backupskip=/tmp/*,/private/tmp/* " Don’t create backups when editing files in certain directories
+
+if has("autocmd")
+    " When editing a file, always jump to the last cursor position
+    autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
+endif
+

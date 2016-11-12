@@ -18,11 +18,13 @@ if [ "$os" = "Linux" ]; then
     # Packages
     sudo npm install -g bower
     sudo npm install -g coffee-script
+    sudo npm install -g eslint
     sudo npm install -g express
     sudo npm install -g express-generator
     sudo npm install -g generator-angular
     sudo npm install -g generator-webapp
     sudo npm install -g grunt-cli
+    sudo npm install -g gulp
     sudo npm install -g http-server
     sudo npm install -g jshint
     sudo npm install -g less
@@ -37,11 +39,13 @@ elif [ "$os" = "Darwin" ]; then
     # Packages
     npm install -g bower
     npm install -g coffee-script
+    npm install -g eslint
     npm install -g express
     npm install -g express-generator
     npm install -g generator-angular
     npm install -g generator-webapp
     npm install -g grunt-cli
+    npm install -g gulp
     npm install -g http-server
     npm install -g jshint
     npm install -g less
