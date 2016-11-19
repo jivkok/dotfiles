@@ -121,8 +121,8 @@ bind f3:${hyper}  ${bottomleft}
 bind f4:${hyper}  ${bottomright}
 
 ## Layout bindings
-bind f12:${hyper} layout 1monitor
-bind f11:${hyper} layout 2monitors
+bind f11:${hyper} layout 1monitor
+bind f12:${hyper} layout 2monitors
 
 ## Monitor bindings
 bind [:${hyper}  throw previous # move to previous screen
@@ -135,7 +135,7 @@ bind space:${hyper} focus ${editor}
 bind c:${hyper}     focus ${browser}
 bind f:${hyper}     focus 'Finder'
 bind i:${hyper}     focus 'Safari'
-bind v:${hyper}     focus 'MacVim'
+bind v:${hyper}     focus 'Code'
 bind x:${hyper}     focus 'Xcode'
 
 # Window Hints

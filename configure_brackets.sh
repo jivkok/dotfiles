@@ -8,12 +8,12 @@ function copy_config_file ()
     bracketsUserPath=$3
 
     if [ ! -f "$settingsDir/$file" ]; then
-        echo "File $settingsDir/$file does not exist."
+        dot_error "File $settingsDir/$file does not exist."
         return
     fi
 
     if [ -f "$bracketsUserPath/$file" ]; then
-        echo "Backing up $bracketsUserPath/$file   to   $bracketsUserPath/$file.old"
+        dot_trace "Backing up $bracketsUserPath/$file   to   $bracketsUserPath/$file.old"
         mv -f "$bracketsUserPath/$file" "$bracketsUserPath/${file}.old"
     fi
 
@@ -26,26 +26,19 @@ function install_extension ()
     extensionsRegistryPath=$2
     extensionDisplayName=$3
 
-    echo
-    echo "Installing extension '$extensionDisplayName' ..."
+    dot_trace "Installing Brackets extension '$extensionDisplayName' ..."
 
-    echo "Searching in the registry"
     extensionName=$(cat "$extensionsRegistryPath" | jq ".[] | select(.metadata.title == \"$extensionDisplayName\").metadata.name" | sed 's/"//g')
     extensionVersion=$(cat "$extensionsRegistryPath" | jq ".[] | select(.metadata.title == \"$extensionDisplayName\").metadata.version" | sed 's/"//g')
     if [ -z "$extensionName" ]; then
-        echo "Error: could not find package name within the registry" >&2
+        dot_error "Could not find package name within the registry"
         return
     fi
     if [ -z "$extensionVersion" ]; then
-        echo "Error: could not find package version within the registry" >&2
+        dot_error "Could not find package version within the registry"
         return
     fi
-    echo "Found '$extensionDisplayName' in the registry - name: $extensionName; version: $extensionVersion"
-
-    if [ -d "$bracketsUserExtensionsPath/$extensionName" ]; then
-        echo "Extension   $bracketsUserExtensionsPath/$extensionName   already exists."
-        return
-    fi
+    dot_trace "Found '$extensionDisplayName' in the registry. Name: $extensionName, version: $extensionVersion"
 
     extensionUrl="https://s3.amazonaws.com/extend.brackets/${extensionName}/${extensionName}-${extensionVersion}.zip"
 
@@ -54,33 +47,41 @@ function install_extension ()
     [ -f "$extensionZipPath" ] && rm -f "$extensionZipPath"
     [ -d "$extensionZipDirPath" ] && rm -rf "$extensionZipDirPath"
 
-    echo "Downloading $extensionUrl   to   $extensionZipPath"
+    dot_trace "Downloading $extensionUrl   to   $extensionZipPath"
     curl -o "$extensionZipPath" "$extensionUrl"
     if [ ! -f "$extensionZipPath" ]; then
-        echo "Error: download failed - $extensionUrl" >&2
+        dot_error "Download failed - $extensionUrl"
         return
     fi
-    echo "Unzipping $extensionZipPath   to   $extensionZipDirPath"
+    dot_trace "Unzipping $extensionZipPath   to   $extensionZipDirPath"
     unzip -q "$extensionZipPath" -d "$extensionZipDirPath"
 
     packagejsonPath=$(find "$extensionZipDirPath" -maxdepth 2 -iname package.json | head -n 1)
     if [ -z "$packagejsonPath" ]; then
-        echo "Error: could not find package.json in $extensionZipDirPath" >&2
+        dot_error "Could not find package.json in $extensionZipDirPath"
         return
     fi
     extensionTempDirPath=$(dirname "$packagejsonPath")
 
-    echo "Copying $extensionTempDirPath/   to   $bracketsUserExtensionsPath/$extensionName/"
+    if [ -d "$bracketsUserExtensionsPath/$extensionName" ]; then
+        dot_trace "Deleting old extension content: $bracketsUserExtensionsPath/$extensionName"
+        rm -rf "$bracketsUserExtensionsPath/$extensionName"
+    fi
+    dot_trace "Copying $extensionTempDirPath/   to   $bracketsUserExtensionsPath/$extensionName/"
     cp -L -r "$extensionTempDirPath/" "$bracketsUserExtensionsPath/$extensionName/"
 
-    echo "Installing extension '$extensionDisplayName' done."
-    echo
+    dot_trace "Installing Brackets extension '$extensionDisplayName' done."
 }
+
+dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$dotdir/setupfunctions.sh"
+
+dot_trace "Configuring Brackets ..."
 
 os=$(uname -s)
 if [ "$os" = "Darwin" ]; then
-    brew cask install brackets
-    brew install jq
+    cask_install_package brackets
+    brew_install_package jq
 
     bracketsUserPath="$HOME/Library/Application Support/Brackets"
     bracketsUserExtensionsPath="$HOME/Library/Application Support/Brackets/extensions/user"
@@ -93,7 +94,7 @@ if [ "$os" = "Darwin" ]; then
     done
 
     extensionsRegistryPath="${TMPDIR}registry.json"
-    echo "Downloading Brackets extensions registry   https://s3.amazonaws.com/extend.brackets/registry.json   to   $extensionsRegistryPath"
+    dot_trace "Downloading Brackets extensions registry   https://s3.amazonaws.com/extend.brackets/registry.json   to   $extensionsRegistryPath"
     curl -H "Accept-Encoding: gzip, deflate" https://s3.amazonaws.com/extend.brackets/registry.json | gunzip - > "$extensionsRegistryPath"
 
     install_extension "$bracketsUserExtensionsPath" "$extensionsRegistryPath" "AngularJS for Brackets" # QuickEdit for directives, controllers, and services
@@ -124,5 +125,9 @@ if [ "$os" = "Darwin" ]; then
     # install_extension "" $bracketsUserExtensionsPath/"
 else
     echo "Unsupported OS: $os"
-    return
 fi
+
+unset -f copy_config_file
+unset -f install_extension
+
+dot_trace "Configuring Brackets done."

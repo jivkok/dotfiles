@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+# Brew packages
 
 # Install homebrew
 if [ ! -f /usr/local/bin/brew ]; then
@@ -11,14 +12,16 @@ sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 brew tap universal-ctags/universal-ctags
+brew tap neovim/neovim
 
-brew upgrade
 brew update
+brew upgrade
 
 # Install GNU core utilities (those that come with OS X are outdated).
 # Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
 brew install coreutils
-sudo ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
+rm -f /usr/local/bin/sha256sum
+ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
 
 brew install moreutils
 brew install findutils # GNU `find`, `locate`, `updatedb`, and `xargs`
@@ -35,10 +38,9 @@ brew install bash-completion
 
 # Install more recent versions of some OS X tools.
 brew install wget --with-iri
-brew install vim --override-system-vi
-brew install homebrew/dupes/grep
-brew install homebrew/dupes/rsync
-brew install homebrew/php/php55 --with-gmp
+brew install grep
+brew install rsync
+brew install php56 --with-gmp
 
 # Packages
 brew install ack
@@ -65,7 +67,7 @@ brew install git-extras
 brew install graphviz
 brew install gzip
 brew install hashpump
-brew install htop
+brew install htop-osx
 brew install hydra
 brew install iftop
 brew install imagemagick --with-webp
@@ -98,7 +100,7 @@ brew install the_silver_searcher
 brew install tmux
 brew install tree
 brew install ucspi-tcp # `tcpserver` etc.
-brew install --HEAD universal-ctags
+brew install universal-ctags --HEAD
 brew install unix2dos
 brew install watch
 brew install webkit2png
@@ -112,15 +114,18 @@ brew install libxslt
 brew link libxml2 --force
 brew link libxslt --force
 
-# MacVim
+# Vim
+brew install vim --override-system-vi --with-lua
 brew install macvim --HEAD --with-cscope --with-lua --with-override-system-vim --with-luajit --with-python
 brew linkapps macvim
+brew install neovim
 
 # TaskWarrior
 brew install task
 brew install vit
 
 # Remove outdated versions from the cellar.
+brew prune
 brew cleanup
 
 # m-cli

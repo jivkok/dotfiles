@@ -63,13 +63,11 @@ fi
 
 [ -f "$ZSH/oh-my-zsh.sh" ] && source "$ZSH/oh-my-zsh.sh"
 
-## set options
+# set options
 set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
 
-##
 # Completion system
-#
 
 autoload -Uz compinit
 compinit
@@ -90,7 +88,8 @@ zstyle ":completion:*" verbose true
 zstyle ":completion:*:*:kill:*:processes" list-colors "=(#b) #([0-9]#)*=0=01;31"
 zstyle ":completion:*:kill:*" command "ps -u $USER -o pid,%cpu,tty,cputime,cmd"
 
-# key bindings. Note: use 'cat' to easily see the escape sequences
+# key bindings
+# Note: use 'cat' to easily see the escape sequences
 bindkey "^[[1;5D" backward-word # ctrl-left
 bindkey "^[[1;5C" forward-word # ctrl-right
 

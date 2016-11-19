@@ -1,31 +1,70 @@
 #!/bin/bash
-# Configuring ZSH
+# Configure ZSH
+
+dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$dotdir/setupfunctions.sh"
+
+dot_trace "Configuring ZSH ..."
 
 os=$(uname -s)
 if [ "$os" = "Linux" ]; then
-    sudo apt-get install zsh
-    _lnflags=-sb
+    if ! apt-cache show zsh >/dev/null 2>&1 ; then
+        dot_trace "Installing ZSH ..."
+        sudo apt-get install zsh
+        dot_trace "Installing ZSH done."
+    fi
 elif [ "$os" = "Darwin" ]; then
-    brew install zsh
-    _lnflags=-sf
+    if ! brew ls --versions zsh >/dev/null 2>&1 ; then
+        dot_trace "Installing ZSH ..."
+        brew install zsh
+        dot_trace "Installing ZSH done."
+    fi
+elif [[ "$os" == CYGWIN* ]]; then
+    if command -v pact >/dev/null 2>&1 ; then # Babun
+        # Cygwin/Babun has ZSH pre-installed
+    else
+        dot_error "No automatic ZSH install in Cygwin"
+        return
+    fi
 else
-    echo "Unsupported OS: $os"
+    dot_error "Unsupported OS: $os"
     return
 fi
 
-[ -d "$HOME/.oh-my-zsh" ] && rm -rf "$HOME/.oh-my-zsh"
-curl -L http://install.ohmyz.sh | sh
+if [ -d "$HOME/.oh-my-zsh" ]; then
+    dot_trace "Updating oh-my-zsh ..."
+    git -C "$HOME/.oh-my-zsh" pull --rebase --stat origin master
 
-mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
-git clone https://github.com/zsh-users/zsh-completions "$HOME/.oh-my-zsh/custom/plugins/zsh-completions"
-git clone git://github.com/zsh-users/zsh-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    for dir in $(find "$HOME/.oh-my-zsh/custom/plugins" -type d -depth 1); do
+        [ -d "$dir/.git" ] && dot_trace "Updating $dir" && git -C "$dir" pull --prune
+    done
+    dot_trace "Updating oh-my-zsh done."
+else
+    dot_trace "Installing oh-my-zsh ..."
+    curl -L http://install.ohmyz.sh | sh
 
-dotdir="$HOME/dotfiles"
-ln $_lnflags "$dotdir/.zprofile" "$HOME/"
-ln $_lnflags "$dotdir/.zshrc" "$HOME/"
-ln $_lnflags "$dotdir/.zsh-theme" "$HOME/"
+    mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
+    git clone https://github.com/zsh-users/zsh-completions "$HOME/.oh-my-zsh/custom/plugins/zsh-completions"
+    git clone git://github.com/zsh-users/zsh-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    dot_trace "Installing oh-my-zsh done."
+fi
 
 _zsh=$(which zsh)
-[ -z "$(grep $_zsh /etc/shells)" ] && sudo -s "echo $_zsh >> /etc/shells"
-chsh -s "$_zsh"
-unset _lnflags _zsh
+
+if [ -z "$(grep $_zsh /etc/shells)" ] ; then
+    dot_trace "Adding ZSH as supported shell"
+    sudo -s "echo $_zsh >> /etc/shells"
+else
+    dot_trace "ZSH is supported shell"
+fi
+
+if [ "$SHELL" != "$_zsh" ]; then
+    dot_trace "Switching to ZSH as default shell"
+    chsh -s "$_zsh"
+else
+    dot_trace "ZSH is default shell"
+fi
+
+unset _zsh
+
+dot_trace "Configuring ZSH done."
