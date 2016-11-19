@@ -1,23 +1,18 @@
 #!/bin/bash
 # Vim configuration
 
-# $1 - message
-function echo2 ()
-{
-    echo -e "\n$1\n"
-}
+dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$dotdir/setupfunctions.sh"
+pull_latest_dotfiles "$dotdir"
 
-# dotfiles refresh
-if [ -d "$HOME/dotfiles/.git" ]; then
-    echo2 'Refreshing dotfiles.'
-    git -C "$HOME/dotfiles" pull --prune --recurse-submodules
-    git -C "$HOME/dotfiles" submodule update --init --recursive
-fi
+dot_trace 'Configuring Vim ...'
 
-echo2 'Configuring Vim ...'
+mkdir -p "$HOME/.config"
+make_symlink "$dotdir/.vim" "$HOME"
+make_symlink "$dotdir/.vim" "$HOME/.config" "nvim"
+make_symlink "$dotdir/.vim/.vimrc" "$HOME"
 
 os=$(uname -s)
-
 if [ "$os" = "Linux" ]; then
     sudo add-apt-repository ppa:neovim-ppa/unstable
     sudo apt-get update
@@ -33,35 +28,41 @@ if [ "$os" = "Linux" ]; then
 elif [ "$os" = "Darwin" ]; then
     xcode-select -p
     if [ $? != 0 ]; then
+        dot_trace "Installing XCode command-line tools ..."
         xcode-select --install
     fi
-    brew install cmake
+
+    ! brew ls --versions cmake >/dev/null 2>&1 && brew install cmake
     # brew install llvm --with-clang
-    brew install vim --override-system-vi --with-lua
-    brew install macvim --HEAD --with-cscope --with-lua --with-override-system-vim --with-luajit --with-python
-    brew install neovim/neovim/neovim
+    ! brew ls --versions vim >/dev/null 2>&1 && brew install vim --override-system-vi --with-lua
+    ! brew ls --versions macvim >/dev/null 2>&1 && brew install macvim --HEAD --with-cscope --with-lua --with-override-system-vim --with-luajit --with-python
+    ! brew ls --versions neovim >/dev/null 2>&1 && brew install neovim/neovim/neovim
 
     pip2 install --upgrade neovim
     pip3 install --upgrade neovim
 else
-    echo2 "Unsupported OS: $os"
+    dot_trace "Unsupported OS: $os"
     return
 fi
 
-echo2 'Downloading VimPlug'
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+if [ ! -f ~/.vim/autoload/plug.vim ] ; then
+    dot_trace 'Downloading VimPlug'
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
 
-echo2 'Install & configure Vim plugins.'
-v +PlugInstall +PlugUpdate +PlugUpgrade +"helptags ~/.vim/doc" +qall
+dot_trace 'Install & configure Vim plugins'
+vim +PlugInstall +PlugUpdate +PlugUpgrade +"helptags ~/.vim/doc" +qall
+dot_trace 'Install & configure NeoVim plugins'
+nvim +PlugInstall +PlugUpdate +PlugUpgrade +"helptags ~/.vim/doc" +qall
 
 # YouCompleteMe post-install configuration
 # Refer to https://github.com/Valloric/YouCompleteMe if issues occur
 ycmdir="$HOME/.vim/plugins/YouCompleteMe"
 if [ -d "$ycmdir" ]; then
     if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ] ; then
-        echo2 'Configuring YouCompleteMe ...'
+        dot_trace 'Configuring YouCompleteMe ...'
 
-        echo "Support for:"
+        echo "YouCompleteMe support for:"
         local supportC supportCsharp supportGo supportJavascript
         supportC="--clang-completer"
         supportCsharp="--omnisharp-completer"
@@ -82,14 +83,13 @@ if [ -d "$ycmdir" ]; then
             echo "- JavaScript: no"
         fi
 
-        if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ] ; then
-            # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
-            "$ycmdir/install.py" $supportC $supportCsharp $supportGo $supportJavascript
-        fi
-        echo2 'Configuring YouCompleteMe done.'
+        # export EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
+        "$ycmdir/install.py" $supportC $supportCsharp $supportGo $supportJavascript
+
+        dot_trace 'Configuring YouCompleteMe done.'
     else
-        echo2 "Warning: Configuring YouCompleteMe for $os not supported yet."
+        dot_error "Configuring YouCompleteMe for $os not supported yet."
     fi
 fi
 
-echo2 'Configuring Vim done.'
+dot_trace 'Configuring Vim done.'

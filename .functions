@@ -108,6 +108,8 @@ function os_update() {
         echo -e "\nUpdating system packages done.\n"
     fi
 
+    [ -f /usr/local/opt/fzf/install ] && /usr/local/opt/fzf/install --key-bindings --completion --no-update-rc
+
     if [ -d "$HOME/.oh-my-zsh" ]; then
         echo -e "\nUpdating oh-my-zsh ...\n"
         git -C "$HOME/.oh-my-zsh" pull --rebase --stat origin master
@@ -131,7 +133,7 @@ function os_update() {
 
     if command -v pip >/dev/null 2>&1 ; then
         echo -e "\nUpdating Python packages ...\n"
-        pip list --outdated | cut -d ' ' -f 1 | xargs -n 1 sudo -H pip install --upgrade
+        pip list --outdated | cut -d ' ' -f 1 | xargs -n 1 pip install --upgrade
         echo -e "\nUpdating Python packages done.\n"
     fi
 
@@ -145,12 +147,12 @@ function os_update() {
         echo -e "\nUpdating Node packages done.\n"
     fi
 
-    if command -v gem >/dev/null 2>&1 ; then
-        echo -e "\nUpdating Ruby packages ...\n"
-        sudo gem update --system
-        sudo gem update
-        echo -e "\nUpdating Ruby packages done.\n"
-    fi
+    # if command -v gem >/dev/null 2>&1 ; then
+    #     echo -e "\nUpdating Ruby packages ...\n"
+    #     sudo gem update --system
+    #     sudo gem update
+    #     echo -e "\nUpdating Ruby packages done.\n"
+    # fi
 
     echo -e "\nUpdating system done.\n"
 }

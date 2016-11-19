@@ -34,7 +34,8 @@ if [ "$os" = "Linux" ]; then
 
     sudo npm cache clean
 elif [ "$os" = "Darwin" ]; then
-    brew install node
+    ! brew ls --versions node >/dev/null 2>&1 && brew install node
+    brew link --overwrite node
 
     # Packages
     npm install -g bower

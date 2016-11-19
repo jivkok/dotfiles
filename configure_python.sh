@@ -4,7 +4,9 @@
 os=$(uname -s)
 if [ "$os" = "Linux" ]; then
     sudo apt-get install python
+    sudo apt-get install python3
     sudo pip install --upgrade pip setuptools
+
     # Packages
     sudo pip install --upgrade glances # system stats
     sudo pip install --upgrade httpie # curl-like with colorized output
@@ -12,7 +14,8 @@ if [ "$os" = "Linux" ]; then
     sudo pip install --upgrade mitmproxy # http traffic interception
     sudo pip install --upgrade Pygments # syntax highlighter
 elif [ "$os" = "Darwin" ]; then
-    brew install python
+    ! brew ls --versions python >/dev/null 2>&1 && brew install python
+    ! brew ls --versions python3 >/dev/null 2>&1 && brew install python3
     pip install --upgrade pip setuptools
 
     # Install virtual environments globally
