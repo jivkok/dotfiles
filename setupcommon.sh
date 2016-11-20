@@ -2,8 +2,10 @@
 # Configure computer environment - common steps
 
 # dotfiles location
-dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# Solution paths with symlinks:
+dotdir="$( cd "$( dirname "$0" )" && pwd )"
+# Solution for executable scripts (not just sourced files):
+# dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# Solution for executable scripts with symlinks:
 # http://stackoverflow.com/questions/59895/can-a-bash-script-tell-which-directory-it-is-stored-in
 # SOURCE="${BASH_SOURCE[0]}"
 # while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -13,7 +15,6 @@ dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # done
 # DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$dotdir/setupfunctions.sh"
 pull_latest_dotfiles "$dotdir"
 
@@ -28,3 +29,6 @@ confirm_and_run "$dotdir/configure_nodejs.sh" "NodeJS (plus packages)"
 # confirm_and_run "$dotdir/configure_ruby.sh" "Ruby (plus packages)"
 confirm_and_run "$dotdir/configure_vim.sh" "Vim"
 confirm_and_run "$dotdir/configure_sublimetext.sh" "SublimeText"
+
+dot_trace "Reloading shell $SHELL"
+exec $SHELL -l

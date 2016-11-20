@@ -1,7 +1,7 @@
 #!/bin/bash
 # Configure Linux environment (Debian-style)
 
-dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+dotdir="$( cd "$( dirname "$0" )" && pwd )"
 source "$dotdir/setupfunctions.sh"
 pull_latest_dotfiles "$dotdir"
 

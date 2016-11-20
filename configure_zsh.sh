@@ -1,7 +1,7 @@
 #!/bin/bash
 # Configure ZSH
 
-dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+dotdir="$( cd "$( dirname "$0" )" && pwd )"
 source "$dotdir/setupfunctions.sh"
 
 dot_trace "Configuring ZSH ..."
@@ -35,7 +35,7 @@ if [ -d "$HOME/.oh-my-zsh" ]; then
     dot_trace "Updating oh-my-zsh ..."
     git -C "$HOME/.oh-my-zsh" pull --rebase --stat origin master
 
-    for dir in $(find "$HOME/.oh-my-zsh/custom/plugins" -mindepth 1 -maxdepth -type d); do
+    for dir in $(find "$HOME/.oh-my-zsh/custom/plugins" -mindepth 1 -maxdepth 1 -type d); do
         [ -d "$dir/.git" ] && dot_trace "Updating $dir" && git -C "$dir" pull --prune
     done
     dot_trace "Updating oh-my-zsh done."
@@ -55,14 +55,14 @@ if [ -z "$(grep $_zsh /etc/shells)" ] ; then
     dot_trace "Adding ZSH as supported shell"
     sudo -s "echo $_zsh >> /etc/shells"
 else
-    dot_trace "ZSH is supported shell"
+    dot_trace "ZSH is already supported shell"
 fi
 
 if [ "$SHELL" != "$_zsh" ]; then
     dot_trace "Switching to ZSH as default shell"
     chsh -s "$_zsh"
 else
-    dot_trace "ZSH is default shell"
+    dot_trace "ZSH is already default shell"
 fi
 
 unset _zsh

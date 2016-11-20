@@ -63,8 +63,8 @@ function pull_latest_dotfiles ()
 function confirm_and_run ()
 {
     if [ ! -f "$1" ]; then return; fi
-    local shh=$(ps -p $$ -oargs=)
-    if [ "-zsh" = "$shh" ]; then
+    local shh="$(ps -p $$ -oargs=)"
+    if [[ "$shh" == *zsh* ]] ; then
         read -r "REPLY?Would you like to configure $2 ? "
     else
         read -r -p "Would you like to configure $2 ? " -n 1
