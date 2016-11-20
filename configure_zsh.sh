@@ -35,7 +35,7 @@ if [ -d "$HOME/.oh-my-zsh" ]; then
     dot_trace "Updating oh-my-zsh ..."
     git -C "$HOME/.oh-my-zsh" pull --rebase --stat origin master
 
-    for dir in $(find "$HOME/.oh-my-zsh/custom/plugins" -type d -depth 1); do
+    for dir in $(find "$HOME/.oh-my-zsh/custom/plugins" -mindepth 1 -maxdepth -type d); do
         [ -d "$dir/.git" ] && dot_trace "Updating $dir" && git -C "$dir" pull --prune
     done
     dot_trace "Updating oh-my-zsh done."
