@@ -38,14 +38,7 @@ There is option to change the shell to [Zsh](www.zsh.org/).
 
 #### Option #1
 ```sh
-# OSX
-curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup_osx.sh | sh
-
-# Linux (Debian-style)
-curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup_debian.sh | sh
-
-# Windows (cygwin)
-curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup_babun.sh | sh
+curl https://raw.githubusercontent.com/jivkok/dotfiles/master/setup.sh | sh
 ```
 
 #### Option #2
@@ -90,7 +83,7 @@ source dotfiles/setup_babun.sh
 If `~/.path` exists, it will be sourced along with the other files.
 Here’s an example `~/.path` file that adds `/usr/local/bin` to the `$PATH`:
 
-```bash
+```sh
 export PATH="/usr/local/bin:$PATH"
 ```
 
