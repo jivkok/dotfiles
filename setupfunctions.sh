@@ -9,8 +9,9 @@
 function dot_trace()
 {
     local msg="$1"
-    local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    local timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
     echo -e "\n$(tput setaf 2)$timestamp: $msg$(tput sgr0)\n"
+    touch ~/.dotfiles_history
     echo "$timestamp: [INFO] $msg" >> ~/.dotfiles_history
 }
 
@@ -113,7 +114,7 @@ function make_dotfiles_symlinks ()
     local source_directory="$1"
     local target_directory="$2"
 
-    for dotfile in $(find "$source_directory" -type f -iname ".*" -mindepth 1 -maxdepth 1); do
+    for dotfile in $(find "$source_directory" -mindepth 1 -maxdepth 1 -type f -iname ".*"); do
         make_symlink "$dotfile" "$target_directory"
     done
 }
@@ -173,4 +174,9 @@ function cask_install_package ()
     else
         brew cask install "$pkg_name" "$pkg_args" 2>&1 | tee ~/.dotfiles_history
     fi
+}
+
+function ver
+{
+    printf "%04d%04d%04d%04d" $(echo "$1" | tr '.' ' ')
 }

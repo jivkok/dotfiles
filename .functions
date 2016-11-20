@@ -114,7 +114,7 @@ function os_update() {
         echo -e "\nUpdating oh-my-zsh ...\n"
         git -C "$HOME/.oh-my-zsh" pull --rebase --stat origin master
 
-        for dir in $(find "$HOME/.oh-my-zsh/custom/plugins" -type d -depth 1); do
+        for dir in $(find "$HOME/.oh-my-zsh/custom/plugins" -mindepth 1 -maxdepth 1 -type d); do
             [ -d "$dir/.git" ] && echo -e "\nUpdating $dir \n" && git -C "$dir" pull --prune
         done
         echo -e "\nUpdating oh-my-zsh done.\n"
@@ -133,7 +133,7 @@ function os_update() {
 
     if command -v pip >/dev/null 2>&1 ; then
         echo -e "\nUpdating Python packages ...\n"
-        pip list --outdated | cut -d ' ' -f 1 | xargs -n 1 pip install --upgrade
+        pip list --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 pip install --upgrade
         echo -e "\nUpdating Python packages done.\n"
     fi
 
@@ -149,8 +149,8 @@ function os_update() {
 
     # if command -v gem >/dev/null 2>&1 ; then
     #     echo -e "\nUpdating Ruby packages ...\n"
-    #     sudo gem update --system
-    #     sudo gem update
+    #     gem update --system
+    #     gem update
     #     echo -e "\nUpdating Ruby packages done.\n"
     # fi
 
@@ -261,7 +261,7 @@ function dataurl() {
 # Pull all repos in the current (or specified) directory
 function git_pull_all() {
     dir="${1:-.}"
-    for i in $(find "$dir" -type d -mindepth 1 -maxdepth 1); do
+    for i in $(find "$dir" -mindepth 1 -maxdepth 1 -type d); do
         [ -d "$i/.git" ] && echo -e "\nRepo: $i" && git -C "$i" pull --prune;
     done
 }
@@ -419,7 +419,7 @@ function man() {
 
 # Helps identifying the source/content of a command
 function help() {
-    local cmd=$1
+    local cmd="$1"
     if [ -z "$cmd" ]; then
         echo "Helps identifying the source/content of a command"
         echo "Usage: help command"
@@ -430,7 +430,7 @@ function help() {
     local hasPygmentize=0
     command -v pygmentize >/dev/null 2>&1 && hasPygmentize=1
 
-    local cmdtest=$(type $cmd) # command -V, which
+    local cmdtest="$(type $cmd)" # command -V, which
 
     # alias
     if [[ $cmdtest == *"is an alias for"* ]]; then
@@ -455,7 +455,7 @@ function help() {
     fi
 
     # file
-    local f=$(echo $cmdtest | sed -r 's/.+\ is\ (.*)/\1/')
+    local f="$(echo $cmdtest | sed -r 's/.+\ is\ (.*)/\1/')"
     if [ -f "$f" ]; then
         echo -e "${GREEN}${cmdtest}${DEFAULT}"
         file $f
@@ -471,7 +471,7 @@ function help() {
     fi
 
     # whatis
-    local mantest=$(man -f $cmd)
+    local mantest="$(man -f $cmd)"
     if [[ $mantest != *"nothing appropriate"* ]]; then
         echo -e "${GREEN}Found whatis entries for: ${cmd}${DEFAULT}"
         man -f $cmd
@@ -479,7 +479,7 @@ function help() {
     fi
 
     # apropos
-    mantest=$(man -k $cmd)
+    mantest="$(man -k $cmd)"
     if [[ $mantest != *"nothing appropriate"* ]]; then
         echo -e "${GREEN}Found whatis strings for: ${cmd}${DEFAULT}"
         man -k $cmd
