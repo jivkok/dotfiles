@@ -1,8 +1,9 @@
 #!/bin/bash
 # Configure computer environment - common steps
 
+[ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
 # dotfiles location
-dotdir="$( cd "$( dirname "$0" )" && pwd )"
+# dotdir="$( cd "$( dirname "$0" )" && pwd )"
 # Solution for executable scripts (not just sourced files):
 # dotdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Solution for executable scripts with symlinks:
