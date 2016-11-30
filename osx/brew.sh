@@ -20,14 +20,18 @@ brew upgrade
 # Install GNU core utilities (those that come with OS X are outdated).
 # Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
 brew install coreutils
-rm -f /usr/local/bin/sha256sum
-ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
-
+rm -f /usr/local/bin/sha256sum && ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
 brew install moreutils
 brew install findutils # GNU `find`, `locate`, `updatedb`, and `xargs`
 brew install gnu-sed --with-default-names
 brew install gnu-tar --with-default-names
 brew install gnu-which --with-default-names
+brew install gawk
+brew install gnutls
+brew install wget --with-iri
+brew install grep --with-default-names
+brew install rsync
+brew install php56 --with-gmp
 
 # Install Bash 4.
 brew install bash
@@ -35,12 +39,6 @@ brew install bash-completion
 # Switch to Bash4 with:
 # echo /usr/local/bin/bash | sudo tee -a /etc/shells
 # chsh -s /usr/local/bin/bash
-
-# Install more recent versions of some OS X tools.
-brew install wget --with-iri
-brew install grep
-brew install rsync
-brew install php56 --with-gmp
 
 # Packages
 brew install ack
