@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Install homebrew
 if [ ! -f /usr/local/bin/brew ]; then
