@@ -57,17 +57,17 @@ fi
 # Run appropriate OS setup
 if [ "$os" = "Linux" ]; then
     echo "Starting Linux setup ..."
-    source "$dotdir/setup_debian.sh"
+    . "$dotdir/setup_debian.sh"
 elif [ "$os" = "Darwin" ]; then
     echo "Starting OSX setup ..."
-    source "$dotdir/setup_osx.sh"
+    . "$dotdir/setup_osx.sh"
 elif [[ "$os" == CYGWIN* ]]; then
     if command -v pact >/dev/null 2>&1; then # Babun
         echo "Starting Cygwin/Babun setup ..."
-        source "$dotdir/setup_babun.sh"
+        . "$dotdir/setup_babun.sh"
     else
         echo "Starting Cygwin setup ..."
-        source "$dotdir/setup_cygwin.sh"
+        . "$dotdir/setup_cygwin.sh"
     fi
 else
     echo "Unsupported OS: $os"

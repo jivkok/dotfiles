@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # DotNet utility
 brew tap aspnet/dnx
