@@ -1,7 +1,9 @@
 #!/bin/bash
 # Configure Windows environment (Cygwin)
 
-dotdir="$( cd "$( dirname "$0" )" && pwd )"
+# dotdir="$( cd "$( dirname "$0" )" && pwd )"
+[ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
+
 source "$dotdir/setupfunctions.sh"
 pull_latest_dotfiles "$dotdir"
 

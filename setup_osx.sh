@@ -1,7 +1,9 @@
 #!/bin/bash
 # Configure OSX environment
 
-dotdir="$( cd "$( dirname "$0" )" && pwd )"
+# dotdir="$( cd "$( dirname "$0" )" && pwd )"
+[ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
+
 source "$dotdir/setupfunctions.sh"
 pull_latest_dotfiles "$dotdir"
 
@@ -30,4 +32,4 @@ cp -f "$dotdir/osx/karabiner.private.xml" "$HOME/Library/Application Support/Kar
 
 source "$dotdir/setupcommon.sh"
 
-echo "Configuring OSX environment done."
+dot_trace "Configuring OSX environment done."
