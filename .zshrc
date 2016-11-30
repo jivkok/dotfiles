@@ -54,7 +54,7 @@ export UPDATE_ZSH_DAYS=30
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(colored-man colorize encode64 httpie jsontools npm pip python rsync tmux tmuxinator urltools zsh-completions zsh-syntax-highlighting)
+plugins=(colored-man colorize encode64 httpie jsontools nmap npm pip python rsync tmux tmuxinator urltools zsh-completions zsh-syntax-highlighting)
 if [[ "$OSTYPE" = darwin* ]]; then
     plugins=("${plugins[@]}" brew osx pod xcode)
 fi
@@ -69,21 +69,23 @@ set -o noclobber        # prevent overwriting files with cat
 
 # Completion system
 
+[ -d $HOME/.zsh/completion ] && fpath=($HOME/.zsh/completion $fpath)
+
 autoload -Uz compinit
 compinit
 
 zstyle ":completion:*" auto-description "specify: %d"
 zstyle ":completion:*" completer _expand _complete _correct _approximate
-zstyle ":completion:*" format "Completing %d"
+zstyle ":completion:*" format "Completing %d :"
 zstyle ":completion:*" group-name ""
-zstyle ":completion:*" menu select=2
-zstyle ":completion:*:default" list-colors ${(s.:.)LS_COLORS}
 zstyle ":completion:*" list-colors ""
 zstyle ":completion:*" list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
 zstyle ":completion:*" matcher-list "" "m:{a-z}={A-Z}" "m:{a-zA-Z}={A-Za-z}" "r:|[._-]=* r:|=* l:|=*"
+zstyle ":completion:*" menu select=2
 zstyle ":completion:*" menu select=long
 zstyle ":completion:*" select-prompt %SScrolling active: current selection at %p%s
 zstyle ":completion:*" verbose true
+zstyle ":completion:*:default" list-colors ${(s.:.)LS_COLORS}
 
 zstyle ":completion:*:*:kill:*:processes" list-colors "=(#b) #([0-9]#)*=0=01;31"
 zstyle ":completion:*:kill:*" command "ps -u $USER -o pid,%cpu,tty,cputime,cmd"
