@@ -18,11 +18,23 @@ function unmark {
 os=$(uname -s)
 if [ "$os" = "Darwin" ]; then
     function marks {
-        ls -l "$MARKPATH" | tail -n +2 | sed 's/  / /g' | cut -d' ' -f9- | awk -F ' -> ' '{printf "%-10s -> %s\n", $1, $2}'
+        ls -l "$MARKPATH" | tail -n +2 | sed 's/  / /g' | cut -d' ' -f8- | awk -F ' -> ' '{printf "%-10s -> %s\n", $1, $2}'
+    }
+    function cdm {
+        local dest_dir=$(ls -l "$MARKPATH" | tail -n +2 | sed 's/  / /g' | cut -d' ' -f10- | fzf )
+        if [[ $dest_dir != '' ]]; then
+            cd "$dest_dir"
+        fi
     }
 else
     function marks {
         ls -l "$MARKPATH" | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g' && echo
+    }
+    function cdm {
+        local dest_dir=$(ls -l "$MARKPATH" | tail -n +2 | sed 's/  / /g' | cut -d' ' -f11- | fzf )
+        if [[ $dest_dir != '' ]]; then
+            cd "$dest_dir"
+        fi
     }
 fi
 
