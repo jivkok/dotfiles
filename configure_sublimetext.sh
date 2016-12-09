@@ -18,8 +18,9 @@ fi
 mkdir -p "$sublimeUserDataPath"
 mkdir -p "$sublimeInstalledPackagesPath"
 
-scriptdir="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-settingsDir="$scriptdir/sublimetext"
+# dotdir="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+[ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
+settingsDir="$dotdir/sublimetext"
 
 cp -f "$settingsDir"/*.sublime-settings "$sublimeUserDataPath"
 cp -f "$settingsDir/Default ($os_label).sublime-keymap" "$sublimeUserDataPath"
