@@ -1,55 +1,57 @@
 #!/bin/bash
 # Packages
 
-sudo add-apt-repository ppa:aacebedo/fasd
 sudo apt-get update
 
 # Common
-sudo apt-get install -y cifs-utils
-sudo apt-get install -y collectl
-sudo apt-get install -y curl
-sudo apt-get install -y dstat
-sudo apt-get install -y exuberant-ctags
-sudo apt-get install -y fasd
-sudo apt-get install -y git
-sudo apt-get install -y git-extras
-sudo apt-get install -y gitk
-sudo apt-get install -y gitstats
-sudo apt-get install -y graphviz
-sudo apt-get install -y jq
-sudo apt-get install -y libwww-perl
-sudo apt-get install -y lnav
-sudo apt-get install -y ngrep
-sudo apt-get install -y mosh
-sudo apt-get install -y python-pip
-sudo apt-get install -y python-pygments # colorize
-sudo apt-get install -y rlwrap
-sudo apt-get install -y silversearcher-ag
-sudo apt-get install -y shellcheck
-sudo apt-get install -y tmux
-sudo apt-get install -y tree
-sudo apt-get install -y vim
-sudo apt-get install -y wget
+sudo apt-get install -y cifs-utils # Common Internet File System utilities
+sudo apt-get install -y collectl # Utility to collect Linux performance data
+sudo apt-get install -y curl # command line tool for transferring data with URL syntax
+sudo apt-get install -y dstat # versatile resource statistics tool
+sudo apt-get install -y exuberant-ctags # build tag file indexes of source code definitions
+sudo apt-get install -y git # fast, scalable, distributed revision control system
+sudo apt-get install -y git-extras # Extra commands for git
+sudo apt-get install -y gitk # fast, scalable, distributed revision control system (revision tree visualizer)
+sudo apt-get install -y gitstats # statistics generator for git repositories
+sudo apt-get install -y graphviz # rich set of graph drawing tools
+sudo apt-get install -y jq # lightweight and flexible command-line JSON processor
+sudo apt-get install -y libwww-perl # simple and consistent interface to the world-wide web
+sudo apt-get install -y lnav # ncurses-based log file viewer
+sudo apt-get install -y ngrep # grep for network traffic
+sudo apt-get install -y mosh # Mobile shell that supports roaming and intelligent local echo
+sudo apt-get install -y python-pip # alternative Python package installer
+sudo apt-get install -y python-pygments # syntax highlighting package written in Python
+sudo apt-get install -y rlwrap # readline feature command line wrapper
+sudo apt-get install -y silversearcher-ag # very fast grep-like program, alternative to ack-grep
+sudo apt-get install -y shellcheck # lint tool for shell scripts
+sudo apt-get install -y tmux # terminal multiplexer
+sudo apt-get install -y tree # displays an indented directory tree, in color
+sudo apt-get install -y vim # Vi IMproved - enhanced vi editor
+sudo apt-get install -y wget # retrieves files from the web
 
-apt-get install libxml2-dev
-apt-get install libxslt1-dev
-apt-get install python-dev
+sudo apt-get install -y libxml2-dev # Development files for the GNOME XML library
+sudo apt-get install -y libxslt1-dev # XSLT 1.0 processing library - development kit
+sudo apt-get install -y python-dev # header files and a static library for Python (default)
 
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install --key-bindings --completion --no-update-rc
+if [ -d $HOME/.fzf/.git ]; then
+  git -C "$HOME/.fzf" pull --prune
+else
+  git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
+fi
+[ -f "$HOME/.fzf/install" ] && "$HOME/.fzf/install" --key-bindings --completion --no-update-rc
 
 # Security-related
-sudo apt-get install -y htop
-sudo apt-get install -y iftop
-sudo apt-get install -y lsof
-sudo apt-get install -y ltrace
-sudo apt-get install -y nethogs
-sudo apt-get install -y secure-delete
-sudo apt-get install -y strace
+sudo apt-get install -y htop # interactive processes viewer
+sudo apt-get install -y iftop # displays bandwidth usage information on an network interface
+sudo apt-get install -y lsof # Utility to list open files
+sudo apt-get install -y ltrace # Tracks runtime library calls in dynamically linked programs
+sudo apt-get install -y nethogs # Net top tool grouping bandwidth per process
+sudo apt-get install -y secure-delete # tools to wipe files, free disk space, swap and memory
+sudo apt-get install -y strace # System call tracer
 
 # TaskWarrior
-sudo apt-get install -y task
-sudo apt-get install -y vit
+sudo apt-get install -y task # feature-rich console based todo list manager - transitional package
+sudo apt-get install -y vit # full-screen terminal interface for Taskwarrior
 
 sudo apt-get clean
 sudo apt-get autoremove
