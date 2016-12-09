@@ -73,7 +73,9 @@ function install_extension ()
     dot_trace "Installing Brackets extension '$extensionDisplayName' done."
 }
 
-dotdir="$( cd "$( dirname "$0" )" && pwd )"
+# dotdir="$( cd "$( dirname "$0" )" && pwd )"
+[ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
+
 source "$dotdir/setupfunctions.sh"
 
 dot_trace "Configuring Brackets ..."
