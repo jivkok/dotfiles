@@ -1,4 +1,4 @@
-#compdef hello
+#compdef lsof
 
 typeset -A opt_args
 

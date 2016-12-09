@@ -21,7 +21,7 @@ elif [ "$os" = "Darwin" ]; then
     fi
 elif [[ "$os" == CYGWIN* ]]; then
     if command -v pact >/dev/null 2>&1 ; then # Babun
-        # Cygwin/Babun has ZSH pre-installed
+        dot_trace "Cygwin/Babun has ZSH pre-installed"
     else
         dot_error "No automatic ZSH install in Cygwin"
         return
