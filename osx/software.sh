@@ -21,6 +21,7 @@ brew cask install brackets # code/text editor
 brew cask install bwana # browser as man pager
 brew cask install ccmenu # CI server status
 brew cask install dash # documentation sets
+brew cask install geektool # OSX desktop customization
 brew cask install gimp # imaging
 brew cask install gisto # Github gists editor
 brew cask install google-chrome # browser
@@ -48,7 +49,6 @@ brew cask install clipmenu # clipboard manager
 brew cask install disk-inventory-x # disk utilization
 brew cask install dropbox # files sync
 brew cask install evernote # notes sync
-brew cask install firefox # browser
 brew cask install flux # color adjustments
 brew cask install handbrake # video transcoder
 brew cask install hermes # Pandora.com
@@ -70,9 +70,11 @@ brew cask install superduper # disk duplication
 # brew cask install teamviewer # remote sharing
 brew cask install transmission # Bittorrent client
 brew cask install tunnelblick # OpenVPN client
+brew cask install Ubersicht # desktop customization
 brew cask install vlc # media player
 brew cask install wireshark # network monitor, depends on xquartz
 brew cask install xquartz # X11
+brew cask install xrg # System Monitor for OSX
 
 # Developer-friendly quick-look plugins; see https://github.com/sindresorhus/quick-look-plugins
 brew cask install qlcolorcode qlstephen qlmarkdown quicklook-json qlprettypatch quicklook-csv betterzipql qlimagesize webpquicklook suspicious-package
@@ -82,7 +84,8 @@ brew prune
 brew cleanup
 
 echo Install these apps from the AppStore:
-echo * Converto
-echo * Dr. CLeaner
-echo * Memory Clean
-echo * Microsoft Remote Desktop
+echo -- Converto
+echo -- Dr. Cleaner
+echo -- Memory Clean
+echo -- Microsoft Remote Desktop
+echo Install these widget apps from the AppStore:
