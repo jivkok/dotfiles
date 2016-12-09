@@ -5,19 +5,19 @@ os=$(uname -s)
 echo "OS: $os"
 
 # Ensure git is present
-if ! command -v git >/dev/null 2>&1; then
+if ! command -V git >/dev/null 2>&1; then
     if [ "$os" = "Linux" ]; then
         echo "Installing Git on Linux"
         sudo apt-get install -y git
     elif [ "$os" = "Darwin" ]; then
-        if ! command -v brew >/dev/null 2>&1; then
+        if ! command -V brew >/dev/null 2>&1; then
             echo "Installing HomeBrew ..."
             /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         fi
         echo "Installing Git on OSX"
         brew install -y git
     elif [[ "$os" == CYGWIN* ]]; then
-        if command -v pact >/dev/null 2>&1; then # Babun
+        if command -V pact >/dev/null 2>&1; then # Babun
             echo "Installing Git on Cygwin/Babun"
             pact install git
         else
@@ -62,7 +62,7 @@ elif [ "$os" = "Darwin" ]; then
     echo "Starting OSX setup ..."
     . "$dotdir/setup_osx.sh"
 elif [[ "$os" == CYGWIN* ]]; then
-    if command -v pact >/dev/null 2>&1; then # Babun
+    if command -V pact >/dev/null 2>&1; then # Babun
         echo "Starting Cygwin/Babun setup ..."
         . "$dotdir/setup_babun.sh"
     else

@@ -16,7 +16,7 @@ else
 fi
 
 function cdd () {
-    cd "$1";
+    cd "$1" || exit;
     ls -AlF $dirsflag $colorflag;
 }
 unset dirsflag colorflag
@@ -70,7 +70,7 @@ function fs() {
 
 # find and list processes matching a case-insensitive partial-match string
 function fp() {
-    ps Ao pid,comm|awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}'|grep -i $1|grep -v grep
+    ps Ao pid,comm | awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}' | grep -i "$1" | grep -v grep
 }
 
 # system update
@@ -87,7 +87,7 @@ function os_update() {
         echo -e "\nUpdating dotfiles done.\n"
     fi
 
-    if command -v brew >/dev/null 2>&1 ; then
+    if command -V brew >/dev/null 2>&1 ; then
         echo -e "\nUpdating Homebrew packages ...\n"
         brew update
         brew upgrade
@@ -99,7 +99,7 @@ function os_update() {
         echo -e "\nUpdating Homebrew packages done.\n"
     fi
 
-    if command -v apt-get >/dev/null 2>&1 ; then
+    if command -V apt-get >/dev/null 2>&1 ; then
         echo -e "\nUpdating apt-get packages ...\n"
         sudo apt-get update --fix-missing
         sudo apt-get dist-upgrade
@@ -114,30 +114,33 @@ function os_update() {
         echo -e "\nUpdating oh-my-zsh ...\n"
         git -C "$HOME/.oh-my-zsh" pull --rebase --stat origin master
 
-        for dir in $(find "$HOME/.oh-my-zsh/custom/plugins" -mindepth 1 -maxdepth 1 -type d); do
+        find "$HOME/.oh-my-zsh/custom/plugins" -mindepth 1 -maxdepth 1 -type d | while read -r dir; do
             [ -d "$dir/.git" ] && echo -e "\nUpdating $dir \n" && git -C "$dir" pull --prune
         done
         echo -e "\nUpdating oh-my-zsh done.\n"
     fi
 
-    if command -v vim >/dev/null 2>&1 ; then
+    if command -V vim >/dev/null 2>&1 ; then
         echo -e "\nUpdating Vim plugins ...\n"
         vim +PlugUpdate +qall
         echo -e "\nUpdating Vim plugins done.\n"
     fi
-    if command -v nvim >/dev/null 2>&1 ; then
+    if command -V nvim >/dev/null 2>&1 ; then
         echo -e "\nUpdating NeoVim plugins ...\n"
         nvim +PlugUpdate +qall
         echo -e "\nUpdating NeoVim plugins done.\n"
     fi
 
-    if command -v pip >/dev/null 2>&1 ; then
-        echo -e "\nUpdating Python packages ...\n"
-        pip list --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 pip install --upgrade
-        echo -e "\nUpdating Python packages done.\n"
+    if command -V pip >/dev/null 2>&1 ; then
+        # echo -e "\nUpdating Python system packages ...\n"
+        # pip list --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 sudo -H pip install --upgrade
+        # echo -e "\nUpdating Python system packages done.\n"
+        echo -e "\nUpdating Python user packages ...\n"
+        pip list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 pip install --user --upgrade
+        echo -e "\nUpdating Python user packages done.\n"
     fi
 
-    if command -v npm >/dev/null 2>&1 ; then
+    if command -V npm >/dev/null 2>&1 ; then
         echo -e "\nUpdating Node packages ...\n"
         npm install npm@latest -g
         npm update -g
@@ -147,7 +150,7 @@ function os_update() {
         echo -e "\nUpdating Node packages done.\n"
     fi
 
-    # if command -v gem >/dev/null 2>&1 ; then
+    # if command -V gem >/dev/null 2>&1 ; then
     #     echo -e "\nUpdating Ruby packages ...\n"
     #     gem update --system
     #     gem update
@@ -187,10 +190,10 @@ lsz() {
         echo "lsz filename.[tar,tgz,gz,zip,etc]"
         return 1
     fi
-    if [ -f $1 ] ; then
+    if [ -f "$1" ] ; then
         case $1 in
-            *.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz) tar tvf $1;;
-            *.zip)  unzip -l $1;;
+            *.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz) tar tvf "$1";;
+            *.zip)  unzip -l "$1";;
             *)      echo "'$1' unrecognized." ;;
         esac
     else
@@ -201,29 +204,29 @@ lsz() {
 # Simple calculator
 function calc() {
     local result="";
-    result="$(printf "scale=10;$*\n" | bc --mathlib | tr -d '\\\n')";
+    result="$(echo "scale=10;$*" | bc --mathlib | tr -d '\\\n')";
     #                       └─ default (when `--mathlib` is used) is 20
     #
     if [[ "$result" == *.* ]]; then
         # improve the output for decimal numbers
-        printf "$result" |
+        echo "$result" |
         sed -e 's/^\./0./'       \ # add "0" for cases like ".5"
             -e 's/^-\./-0./'     \ # add "0" for cases like "-.5"
             -e 's/0*$//;s/\.$//';  # remove trailing zeros
     else
-        printf "$result";
+        echo "$result";
     fi;
     printf "\n";
 }
 
 # Create a new directory and enter it
 function mkd() {
-    mkdir -p "$@" && cd "$_";
+    mkdir -p "$@" && cd "$_" || exit;
 }
 
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
 function targz() {
-    local tmpFile="${@%/}.tar";
+    local tmpFile="${*%/}.tar";
     tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1;
 
     size=$(
@@ -251,7 +254,8 @@ function targz() {
 
 # Create a data URL from a file
 function dataurl() {
-    local mimeType=$(file -b --mime-type "$1");
+    local mimeType
+    mimeType=$(file -b --mime-type "$1");
     if [[ $mimeType == text/* ]]; then
         mimeType="${mimeType};charset=utf-8";
     fi
@@ -261,8 +265,8 @@ function dataurl() {
 # Pull all repos in the current (or specified) directory
 function git_pull_all() {
     dir="${1:-.}"
-    for i in $(find "$dir" -mindepth 1 -maxdepth 1 -type d); do
-        [ -d "$i/.git" ] && echo -e "\nRepo: $i" && git -C "$i" pull --prune;
+    find "$dir" -mindepth 1 -maxdepth 1 -type d | while read -r repodir; do
+        [ -d "$repodir/.git" ] && echo -e "\nRepo: $repodir" && git -C "$repodir" pull --prune;
     done
 }
 
@@ -274,18 +278,18 @@ function git_pull_submodules() {
         return
     fi
 
-    cat "$dir/.gitmodules" | sed -rn 's/\s+path\ =\ (.*)/\1/p' | while read gitdir
+    sed -rn 's/\s+path\ =\ (.*)/\1/p' "$dir/.gitmodules" | while read -r repodir
     do
-        echo -e "\n\033[0;32mUpdating $gitdir ...\033[0;39m\n"
-        git -C "$gitdir" checkout master
-        git -C "$gitdir" pull --prune --recurse-submodules
-        git -C "$gitdir" submodule update --init --recursive
+        echo -e "\n\033[0;32mUpdating $repodir ...\033[0;39m\n"
+        git -C "$repodir" checkout master
+        git -C "$repodir" pull --prune --recurse-submodules
+        git -C "$repodir" submodule update --init --recursive
     done
 }
 
 # Create a git.io short URL
 function gitio() {
-    if [ -z "${1}" -o -z "${2}" ]; then
+    if [ -z "${1}" ] || [ -z "${2}" ]; then
         echo "Usage: \`gitio slug url\`";
         return 1;
     fi;
@@ -326,7 +330,7 @@ function json() {
 
 # UTF-8-encode a string of Unicode symbols
 function escape() {
-    printf "\\\x%s" $(printf "$@" | xxd -p -c1 -u);
+    printf "\\\x%s" $(printf "%s" "$@" | xxd -p -c1 -u);
     # print a newline unless we’re piping the output to another program
     if [ -t 1 ]; then
         echo ""; # newline
@@ -335,7 +339,7 @@ function escape() {
 
 # Decode \x{ABCD}-style Unicode escape sequences
 function unidecode() {
-    perl -e "binmode(STDOUT, ':utf8'); print \"$@\"";
+    perl -e "binmode(STDOUT, ':utf8'); print \"$*\"";
     # print a newline unless we’re piping the output to another program
     if [ -t 1 ]; then
         echo ""; # newline
@@ -344,19 +348,19 @@ function unidecode() {
 
 # encode a given image file as base64 and output css background property to clipboard
 function img2base64() {
-    openssl base64 -in $1 | awk -v ext="${1#*.}" '{ str1=str1 $0 }END{ print "background:url(data:image/"ext";base64,"str1");" }'|pbcopy
-    echo "$1 encoded to clipboard"
+    openssl base64 -in "$1" | awk -v ext="${1#*.}" '{ str1=str1 $0 }END{ print "background:url(data:image/"ext";base64,"str1");" }' | pbcopy
+    echo "$1 encoded as base64 and copied as css background property to clipboard"
 }
 
 # encode a given font file as base64 and output css src property to clipboard
 function 64font() {
-    openssl base64 -in $1 | awk -v ext="${1#*.}" '{ str1=str1 $0 }END{ print "src:url(\"data:font/"ext";base64,"str1"\")  format(\"woff\");" }'|pbcopy
-    echo "$1 encoded as font and copied to clipboard"
+    openssl base64 -in "$1" | awk -v ext="${1#*.}" '{ str1=str1 $0 }END{ print "src:url(\"data:font/"ext";base64,"str1"\")  format(\"woff\");" }' | pbcopy
+    echo "$1 encoded as font and copied as css src property to clipboard"
 }
 
 # Get a character’s Unicode code point
 function codepoint() {
-    perl -e "use utf8; print sprintf('U+%04X', ord(\"$@\"))";
+    perl -e "use utf8; print sprintf('U+%04X', ord(\"$*\"))";
     # print a newline unless we’re piping the output to another program
     if [ -t 1 ]; then
         echo ""; # newline
@@ -375,11 +379,13 @@ function getcertnames() {
     echo "Testing ${domain}…";
     echo ""; # newline
 
-    local tmp=$(echo -e "GET / HTTP/1.0\nEOT" \
+    local tmp
+    tmp=$(echo -e "GET / HTTP/1.0\nEOT" \
         | openssl s_client -connect "${domain}:443" -servername "${domain}" 2>&1);
 
     if [[ "${tmp}" = *"-----BEGIN CERTIFICATE-----"* ]]; then
-        local certText=$(echo "${tmp}" \
+        local certText
+        certText=$(echo "${tmp}" \
             | openssl x509 -text -certopt "no_aux, no_header, no_issuer, no_pubkey, \
             no_serial, no_sigdump, no_signame, no_validity, no_version");
         echo "Common Name:";
@@ -428,17 +434,18 @@ function help() {
 
     local DEFAULT="\033[0;39m" RED="\033[0;31m" GREEN="\033[0;32m"
     local hasPygmentize=0
-    command -v pygmentize >/dev/null 2>&1 && hasPygmentize=1
+    command -V pygmentize >/dev/null 2>&1 && hasPygmentize=1
 
-    local cmdtest="$(type $cmd)" # command -V, which
+    local cmdtest
+    cmdtest="$(type "$cmd")" # command -V, which
 
     # alias
     if [[ $cmdtest == *"is an alias for"* ]]; then
         echo -e "${GREEN}Alias${DEFAULT}"
         if [[ $hasPygmentize == 1 ]]; then
-            alias $cmd | pygmentize -l sh
+            alias "$cmd" | pygmentize -l sh
         else
-            alias $cmd
+            alias "$cmd"
         fi
         return
     fi
@@ -447,42 +454,44 @@ function help() {
     if [[ $cmdtest == *"is a shell function"* ]]; then
         echo -e "${GREEN}${cmdtest}${DEFAULT}"
         if [[ $hasPygmentize == 1 ]]; then
-            which $cmd | pygmentize -l sh
+            which "$cmd" | pygmentize -l sh
         else
-            which $cmd
+            which "$cmd"
         fi
         return
     fi
 
     # file
-    local f="$(echo $cmdtest | sed -r 's/.+\ is\ (.*)/\1/')"
+    local f
+    f="$(echo "$cmdtest" | sed -r 's/.+\ is\ (.*)/\1/')"
     if [ -f "$f" ]; then
         echo -e "${GREEN}${cmdtest}${DEFAULT}"
-        file $f
+        file "$f"
         return
     fi
 
     # man
-    man $cmd >/dev/null 2>&1
-    if [[ $? == 0 ]]; then
+
+    if man "$cmd" >/dev/null 2>&1; then
         echo -e "${GREEN}Found man entry for: ${cmd}${DEFAULT}"
-        man $cmd
+        man "$cmd"
         return
     fi
 
     # whatis
-    local mantest="$(man -f $cmd)"
+    local mantest
+    mantest="$(man -f "$cmd")"
     if [[ $mantest != *"nothing appropriate"* ]]; then
         echo -e "${GREEN}Found whatis entries for: ${cmd}${DEFAULT}"
-        man -f $cmd
+        man -f "$cmd"
         return
     fi
 
     # apropos
-    mantest="$(man -k $cmd)"
+    mantest="$(man -k "$cmd")"
     if [[ $mantest != *"nothing appropriate"* ]]; then
         echo -e "${GREEN}Found whatis strings for: ${cmd}${DEFAULT}"
-        man -k $cmd
+        man -k "$cmd"
         return
     fi
 
@@ -490,16 +499,18 @@ function help() {
     return 1
 }
 
-function psa () {
+function psgrep () {
     if [ -z "$1" ]; then
         ps aux
     else
-        ps aux | grep -i $1
+        ps aux | grep -iE "$1"
     fi
 }
 
 # Tails the system log
 function sys_log () {
+    local os
+    os="$(uname -s)"
     if [ "$os" = "Linux" ]; then
         syslog=/var/log/syslog
     elif [ "$os" = "Darwin" ]; then
@@ -509,13 +520,39 @@ function sys_log () {
         return
     fi
 
-    if [[ $# > 0 ]]; then
+    if [[ $# -gt 0 ]]; then
         query=$(echo "$*"|tr -s ' ' '|')
         tail -f $syslog|grep -i --color=auto -E "$query"
     else
         tail -f $syslog
     fi
 }
+
+shell () {
+  ps | grep "$$" | awk '{ print $4 }'
+}
+
+#######################################
+# Disk usage
+# Arguments:
+#   $1 - directory
+#   $2 - depth
+# Returns:
+#   List of directories and their cummulative size
+usage() {
+  local _dushow _dusort
+  if echo zzz | sort -h > /dev/null 2>&1; then
+    _dushow="-h"
+    _dusort="-h"
+  else
+    _dushow=""
+    _dusort="-n"
+  fi
+
+  du $_dushow --max-depth="${2:-1}" "${1:-.}" | sort $_dusort -r | sed "s:\./::" | sed "s:$HOME:~:"
+}
+
+# OS-specific functions ######################################################
 
 os=$(uname -s)
 
@@ -533,7 +570,7 @@ if [ "$os" = "Darwin" ]; then
     cdf() {
         target=$(osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as text)')
         if [ "$target" != "" ]; then
-            cd "$target"; pwd
+            cd "$target" || exit; pwd
         else
             echo 'No Finder window found' >&2
         fi

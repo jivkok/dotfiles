@@ -9,25 +9,17 @@ alias md="mkdir"
 alias rd="rm -rf"
 alias tree2='tree -A -C -L 2 --dirsfirst'
 alias tree2a='tree -a -A -C -L 2 --dirsfirst'
-if echo zzz | sort -h > /dev/null 2>&1; then
-    dushow="-h"
-    dusort="-h"
-else
-    dushow=""
-    dusort="-n"
-fi
-alias dud="du $dushow -d 1 | sort $dusort -r"
-alias dud2="du $dushow -d 2 | sort $dusort -r"
-alias dud3="du $dushow -d 3 | sort $dusort -r"
-alias dud4="du $dushow -d 4 | sort $dusort -r"
-alias ducks='du -cks * | sort -n -r | head -n 30'
-alias path='echo -e ${PATH//:/\\n}'
+alias paths='echo -e ${PATH//:/\\n}'
 
 # Shortcuts
+alias e="subl"
+alias em='emacs -nw'     # No X11 windows
+alias eqq='emacs -nw -Q' # No config and no X11
+alias envs="printenv | sort"
 alias g="git"
 alias h="history"
 alias j="jobs"
-alias e="subl"
+alias vars="set | sort"
 if command -v nvim >/dev/null 2>&1; then
     alias v="nvim"
 elif command -v gvim >/dev/null 2>&1; then
@@ -36,35 +28,46 @@ else
     alias v="vim"
 fi
 alias vimupd="v +PlugUpdate +qall"
-alias em='emacs -nw'     # No X11 windows
-alias eqq='emacs -nw -Q' # No config and no X11
 alias x='exit'
 
-# ls dirs flag
+# Listings
 if ls ~ --group-directories-first > /dev/null 2>&1; then
-    dirsflag="--group-directories-first"
+    _dirsflag="--group-directories-first"
 else
-    dirsflag=""
+    _dirsflag=""
 fi
-# ls color flag
 if ls --color ~ > /dev/null 2>&1; then
     # GNU
-    colorflag="--color=auto"
+    _colorflag="--color=auto"
 elif ls -G ~ > /dev/null 2>&1; then
     # OSX
-    colorflag="-G"
+    _colorflag="-G"
 else
-    colorflag=""
+    _colorflag=""
 fi
-
-# Listing
-alias l="ls -AF $dirsflag $colorflag"
-alias ll="ls -AlF $dirsflag $colorflag"
+alias l="ls -AF $_dirsflag $_colorflag"
+alias ll="ls -AlF $_dirsflag $_colorflag"
+unset _dirsflag _colorflag
 alias recent='ls -Alt | head'   # Most recent files
-LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
+export LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
 
-# Top processes
-alias top10='ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10'
+# Clipboard
+# copy output of last command to clipboard
+alias cl="fc -e -|pbcopy"
+# copy the working directory path
+alias cpwd='pwd|tr -d "\n"|pbcopy'
+# show the current cliboard content
+alias cbp="pbpaste|less"
+
+# System info
+## top processes by CPU
+alias pscpu10='ps aux | head -1; ps aux | tail -n +2 | sort -nr -k 3 | head -10'
+# alias pscpu10='ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10'
+## top processes by memory
+alias psmem10='ps aux | head -1; ps aux | tail -n +2 | sort -nr -k 4 | head -10'
+
+# Networking
+alias ports='netstat -tulan'
 
 # Get week number
 alias week='date +%V'
@@ -80,10 +83,21 @@ alias localip="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo
 alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1]);"'
 
 # Reload the shell (i.e. invoke as a login shell)
-alias reload="exec $SHELL -l"
+alias reload='exec $SHELL -l'
 
 # Make Grunt print stack traces by default
 command -v grunt > /dev/null && alias grunt="grunt --stack"
+
+# Tmux auto-attach
+command -v tmux > /dev/null && alias t='(tmux has-session 2>/dev/null && tmux attach) || (tmux new-session)'
+
+# Web servers
+alias nginxreload='/usr/local/nginx/sbin/nginx -s reload'
+alias nginxtest='/usr/local/nginx/sbin/nginx -t'
+alias lightyload='/etc/init.d/lighttpd reload'
+alias lightytest='/usr/sbin/lighttpd -f /etc/lighttpd/lighttpd.conf -t'
+alias httpdreload='/usr/sbin/apachectl -k graceful'
+alias httpdtest='/usr/sbin/apachectl -t && /usr/sbin/apachectl -t -D DUMP_VHOSTS'
 
 # Misc
 os=$(uname -s)
@@ -114,6 +128,9 @@ if [ "$os" = "Linux" ]; then
     alias pkglist="apt-cache pkgnames"
     alias pkgshow="apt-cache show"
     alias pkgupdate="sudo apt-get update --fix-missing && sudo apt-get dist-upgrade && sudo apt-get clean && sudo apt-get autoremove"
+
+    # memory
+    alias meminfo='free -m -l -t'
 
 elif [ "$os" = "Darwin" ]; then
 
@@ -185,6 +202,7 @@ elif [ "$os" = "Darwin" ]; then
     alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
     alias of='open -a Finder ./'
+    alias ql="qlmanage -p &>/dev/null"
 
     if [ -f "/Applications/p4merge.app/Contents/Resources/launchp4merge" ]; then
         alias p4diff="/Applications/p4merge.app/Contents/Resources/launchp4merge $*"
