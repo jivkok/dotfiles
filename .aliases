@@ -24,8 +24,10 @@ if command -v nvim >/dev/null 2>&1; then
     alias v="nvim"
 elif command -v gvim >/dev/null 2>&1; then
     alias v="gvim"
-else
+elif command -v vim >/dev/null 2>&1; then
     alias v="vim"
+else
+    alias v="vi"
 fi
 alias vimupd="v +PlugUpdate +qall"
 alias x='exit'
@@ -77,7 +79,7 @@ alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date
 
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
-alias localip="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'"
+alias localip="ifconfig | grep -Eo 'inet (addr:)?([0-9]+\.){3}[0-9]+' | grep -Eo '([0-9]+\.){3}[0-9]+' | grep -v '127.0.0.1'"
 
 # URL-encode strings
 alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1]);"'

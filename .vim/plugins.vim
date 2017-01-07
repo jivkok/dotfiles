@@ -74,8 +74,8 @@ Plug 'kshenoy/vim-signature' " place, toggle and display marks
 if has('nvim')
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } " code-completion engine
 else
-  Plug 'Valloric/YouCompleteMe' " code-completion engine
-  " Plug 'Shougo/neocomplete' " code-completion engine
+  " Plug 'Valloric/YouCompleteMe' " code-completion engine
+  Plug 'Shougo/neocomplete' " code-completion engine
 endif
 
 if has('mac')

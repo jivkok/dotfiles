@@ -54,6 +54,7 @@ alias bottom_rightthird     move screenOriginX+screenSizeX*2/3;screenOriginY+scr
 
 ## 1monitor
 layout 1monitor ${terminal}:REPEAT          ${lefthalf}
+layout 1monitor 'Terminal':REPEAT           ${full}
 layout 1monitor 'Finder':REPEAT             ${lefthalf}
 layout 1monitor 'SourceTree':REPEAT         ${lefthalf}
 layout 1monitor ${editor}:REPEAT            ${lefthalf}
@@ -71,6 +72,7 @@ layout 1monitor 'Console':REPEAT            ${full}
 
 ## 2monitors
 layout 2monitors ${terminal}:REPEAT          ${bottom_leftthird}
+layout 2monitors 'Terminal':REPEAT           ${full}        ${mon-laptop}
 layout 2monitors 'Finder':REPEAT             ${top_leftthird}
 layout 2monitors 'SourceTree':REPEAT         ${leftthird}
 layout 2monitors ${editor}:REPEAT            ${middlethird}
@@ -130,7 +132,7 @@ bind ]:${hyper}  throw next # move to next screen
 
 ## App bindings
 # These are laid out on the left hand
-bind z:${hyper}     focus ${terminal}
+bind z:${hyper}     focus 'Terminal' # iTerm2 already has Ctrl-apostrophe mapped
 bind space:${hyper} focus ${editor}
 bind c:${hyper}     focus ${browser}
 bind f:${hyper}     focus 'Finder'
