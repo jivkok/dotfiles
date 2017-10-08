@@ -66,6 +66,9 @@ fi
 # set options
 set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
+setopt no_BEEP
+setopt no_NOMATCH       # Don't display an error if there are no matches
+setopt no_HUP           # Leave processes open when closing a shell with background processes
 
 # Completion system
 
@@ -101,3 +104,4 @@ for file in ~/{.zsh-theme,.aliases,.functions,.fzf.zsh,.marks.sh,.profile.local}
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
+eval $(/usr/libexec/path_helper -s)

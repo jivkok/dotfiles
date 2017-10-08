@@ -11,3 +11,4 @@ for file in ~/{.bashrc,.exports,.path,.profile.local}; do
 	[ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
+eval $(/usr/libexec/path_helper -s)
