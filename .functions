@@ -144,8 +144,8 @@ function os_update() {
         echo -e "\nUpdating Node packages ...\n"
         npm install npm@latest -g
         npm update -g
-        n stable
-        npm cache clean
+        sudo -E env "PATH=$PATH" n stable
+        npm cache verify
         bower cache clean
         echo -e "\nUpdating Node packages done.\n"
     fi

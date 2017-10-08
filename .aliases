@@ -18,6 +18,7 @@ alias eqq='emacs -nw -Q' # No config and no X11
 alias envs="printenv | sort"
 alias g="git"
 alias h="history"
+alias nh='unset HISTFILE'
 alias j="jobs"
 alias vars="set | sort"
 if command -v nvim >/dev/null 2>&1; then
@@ -33,12 +34,12 @@ alias vimupd="v +PlugUpdate +qall"
 alias x='exit'
 
 # Listings
-if ls ~ --group-directories-first > /dev/null 2>&1; then
+if ls --group-directories-first ~ > /dev/null 2>&1; then
     _dirsflag="--group-directories-first"
 else
     _dirsflag=""
 fi
-if ls --color ~ > /dev/null 2>&1; then
+if ls --color=auto ~ > /dev/null 2>&1; then
     # GNU
     _colorflag="--color=auto"
 elif ls -G ~ > /dev/null 2>&1; then
