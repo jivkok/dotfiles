@@ -76,6 +76,7 @@ brew install lnav
 brew install lsof
 brew install lua
 brew install lynx
+brew install mas
 brew install mobile-shell
 brew install ngrep
 brew install nmap
@@ -84,6 +85,7 @@ brew install pigz
 brew install pngcheck
 brew install pt
 brew install pv
+brew install ranger # libcaca highlight atool lynx w3m elinks poppler transmission mediainfo exiftool
 brew install rename
 brew install rhino
 brew install shellcheck
@@ -121,6 +123,9 @@ brew install neovim
 # TaskWarrior
 brew install task
 brew install vit
+
+# Reference-only, requires osxfuse
+# brew install sshfs # File system client based on SSH File Transfer Protocol
 
 # Remove outdated versions from the cellar.
 brew prune
