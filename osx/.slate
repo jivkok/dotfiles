@@ -62,10 +62,11 @@ layout 1monitor 'Brackets':REPEAT           ${lefthalf}
 layout 1monitor 'MacVim':REPEAT             ${lefthalf}
 layout 1monitor 'PyCharm':REPEAT            ${lefthalf}
 layout 1monitor 'Xcode':REPEAT              ${full}
-layout 1monitor 'Google Chrome':REPEAT      ${righthalf}
-layout 1monitor 'Safari':REPEAT             ${righthalf}
+layout 1monitor 'Google Chrome':REPEAT      ${full}
+layout 1monitor 'Safari':REPEAT             ${full}
 layout 1monitor 'Firefox':REPEAT            ${righthalf}
-layout 1monitor 'Evernote':REPEAT           ${righthalf}
+layout 1monitor 'Evernote':REPEAT           ${full}
+layout 1monitor 'Kindle':REPEAT             ${righthalf}
 layout 1monitor 'iTunes':REPEAT             ${full}
 layout 1monitor 'Activity Monitor':REPEAT   ${full}
 layout 1monitor 'Console':REPEAT            ${full}
@@ -83,7 +84,8 @@ layout 2monitors 'Xcode':REPEAT              ${middlethird}
 layout 2monitors 'Google Chrome':REPEAT      ${rightthird}
 layout 2monitors 'Safari':REPEAT             ${rightthird}
 layout 2monitors 'Firefox':REPEAT            ${rightthird}
-layout 2monitors 'Evernote':REPEAT           ${rightthird}
+layout 2monitors 'Evernote':REPEAT           ${leftthird}
+layout 2monitors 'Kindle':REPEAT             ${leftthird}
 layout 2monitors 'iTunes':REPEAT             ${full}
 layout 2monitors 'Activity Monitor':REPEAT   ${full}        ${mon-laptop}
 layout 2monitors 'Console':REPEAT            ${full}        ${mon-laptop}
@@ -134,10 +136,10 @@ bind ]:${hyper}  throw next # move to next screen
 # These are laid out on the left hand
 bind z:${hyper}     focus 'Terminal' # iTerm2 already has Ctrl-apostrophe mapped
 bind space:${hyper} focus ${editor}
-bind c:${hyper}     focus ${browser}
+bind b:${hyper}     focus ${browser}
 bind f:${hyper}     focus 'Finder'
 bind i:${hyper}     focus 'Safari'
-bind v:${hyper}     focus 'Code'
+bind c:${hyper}     focus 'Code'
 bind x:${hyper}     focus 'Xcode'
 
 # Window Hints
