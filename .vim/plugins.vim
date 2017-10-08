@@ -60,6 +60,7 @@ Plug 'neomake/neomake' " asynchronous :make, used for compiling, linting, syntax
 " Plug 'scrooloose/syntastic' " syntax checking
 Plug 'Chiel92/vim-autoformat' " code auto-formatting
 Plug 'scrooloose/nerdcommenter' " comments mgmt
+Plug 'robbles/logstash.vim' " code highlighting for Logstash configuration files
 
 " Search
 Plug 'ctrlpvim/ctrlp.vim' " Full path fuzzy file, buffer, mru, tag, ... finder

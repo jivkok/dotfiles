@@ -93,6 +93,23 @@ if exists("&undodir")
 endif
 set backupskip=/tmp/*,/private/tmp/* " Don’t create backups when editing files in certain directories
 
+" When using vimdiff, remap prev/next changes to [ and ].
+" Specify colors for added, modified, and deleted text. For details, see :help highlighting
+" DiffAdd - added line
+" DiffDelete - removed line
+" DiffChange - changed line
+" DiffText - changed text inside a changed line
+if &diff
+    set cursorline
+    map ] ]c
+    map [ [c
+    " from https://github.com/jonathanfilip/vim-lucius/blob/master/colors/lucius.vim
+    highlight DiffAdd    cterm=bold ctermfg=fg ctermbg=65 gui=bold guifg=fg guibg=#5f875f
+    highlight DiffDelete cterm=bold ctermfg=fg ctermbg=95 gui=bold guifg=fg guibg=#875f5f
+    highlight DiffChange cterm=bold ctermfg=fg ctermbg=101 gui=bold guifg=fg guibg=#87875f
+    highlight DiffText   cterm=bold ctermfg=228 ctermbg=101 gui=bold guifg=#ffff87 guibg=#87875f
+endif
+
 if has("autocmd")
     " When editing a file, always jump to the last cursor position
     autocmd BufReadPost * if line("'\"") | exe "'\"" | endif
