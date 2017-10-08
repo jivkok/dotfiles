@@ -7,7 +7,7 @@ if [ "$os" = "Linux" ] ; then
     sudo apt-get remove --purge node # unrelated package
 
     # https://github.com/nodesource/distributions
-    curl -sL https://deb.nodesource.com/setup_6.x | sudo bash -
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
 
     sudo apt-get install -y nodejs # this package includes npm too
     sudo apt-get install -y build-essential
@@ -32,8 +32,9 @@ npm install -g gulp
 npm install -g http-server
 npm install -g jshint
 npm install -g less
+npm install -g n
 npm install -g nodemon
 npm install -g typescript
 npm install -g yo
 
-npm cache clean
+npm cache verify
