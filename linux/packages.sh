@@ -23,6 +23,7 @@ sudo apt-get install -y python-pip # alternative Python package installer
 sudo apt-get install -y python-pygments # syntax highlighting package written in Python
 sudo apt-get install -y ranger # caca-utils highlight atool w3m poppler-utils mediainfo # File manager with an ncurses frontend written in Python
 sudo apt-get install -y rlwrap # readline feature command line wrapper
+sudo apt-get install -y screenfetch # Bash Screenshot Information Tool. Fetches system/theme information in terminal
 sudo apt-get install -y silversearcher-ag # very fast grep-like program, alternative to ack-grep
 sudo apt-get install -y shellcheck # lint tool for shell scripts
 sudo apt-get install -y tmux # terminal multiplexer
