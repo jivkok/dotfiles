@@ -88,6 +88,7 @@ brew install pv
 brew install ranger # libcaca highlight atool lynx w3m elinks poppler transmission mediainfo exiftool
 brew install rename
 brew install rhino
+brew install screenfetch
 brew install shellcheck
 brew install socat
 brew install speedtest_cli
