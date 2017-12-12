@@ -64,7 +64,7 @@ fi
 [ -f "$ZSH/oh-my-zsh.sh" ] && source "$ZSH/oh-my-zsh.sh"
 
 # set options
-set -o vi               # vi keys
+#set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
 setopt no_BEEP
 setopt no_NOMATCH       # Don't display an error if there are no matches
@@ -95,8 +95,8 @@ zstyle ":completion:*:kill:*" command "ps -u $USER -o pid,%cpu,tty,cputime,cmd"
 
 # key bindings
 # Note: use 'cat' to easily see the escape sequences
-bindkey "^[[1;5D" backward-word # ctrl-left
-bindkey "^[[1;5C" forward-word # ctrl-right
+#bindkey "^[[1;5D" backward-word # ctrl-left
+#bindkey "^[[1;5C" forward-word # ctrl-right
 
 # Load the shell dotfiles
 #   ~/.profile.local can be used for any local settings you don’t want to commit
@@ -104,4 +104,8 @@ for file in ~/{.zsh-theme,.aliases,.functions,.fzf.zsh,.marks.sh,.profile.local}
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
-eval $(/usr/libexec/path_helper -s)
+
+if [[ "$OSTYPE" = darwin* ]]; then
+    eval $(/usr/libexec/path_helper -s)
+fi
+

@@ -73,6 +73,32 @@ function fp() {
     ps Ao pid,comm | awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}' | grep -i "$1" | grep -v grep
 }
 
+# open file/s in Emacs (in current session, if any) in new frame
+function em() {
+    if ! pgrep -f -u $USER "emacs --daemon">/dev/null 2>&1; then
+        emacs --daemon
+    fi
+
+    emacsclient -c "$@"
+}
+
+# open file/s in Emacs in existing frame/session
+function ems() {
+    if ! pgrep -f -u $USER "emacs --daemon">/dev/null 2>&1; then
+        emacs --daemon "$@"
+        emacsclient "$@"
+    else
+        emacsclient -n "$@"
+    fi
+}
+
+# close existing Emacs session
+function emq() {
+    if pgrep -f -u $USER "emacs --daemon">/dev/null 2>&1; then
+        emacsclient -e "(kill-emacs)" "$@"
+    fi
+}
+
 # system update
 function os_update() {
     echo -e "\nUpdating system ...\n"

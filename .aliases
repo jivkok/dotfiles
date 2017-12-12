@@ -13,8 +13,6 @@ alias paths='echo -e ${PATH//:/\\n}'
 
 # Shortcuts
 alias e="subl"
-alias em='emacs -nw'     # No X11 windows
-alias eqq='emacs -nw -Q' # No config and no X11
 alias envs="printenv | sort"
 alias g="git"
 alias h="history"
