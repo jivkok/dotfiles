@@ -68,7 +68,7 @@ function install_extension ()
         rm -rf "$bracketsUserExtensionsPath/$extensionName"
     fi
     dot_trace "Copying $extensionTempDirPath/   to   $bracketsUserExtensionsPath/$extensionName/"
-    cp -L -r "$extensionTempDirPath/" "$bracketsUserExtensionsPath/$extensionName/"
+    cp -r "$extensionTempDirPath/" "$bracketsUserExtensionsPath/$extensionName/"
 
     dot_trace "Installing Brackets extension '$extensionDisplayName' done."
 }

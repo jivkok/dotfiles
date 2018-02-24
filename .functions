@@ -65,6 +65,7 @@ function fs() {
     # find "$directory" -type f -iname "$file_pattern" -exec grep -I -l -i "$string_pattern" {} \; -exec grep -I -n -i "$string_pattern" {} \;
     # ack
     # ag
+    # rg
     grep -Hrn "$string_pattern" "$directory" --include "$file_pattern"
 }
 
@@ -427,6 +428,21 @@ function getcertnames() {
         echo "ERROR: Certificate not found.";
         return 1;
     fi;
+}
+
+# MAC lookup
+function mac-lookup() {
+    local mac="$1"
+    if [ -z "$mac" ]; then
+        echo "MAC vendor lookup"
+        echo "Usage: mac-lookup MAC_address_or_prefix"
+        return
+    fi
+
+    mac=${mac//:/}
+    mac=${mac:0:6}
+
+    curl "https://api.macvendors.com/$mac"
 }
 
 # `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring

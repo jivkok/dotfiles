@@ -17,7 +17,7 @@ else
 fi
 
 ## set options
-set -o vi               # vi keys
+#set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
 
 # Shell options
@@ -31,8 +31,8 @@ shopt -s autocd 2> /dev/null   # * `autocd`, e.g. `**/qux` will enter `./foo/bar
 shopt -s globstar 2> /dev/null # * Recursive globbing, e.g. `echo **/*.txt`
 
 # key bindings. Note: use 'cat' to easily see the escape sequences
-bind "^[[1;5D" backward-word # ctrl-left
-bind "^[[1;5C" forward-word # ctrl-right
+# bind "^[[1;5D" backward-word # ctrl-left
+# bind "^[[1;5C" forward-word # ctrl-right
 
 # Enable tab completion for `g` by marking it as an alias for `git`
 if type _git &> /dev/null && [ -f /usr/local/etc/bash_completion.d/git-completion.bash ]; then
