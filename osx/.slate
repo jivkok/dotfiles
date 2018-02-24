@@ -91,10 +91,10 @@ layout 2monitors 'Activity Monitor':REPEAT   ${full}        ${mon-laptop}
 layout 2monitors 'Console':REPEAT            ${full}        ${mon-laptop}
 
 ## Default Layouts
-#default 1monitor  resolutions:${mon-laptop}
-#default 2monitors resolutions:${mon-laptop};${mon-4k}
-default 1monitor count:1
-default 2monitors count:2
+default 1monitor  resolutions:${mon-laptop}
+default 2monitors resolutions:${mon-laptop};${mon-4k}
+#default 1monitor count:1
+#default 2monitors count:2
 
 # Bindings
 
