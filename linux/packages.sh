@@ -5,7 +5,6 @@ sudo apt-get update
 
 # Common
 sudo apt-get install -y cifs-utils # Common Internet File System utilities
-sudo apt-get install -y collectl # Utility to collect Linux performance data
 sudo apt-get install -y curl # command line tool for transferring data with URL syntax
 sudo apt-get install -y dstat # versatile resource statistics tool
 sudo apt-get install -y exuberant-ctags # build tag file indexes of source code definitions
@@ -32,26 +31,29 @@ sudo apt-get install -y vim # Vi IMproved - enhanced vi editor
 sudo apt-get install -y wget # retrieves files from the web
 sudo apt-get install -y xsel # command line tool to access X clipboard and selection buffers
 
-sudo apt-get install -y libxml2-dev # Development files for the GNOME XML library
-sudo apt-get install -y libxslt1-dev # XSLT 1.0 processing library - development kit
-sudo apt-get install -y python-dev # header files and a static library for Python (default)
-
+# FZF
 if [ -d $HOME/.fzf/.git ]; then
   git -C "$HOME/.fzf" pull --prune
 else
   git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
 fi
-[ -f "$HOME/.fzf/install" ] && "$HOME/.fzf/install" --key-bindings --completion --no-update-rc
+"$HOME/.fzf/install" --key-bindings --completion --no-update-rc
+
+# Dev
+sudo apt-get install -y libxml2-dev # Development files for the GNOME XML library
+sudo apt-get install -y libxslt1-dev # XSLT 1.0 processing library - development kit
+sudo apt-get install -y python-dev # header files and a static library for Python (default)
 
 # Diagnostics
 sudo apt-get install -y atop # Monitor for system resources and process activity
+# sudo apt-get install -y collectl # Utility to collect Linux performance data
 sudo apt-get install -y htop # interactive processes viewer
 sudo apt-get install -y iftop # displays bandwidth usage information on an network interface
 sudo apt-get install -y iotop # simple top-like I/O monitor
 sudo apt-get install -y lsof # Utility to list open files
 sudo apt-get install -y ltrace # Tracks runtime library calls in dynamically linked programs
 sudo apt-get install -y nethogs # Net top tool grouping bandwidth per process
-sudo apt-get install -y ntop # display network usage in web browser
+# sudo apt-get install -y ntop # display network usage in web browser
 sudo apt-get install -y secure-delete # tools to wipe files, free disk space, swap and memory
 sudo apt-get install -y strace # System call tracer
 

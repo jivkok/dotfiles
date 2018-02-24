@@ -8,9 +8,9 @@ dot_trace "Configuring ZSH ..."
 
 os=$(uname -s)
 if [ "$os" = "Linux" ]; then
-    if ! apt-cache show zsh >/dev/null 2>&1 ; then
+    if ! dpkg -s zsh >/dev/null 2>&1 ; then
         dot_trace "Installing ZSH ..."
-        sudo apt-get install zsh
+        sudo apt-get install -y zsh
         dot_trace "Installing ZSH done."
     fi
 elif [ "$os" = "Darwin" ]; then
@@ -41,11 +41,13 @@ if [ -d "$HOME/.oh-my-zsh" ]; then
     dot_trace "Updating oh-my-zsh done."
 else
     dot_trace "Installing oh-my-zsh ..."
-    curl -L http://install.ohmyz.sh | sh
+    # https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh
+    git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"
+
 
     mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
     git clone https://github.com/zsh-users/zsh-completions "$HOME/.oh-my-zsh/custom/plugins/zsh-completions"
-    git clone git://github.com/zsh-users/zsh-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
     dot_trace "Installing oh-my-zsh done."
 fi
 
@@ -54,15 +56,11 @@ _zsh=$(which zsh)
 if [ -z "$(grep $_zsh /etc/shells)" ] ; then
     dot_trace "Adding ZSH as supported shell"
     sudo -s "echo $_zsh >> /etc/shells"
-else
-    dot_trace "ZSH is already supported shell"
 fi
 
 if [ "$SHELL" != "$_zsh" ]; then
     dot_trace "Switching to ZSH as default shell"
     chsh -s "$_zsh"
-else
-    dot_trace "ZSH is already default shell"
 fi
 
 unset _zsh

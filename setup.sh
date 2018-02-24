@@ -31,7 +31,7 @@ if ! command -V git >/dev/null 2>&1; then
 fi
 
 # dotfiles location
-dotdir="$HOME/dotfiles"
+export dotdir="$HOME/dotfiles"
 if [ -n "$1" ]; then
     if  [[ $1 == /* ]] ; then
         dotdir="$1"

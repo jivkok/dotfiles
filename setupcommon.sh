@@ -24,12 +24,12 @@ make_dotfiles_symlinks "$dotdir" "$HOME"
 curl -o "$HOME/git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
 confirm_and_run "$dotdir/configure_git.sh" "Git"
-confirm_and_run "$dotdir/configure_zsh.sh" "Zsh"
 confirm_and_run "$dotdir/configure_python.sh" "Python (plus packages)"
 confirm_and_run "$dotdir/configure_nodejs.sh" "NodeJS (plus packages)"
 # confirm_and_run "$dotdir/configure_ruby.sh" "Ruby (plus packages)"
 confirm_and_run "$dotdir/configure_vim.sh" "Vim"
 confirm_and_run "$dotdir/configure_sublimetext.sh" "SublimeText"
+confirm_and_run "$dotdir/configure_zsh.sh" "Zsh"
 
 dot_trace "Reloading shell $SHELL"
 exec $SHELL -l

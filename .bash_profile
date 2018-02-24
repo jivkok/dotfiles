@@ -8,7 +8,10 @@ export PATH=$HOME/bin:$PATH
 #   ~/.path can be used to extend `$PATH`
 #   ~/.profile.local can be used for any local settings you don’t want to commit
 for file in ~/{.bashrc,.exports,.path,.profile.local}; do
-	[ -r "$file" ] && [ -f "$file" ] && source "$file";
+    [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
-eval $(/usr/libexec/path_helper -s)
+
+if [[ "$OSTYPE" = darwin* ]]; then
+    eval $(/usr/libexec/path_helper -s)
+fi

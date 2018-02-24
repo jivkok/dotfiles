@@ -19,14 +19,14 @@ if [ "$os" = "Linux" ]; then
     sudo add-apt-repository ppa:neovim-ppa/unstable
     sudo apt-get update
 
-    sudo apt-get install build-essential
-    sudo apt-get install cmake
-    sudo apt-get install python-dev python-pip python3-dev python3-pip
-    sudo apt-get install vim
-    sudo apt-get install neovim
+    sudo apt-get install -y build-essential
+    sudo apt-get install -y cmake
+    sudo apt-get install -y python-dev python-pip python3-dev python3-pip
+    sudo apt-get install -y vim
+    sudo apt-get install -y neovim
 
-    sudo pip2 install --upgrade neovim
-    sudo pip3 install --upgrade neovim
+    sudo -H pip2 install --upgrade neovim
+    sudo -H pip3 install --upgrade neovim
 elif [ "$os" = "Darwin" ]; then
     xcode-select -p
     if [ $? != 0 ]; then
@@ -36,7 +36,7 @@ elif [ "$os" = "Darwin" ]; then
 
     ! brew ls --versions cmake >/dev/null 2>&1 && brew install cmake
     # brew install llvm --with-clang
-    ! brew ls --versions vim >/dev/null 2>&1 && brew install vim --override-system-vi --with-lua
+    ! brew ls --versions vim >/dev/null 2>&1 && brew install vim --with-override-system-vi --with-lua
     ! brew ls --versions macvim >/dev/null 2>&1 && brew install macvim --HEAD --with-cscope --with-lua --with-override-system-vim --with-luajit --with-python
     ! brew ls --versions neovim >/dev/null 2>&1 && brew install neovim/neovim/neovim
 
