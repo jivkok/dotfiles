@@ -1,8 +1,8 @@
 
 # iTerm → Profiles → Text → use 12pt Monaco with 1.1 vertical spacing.
 
-if [ -f ~/git-prompt.sh ]; then
-    source ~/git-prompt.sh
+if [ -f "$HOME/bin/git-prompt.sh" ]; then
+    source "$HOME/bin/git-prompt.sh"
     GIT_PS1_SHOWDIRTYSTATE=1
     GIT_PS1_SHOWUNTRACKEDFILES=1
     GIT_PS1_SHOWUPSTREAM="auto"

@@ -67,7 +67,7 @@ fi
 #set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
 setopt no_BEEP
-setopt no_NOMATCH       # Don't display an error if there are no matches
+setopt no_NOMATCH       # Do not display an error if there are no matches
 setopt no_HUP           # Leave processes open when closing a shell with background processes
 
 # Completion system
@@ -100,7 +100,7 @@ zstyle ":completion:*:kill:*" command "ps -u $USER -o pid,%cpu,tty,cputime,cmd"
 
 # Load the shell dotfiles
 #   ~/.profile.local can be used for any local settings you don’t want to commit
-for file in ~/{.zsh-theme,.aliases,.functions,.fzf.zsh,.marks.sh,.profile.local}; do
+for file in ~/{.zsh-theme.sh,.aliases.sh,.functions.sh,.fzf.zsh,.marks.sh,.profile_local.sh}; do
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
