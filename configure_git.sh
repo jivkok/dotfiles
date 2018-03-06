@@ -43,20 +43,27 @@ git config --global rebase.autosquash true
 
 # Colors
 git config --global color.branch.current "red bold"
-git config --global color.branch.local normal
-git config --global color.branch.remote "yellow bold"
-git config --global color.branch.plain normal
-git config --global color.diff.meta "yellow bold"
-git config --global color.diff.frag "magenta bold"
-git config --global color.diff.old "red bold"
-git config --global color.diff.new "green bold"
-git config --global color.status.header normal
-git config --global color.status.new "red bold"
-git config --global color.status.added "green bold"
-git config --global color.status.updated "cyan bold"
-git config --global color.status.changed "cyan bold"
+git config --global color.branch.local   normal
+git config --global color.branch.plain   normal
+git config --global color.branch.remote  "yellow bold"
+git config --global color.diff.meta       "yellow"
+git config --global color.diff.frag       "magenta bold"
+git config --global color.diff.commit     "yellow bold"
+git config --global color.diff.old        "red bold"
+git config --global color.diff.new        "green bold"
+git config --global color.diff.whitespace "red reverse"
+git config --global color.diff-highlight.oldNormal    "red bold"
+git config --global color.diff-highlight.oldHighlight "red bold 52"
+git config --global color.diff-highlight.newNormal    "green bold"
+git config --global color.diff-highlight.newHighlight "green bold 22"
+git config --global color.status.header    normal
+git config --global color.status.new       "red bold"
+git config --global color.status.added     "green bold"
+git config --global color.status.updated   "cyan bold"
+git config --global color.status.changed   "cyan bold"
 git config --global color.status.untracked "red bold"
-git config --global color.status.nobranch "red bold"
+git config --global color.status.nobranch  "red bold"
+git config --global color.ui true
 
 # Aliases
 git config --global alias.a 'add -A'
@@ -102,13 +109,16 @@ git config --global alias.wdiff 'diff --word-diff'
 git config --global alias.who 'shortlog -s -e --'
 git config --global alias.zap 'reset --hard HEAD'
 
+if command -V diff-so-fancy >/dev/null 2>&1 ; then
+    git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
+    git config --bool --global diff-so-fancy.markEmptyLines false
+fi
+
 os=$(uname -s)
 if [ "$os" = "Darwin" ]; then
-    # OSX default FileMerge
     git config --global alias.opendiff 'difftool --tool=opendiff --no-prompt'
 
-    # P4Merge installed with homebrew
-    if [ -f "$HOME/Applications/p4merge.app/Contents/Resources/launchp4merge" ]; then
+    if [ -f "/Applications/p4merge.app/Contents/Resources/launchp4merge" ]; then
         echo Setting P4Merge as diff and merge tool
 
         git config --global mergetool.keepBackup false
@@ -116,12 +126,27 @@ if [ "$os" = "Darwin" ]; then
         git config --global mergetool.prompt false
 
         git config --global merge.tool p4mergetool
-        git config --global mergetool.p4mergetool.cmd "$HOME/Applications/p4merge.app/Contents/Resources/launchp4merge \$PWD/\$BASE \$PWD/\$REMOTE \$PWD/\$LOCAL \$PWD/\$MERGED"
+        git config --global mergetool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$PWD/\$BASE \$PWD/\$REMOTE \$PWD/\$LOCAL \$PWD/\$MERGED"
         git config --global mergetool.p4mergetool.trustExitCode false
 
         git config --global difftool.prompt false
 
         git config --global diff.tool p4mergetool
-        git config --global difftool.p4mergetool.cmd "$HOME/Applications/p4merge.app/Contents/Resources/launchp4merge \$LOCAL \$REMOTE"
+        git config --global difftool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$LOCAL \$REMOTE"
+    elif [ -f "/Applications/kdiff3.app/Contents/MacOS/kdiff3" ]; then
+        echo Setting P4Merge as diff and merge tool
+
+        git config --global mergetool.keepBackup false
+        git config --global mergetool.keepTemporaries false
+        git config --global mergetool.prompt false
+
+        git config --global merge.tool kdiff3
+        git config --global mergetool.kdiff3.path "/Applications/kdiff3.app/Contents/MacOS/kdiff3"
+        git config --global mergetool.kdiff3.trustExitCode false
+
+        git config --global difftool.prompt false
+
+        git config --global diff.tool kdiff3
+        git config --global difftool.kdiff3.path "/Applications/kdiff3.app/Contents/MacOS/kdiff3"
     fi
 fi
