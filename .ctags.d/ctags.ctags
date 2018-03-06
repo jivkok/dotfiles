@@ -5,3 +5,5 @@
 # Excludes
 --exclude=.git
 --exclude=.vim/plugins
+--exclude=osx/com.googlecode.iterm2.plist
+
