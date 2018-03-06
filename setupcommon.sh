@@ -21,7 +21,10 @@ pull_latest_dotfiles "$dotdir"
 
 make_dotfiles_symlinks "$dotdir" "$HOME"
 
-curl -o "$HOME/git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+mkdir "$HOME/bin"
+curl -o "$HOME/bin/git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+curl -o "$HOME/bin/diff-so-fancy" https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy
+chmod 755 "$HOME/bin/diff-so-fancy"
 
 confirm_and_run "$dotdir/configure_git.sh" "Git"
 confirm_and_run "$dotdir/configure_python.sh" "Python (plus packages)"
