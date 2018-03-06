@@ -74,6 +74,7 @@ brew install pngcheck # Print info and check PNG, JNG, and MNG files
 brew install pv # Monitor data's progress through a pipe
 brew install ranger # File browser. Extras: libcaca highlight atool lynx w3m elinks poppler transmission mediainfo exiftool
 brew install rename # Perl-powered file rename script with many helpful built-ins
+brew install ripgrep # Search tool like grep and The Silver Searcher
 brew install screenfetch # Generate ASCII art with terminal, shell, and OS info
 brew install shellcheck # Static analysis and lint tool, for (ba)sh scripts
 brew install socat # netcat on steroids

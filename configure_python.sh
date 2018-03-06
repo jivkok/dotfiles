@@ -28,3 +28,4 @@ pip install --user --upgrade mitmproxy # http traffic interception
 pip install --user --upgrade Pygments # syntax highlighter
 pip install --user --upgrade jupyter # Jupyter Notebooks
 pip install --user --upgrade cdiff # color diff
+pip install --user --upgrade icdiff # improved color diff
