@@ -1,6 +1,9 @@
 " Custom mapleader
 let mapleader="\<Space>"
 
+" Help
+nmap <F1> :help<space>jkvim<cr>
+
 " Searching
 " Visual mode pressing * or # searches for the current selection, forward or backward, respectively
 vnoremap <silent> * :call VisualSelection('f')<cr>
