@@ -7,7 +7,6 @@ sudo apt-get update
 sudo apt-get install -y cifs-utils # Common Internet File System utilities
 sudo apt-get install -y curl # command line tool for transferring data with URL syntax
 sudo apt-get install -y dstat # versatile resource statistics tool
-sudo apt-get install -y exuberant-ctags # build tag file indexes of source code definitions
 sudo apt-get install -y git # fast, scalable, distributed revision control system
 sudo apt-get install -y git-extras # Extra commands for git
 sudo apt-get install -y gitk # fast, scalable, distributed revision control system (revision tree visualizer)
@@ -30,14 +29,6 @@ sudo apt-get install -y tree # displays an indented directory tree, in color
 sudo apt-get install -y vim # Vi IMproved - enhanced vi editor
 sudo apt-get install -y wget # retrieves files from the web
 sudo apt-get install -y xsel # command line tool to access X clipboard and selection buffers
-
-# FZF
-if [ -d $HOME/.fzf/.git ]; then
-  git -C "$HOME/.fzf" pull --prune
-else
-  git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
-fi
-"$HOME/.fzf/install" --key-bindings --completion --no-update-rc
 
 # Dev
 sudo apt-get install -y libxml2-dev # Development files for the GNOME XML library
@@ -63,3 +54,34 @@ sudo apt-get install -y vit # full-screen terminal interface for Taskwarrior
 
 sudo apt-get clean
 sudo apt-get autoremove
+
+riptemp=$(mktemp -t ripgrep.XXX)
+ripurl=$(curl -s https://github.com/BurntSushi/ripgrep/releases | grep -E -o -m1 "\/BurntSushi.+_amd64\.deb")
+ripurl="https://github.com$ripurl"
+curl -L -o "$riptemp" "$ripurl"
+sudo dpkg -i "$riptemp"
+
+dotrepos="$HOME/.repos"
+mkdir -p "$dotrepos"
+
+# FZF
+if [ -d $dotrepos/fzf/.git ]; then
+  git -C "$dotrepos/fzf" pull --prune
+else
+  git clone --depth 1 https://github.com/junegunn/fzf "$dotrepos/fzf"
+fi
+"$dotrepos/fzf/install" --key-bindings --completion --no-update-rc
+
+# ctags
+if [ -d $dotrepos/ctags/.git ]; then
+  git -C "$dotrepos/ctags" pull --prune
+else
+  git clone https://github.com/universal-ctags/ctags.git "$dotrepos/ctags"
+fi
+cd "$dotrepos/ctags"
+sudo apt-get install -y dh-autoreconf pkg-config
+./autogen.sh
+./configure
+make
+sudo make install
+cd $OLDPWD
