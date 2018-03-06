@@ -99,13 +99,9 @@ zstyle ":completion:*:kill:*" command "ps -u $USER -o pid,%cpu,tty,cputime,cmd"
 #bindkey "^[[1;5C" forward-word # ctrl-right
 
 # Load the shell dotfiles
-#   ~/.profile.local can be used for any local settings you don’t want to commit
-for file in ~/{.zsh-theme.sh,.aliases.sh,.functions.sh,.fzf.zsh,.marks.sh,.profile_local.sh}; do
+#   ~/.profile_local.sh can be used for any local settings you don’t want to commit
+for file in ~/{.path.sh,.zsh-theme.sh,.aliases.sh,.functions.sh,.fzf.zsh,.marks.sh,.exports.sh,.profile_local.sh}; do
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
-
-if [[ "$OSTYPE" = darwin* ]]; then
-    eval $(/usr/libexec/path_helper -s)
-fi
 
