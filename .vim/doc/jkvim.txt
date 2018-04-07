@@ -18,7 +18,21 @@ CONTENTS                                                  *jkvim-contents*
 ==============================================================================
 SUMMARY                                                    *jkvim-summary*
 
-Cheat-sheet for all vim-related.
+Cheat-sheet for all vim customizations.
+
+==============================================================================
+CODE PRODUCTIVITY                                         *jkvim-code-productivity*
+
+Plugins handling these coding aspects:
+Languages, filetypes, syntax: sheerun/vim-polyglot
+Coding styles: vim-editorconfig
+Completion: Shougo/deoplete.nvim
+Formatting: Chiel92/vim-autoformat
+Linting: w0rp/ale
+Searching: junegunn/fzf, junegunn/fzf.vim, mileszs/ack.vim
+Symbols: majutsushi/tagbar
+Sessions: xolox/vim-session
+Snippets: msanders/snipmate.vim
 
 ==============================================================================
 COMMANDS                                                  *jkvim-commands*
@@ -31,28 +45,76 @@ Leader key: space ( )
 :h :help some_topic
 :q :quit Ctrl-W_q - quits current window
 ( ss) - strip trailing whitespace
+C-o - move back the jump stack
+C-i - move forward in jump stack (assumes previous moves back)
+( ci) - toggles comment state (requires nerdcommenter)
+:echo mapleader - prints current leader key
+:map :Maps - shows all mappings
+
+== Edit
+r<some_char> - replaces the current character with some_char
 u - undo
 C-r - redo
+C-w - (insert mode) erases word
+C-u - (insert mode) erases text from cursor to beginning of line. Also works in the command line.
+~ - inverts casing of current character
+~ (visual mode) - inverts casing of current selection.
+U (visual mode) - uppercases the current selection.
+u (visual mode) - lowercases the current selection.
+
+=== Help
+:h(elp) command - opens help for command. When command is incomplete, <Tab> cycles through and C-d lists possible command completions.
+When in help pages, C-] jumps to subjects between |bars| and C-t jumps back. Use :q to quit.
+
+=== Variables
+:set                - shows vars different from defaults
+:set all            - shows all values
+:set foo?           - shows the value of foo
+:set foo+=opt       - add opt to the value w/o changing others
+:set foo-=opt       - remove opt from value
+:set foo&           - reset foo to default value
+:setlocal foo       - sets foo only in the current buffer
+:verbose set foo?   - tells where foo was last set
+
+=== Indenting
+>> - indent line. Repeat with .
+visual < or > - indent selected text in or out. Repeat with .
+
+=== Text selection, copy & paste
+:v - visual mode, char selection
+:V - line selection
+:C-v - block selection
+d - cut
+y - copy
+p - paste before current char
+P - paste after current char
+On selected test: :s/match/replace/, or :center, or !sort, etc.
 
 === Buffers/Files
 :e :edit                    - open file for editing
 :w :write ( w)              - write buffer to file
 ( W)                        - save file as root
-:bn :bnext (F4) ( bn)       - next buffer
-:bp :bprevious (F3) ( bp)   - previous buffer
+:bn :bnext (]b) ( bn)       - next buffer
+:bp :bprevious ([b) ( bp)   - previous buffer
 :bd ( bd)                   - close buffer
+:ls                         - show current buffers
 
 === Windows - Ctrl-W
-:new Ctrl-W_n        - create new window and starts editing empty file
-:c :close Ctrl-W_q   - close current window
-:sp :split Ctrl-W_s  - split current window in two, horizontally
-:vs :vsplit Ctrl-W_v - split current window in two, vertically
+:new (C-w n)         - create new window and starts editing empty file
+:c :close (C-w q)    - close current window
+:sp :split (C-w s)   - split current window in two, horizontally
+:vs :vsplit (C-w v)  - split current window in two, vertically
 :split <file>        - split current window with horizontal bar, opens <file> in new window
-:vsplit <file>        - split current window with vertical bar, opens <file> in new window
-Ctrl-W arrows        - move between windows
-Ctrl-W h/j/k/l       - move between windows
-Ctrl-W +/-           - increase/decrease window with 1 line
-Ctrl-W <number>+/-   - increase/decrease window with <number> lines
+:vsplit <file>       - split current window with vertical bar, opens <file> in new window
+:b 2                 - open buffer #2 in current window
+:hide                - close current window
+:only                - only keep current window open
+C-w arrows           - move between windows
+C-w h/j/k/l          - move between windows
+C-w w                - toggle between windows
+C-w +/-              - increase/decrease window with 1 line (numbers work too - for multiple lines size change)
+C-w _                - maximize current window
+C-w =                - make all windows same size
 ( cd)                - Switch CWD to the directory of the open buffer
 
 === Tabs
@@ -74,6 +136,9 @@ vim --servername some_session_name - this can be used to automatically load/save
 :reg :registers - see registers content
 :h registers
 Access a register with double-quote ".
+Copy to a named register: ", then the name of the register (a), then y. Usage: "ay
+Paste from a named register - same format as the copy: "ap
+Copying/deleting/pasting from a "q" register: "qy / "qd / "qp
 There are ten types of registers:
 1. The unnamed register ""
     Vim fills this register with text deleted with the "d", "c", "s", "x" commands or copied with the yank "y" command, regardless of whether or not a specific register was used. This is like the unnamed register is pointing to the last used register.
@@ -103,13 +168,25 @@ There are ten types of registers:
 10. Last search pattern register "/
     Contains the most recent search-pattern.
 
+=== Macros
+qk  - starts recording commands into register 'k'. Enter commands, then q to stop recording.
+@k  - execute macro in register k
+5@k  - execute 5 times macro in register k
+@@  - repeat last executed macro
+5@@ - repeat last macro 5 times
+"kp - print macro k
+"kd - replace register k with what cursor is on
+
 === Linting, syntax-coloring, and auto-formatting
-:Neomake ( mk) - maker/linter
-:Autoformat ( f) - auto-format text, according to the filetype, indent settings, and formatters
-Manually autoindent, retab or remove trailing whitespace by
-    gg=G
-    :retab
-    :RemoveTrailingSpaces
+:Autoformat ( f) - from vim-autoformat, auto-formats text, according to the filetype, indent settings, and formatters
+gg=G - re-indents the whole file, by: going to beginning of file (gg), indent (=), go to end of file (G)
+== - indents selected section
+:retab - re-tabs the whole file
+:RemoveTrailingSpaces - remove trailing whitespaces
+
+=== Makefile
+:make - runs make (assumes makefile exists)
+:set makeprg - change what :make does
 
 === Visual mode
 v - in visual mode, this, as pressed multiple times, continues to expand the selection
@@ -121,8 +198,6 @@ C-v - shrink previously expanded selection
     - C-t - new tab
     - C-x - horizontal split
     - C-v - vertical split
-<C-p> - CtrlP
-<C-l> - Unite with the following sources: file_rec buffer
 
 === Search & Replace
 /
@@ -131,21 +206,24 @@ N - previous match
 :%s/SSS/RRR/g - search SSS and replace it with RRR
 :%s/SSS/RRR/gc - Change each 'SSS' to 'RRR', but ask for confirmation first.
 (*) (#) - search for current selection and highlight matches
+g* - search for partial match for current selection and highlight matches
 <space><enter> - un-highlight search highlights
 do /, type the searched string, <CR>, cgn, type replacement, . to repeat the replacement consecutively through all selections; or n to skip a selection
 Instead of searching for the string - use * to search for the current word under the cursor, then continue with cgn
 Note: cgN, dgn, dgN work appropriately as well.
+f<some_character> - looks for some_character in the same line after the cursor
 :Ag [pattern] - search recursively files for text pattern (requires fzf-vim)
 C-n - multiple cursors selection (requires vim-multiple-cursors). Change text by C-n, c, text
+[I - show lines with matching word under cursor
 
 === Marks
 :h mark-motions
 :marks - show all marks
-:marks aB - show marks a and B
+:marks aB - show marks "a" and "B"
 :Marks - show/search all marks (requires fzf-vim)
-ma - store the current position in the a mark. Lowercase a-z letters are local marks - they work within a file. Upper-case A-Z letters are global marks - they work across multiple files
-`a - go to the line and column for mark a.
-'a - go to the beginning of the line where mark a is set
+ma - store the current position in the "a" mark. Lowercase a-z letters are local marks - they work within a file. Upper-case A-Z letters are global marks - they work across multiple files
+`a - go to the line and column for mark "a".
+'a - go to the beginning of the line where mark "a" is set
 ]' - jump to next line with lowercase mark
 [' - jump to previous line with a lowercase mark
 ]` - jump to next lowercase mark
@@ -173,38 +251,43 @@ vim-signature commands:
 :CtrlPTag ( t) - search tags (requires CtrlP)
 :Tags - show tags (requires fzf-vim)
 :BTags - show tags in the current buffer (requires fzf-vim)
-F8 - toggles Tagbar
+F3 - toggles Tagbar
 :tnext :tn ( ]t) - go to the next definition for the last searched tag
 :tprevious :tp ( [p) - go to the previous definition for the last searched tag
 :tfirst :tf ( [T) - go to the first definition for the last searched tag
 :tlast :tl ( ]T) - go to the last definition for the last searched tag
 :tselect :ts ( ts) - list all definitions for the last searched tag
-^] - Jump to definition for text under the cursor
-^t - Jump back from definition
-^W} - Preview definition for text under the cursor
+C-] - Jump to definition for text under the cursor
+C-t - Jump back from definition
+C-w} :ptag - Preview definition for text under the cursor
 g] - See all definitions for text under the cursor
+:pclose - close Preview window
 
-=== Quickfix & Location
-( ]q) - next Quickfix entry
-( [q) - previous Quickfix entry
-( [Q) - first Quickfix entry
-( ]Q) - last Quickfix entry
-( qo) - open Quickfix window
-( qc) - close Quickfix window
-( ]l) - next Locations entry
-( [l) - previous Locations entry
-( [L) - first Locations entry
-( ]L) - last Locations entry
-( lo) - open Locations window
-( lc) - close Locations window
+=== Quickfix & Location windows
+In Vim the quickfix commands are used to find a list of positions in files - the idea being to speedup the edit-compile-edit cycle.
+Various commands can produce quickfix lists (`:vimgrep`, `:grep`, `:helpgrep`, `:make`). The Quickfix lists are global for all buffers.
+A location list is a window-local quickfix list. You get one after commands like `:lvimgrep`, `:lgrep`, `:lhelpgrep`, `:lmake`, etc., which create a location list instead of a quickfix list. A location list is associated with one-and-only window.
+:cnext ( ]q) - next Quickfix entry
+:cprevious ( [q) - previous Quickfix entry
+:cfirst ( [Q) - first Quickfix entry
+:clast ( ]Q) - last Quickfix entry
+:copen ( qo) - open Quickfix window
+:cclose ( qc) - close Quickfix window
+:cw - toggles Quickfix window
+:lnext ( ]l) - next Locations entry
+:lprevious ( [l) - previous Locations entry
+:lfirst ( [L) - first Locations entry
+:llast ( ]L) - last Locations entry
+:lopen ( lo) - open Locations window
+:lclose ( lc) - close Locations window
 
 === Key mappings
 :nmap,vmap,imap - show key mappings for normal,visual,insert mode
 :Unite mapping - show all key mappings (requires Unite)
 
 === Folding
-( zc) - close a fold
-( zo) - open a fold
+:zc ( zc) - close a fold
+:zo ( zo) - open a fold
 ( za) - toggle a fold
 ( zC) ( zO) ( zA) - same as above but operating on all folding levels
 ( zr) - open one more level of folds throughout the buffer
@@ -222,6 +305,13 @@ g] - See all definitions for text under the cursor
 :set syntax=sh - force desired syntax coloring
 :set filetype=sh - set file type (bash in the example)
 :setf sh - set file type (bash in the example)
+
+=== History - commands and key bindings for removed plugins
+--- Linting, syntax-coloring, and auto-formatting
+:Neomake ( mk) - maker/linter
+--- Fuzzy text finders
+<C-p> - CtrlP
+<C-l> - Unite with the following sources: file_rec buffer
 
 
 ==============================================================================
@@ -289,27 +379,27 @@ Help:
 Usage:
 :GitGutterDisable :GitGutterEnable :GitGutterToggle
 :GitGutterSignsEnable :GitGutterSignsDisable :GitGutterSignsToggle
-:GitGutterLineHighlightsEnable :GitGutterLineHighlightsDisable :GitGutterLineHighlightsToggle (,ht)
+:GitGutterLineHighlightsEnable :GitGutterLineHighlightsDisable :GitGutterLineHighlightsToggle ( ht)
 :GitGutterNextHunk (]c) - jump to next change
 :GitGutterPrevHunk ([c) - jump to next change
-:GitGutterStageHunk (,hs) - stage the hunk
-:GitGutterRevertHunk (,hr) - revert the hunk
-:GitGutterPreviewHunk (,hp) - preview hunk's changes
+:GitGutterStageHunk ( hs) - stage the hunk
+:GitGutterRevertHunk ( hr) - revert the hunk
+:GitGutterPreviewHunk ( hp) - preview hunk's changes
 
 === vim-fugitive
 Git wrapper
 Custom mappings:
-:Gstatus (,gs)
-:Gcommit (,gc)
-(,ga) - adds everything and commits
-:Gblame (,gb)
+:Gstatus ( gs)
+:Gcommit ( gc)
+( ga) - adds everything and commits
+:Gblame ( gb)
 More help:
 :h fugitive
 :h Gstatus - for more keys during the status message
 
 === indent-guides
 Displays indent levels
-:IndentGuidesToggle (,ig) - toggles the indent guides on and off
+:IndentGuidesToggle ( ig) - toggles the indent guides on and off
 :h indent-guide
 
 
@@ -419,6 +509,7 @@ Adding support to a plugin is generally as simple as the following command at th
 === vim-unimpaired
 This plugin provides several pairs of bracket maps.
 :h unimpaired
+The following maps all correspond to normal mode commands.If [count] is given, it becomes an argument to the command.
 Mappings:
 [a     :previous
 ]a     :next
@@ -444,8 +535,14 @@ Mappings:
 ]t     :tnext
 [T     :tfirst
 ]T     :tlast
+[n     Go to the previous SCM conflict marker or diff/patch hunk
+]n     Go to the next SCM conflict marker or diff/patch hunk
+[<Space> Add blank line/s above the cursor.
+]<Space> Add blank line/s below the cursor.
+[e     Exchange the current line with line/s above it.
+]e     Exchange the current line with line/s below it.
 
-== Emmet
+=== Emmet
 Emmet is an editor plugin for high-speed HTML, XML, XSL (or any other
 structured code format) coding and editing. The core of this plugin is a
 powerful abbreviation engine which allows you to expand expressions,
@@ -477,8 +574,9 @@ File tree explorer
 :h NERDTree
 :h NERDTreeBookmarkCommands
 :h NERDTreeMappings
-:NERDTreeToggle (F5) (,nt) - toggles the explorer on/off
-:NERDTree /home/marty/vim7/src
+:NERDTreeToggle (F2) ( nt) - toggles the explorer on/off
+:NERDTreeFind ( ntf) - opens the explorer with focus on the current file
+:NERDTree /home/Jivko/dotfiles
 :NERDTree foo - roots the tree at foo (foo is the name of a bookmark)
 :NERDTreeFind - Find the current file in the tree
 :NERDTreeCWD - Change tree root to current directory
@@ -549,22 +647,17 @@ Temporary scratch buffers
                         no makers are specified, the default makers for the
                         current |filetype| are used. See |neomake-configuration|
                         for more on makers.
-
 :Neomake! [makers]      Run a make command with no file as input. If no makers
                         are specified, the default top-level makers will be
                         used. If no default top-level makers exist, |makeprg|
                         will be used.
-
 :NeomakeSh {command}    Run {command} in a shell (according to 'shell'). The
                         command output will be loaded into the quickfix list
                         when the job is complete. Example: >
                         :NeomakeSh find . -name '*.pyc'
-<
-
 :NeomakeSh! {command}   Same as |:NeomakeSh|, but does not buffer the output.
                         Example: >
                         :NeomakeSh! while true; do date; sleep 1; done
-<
 :lopen                  opens the locations window to see the results from Neomake
 :copen                  opens the quickfix window to see the results from Neomake!
 
@@ -582,11 +675,12 @@ comments mgmt
 :h NERDCommenter
 :h NERDComFunctionalitySummary
 :h NERDComToggleComment
-(,cc) - comments block
-(,cu) - uncomments block
-(,cm) - uses multipart delimiters if possible - as in /* ... */
-(,ci) - inverts the comment state
-(,cl) (,cr) - left/right alligned comments
+( cc) - comments block
+( cu) - uncomments block
+( cm) - uses multipart delimiters if possible - as in /* ... */
+( ci) - inverts the comment state
+( cl) - left-alligned comments
+( cr) - right-alligned comments
 
 === Tagbar
 Class outline viewer
@@ -643,14 +737,14 @@ Run :help ctrlp-mappings or submit ? in CtrlP for more mapping help.
   - Use :25 to jump to line 25.
   - Use :diffthis when opening multiple files to run :diffthis on the first 4 files.
 
-=== ag.vim
-Plugin for the_silver_searcher 'ag' - code-searching tool
-:h ag.txt
+=== ack.vim
+Plugin for text searchers such as ack, ag, rg
+:h ack.txt
 Commands:
-:Ag[!] [options] {pattern} [{directory}]
-:AgBuffer[!] [options] {pattern}
-:AgFile [options] {pattern} [{directory}]
-:AgHelp[!] [options] {pattern}
+:Ack[!] [options] {pattern} [{directory}]
+:AckBuffer[!] [options] {pattern}
+:AckFile [options] {pattern} [{directory}]
+:AckHelp[!] [options] {pattern}
 Mappings:
 e - open file and close the quickfix window.
 o - open file (same as enter).
@@ -667,29 +761,29 @@ q - close the quickfix window.
 fzf is a general-purpose command-line fuzzy finder. This plugin is a bundle of fzf-based commands and mappings
 :h fzf
 Commands:
-:Files [PATH]    | Files (similar to `:FZF`)
-:GFiles [OPTS]   | Git files (git ls-files)
-:GFiles?         | Git files (git status)
-:Buffers         | Open buffers
-:Colors          | Color schemes
-:Ag [PATTERN]    | {ag} search result (ALT-A to select all, ALT-D to deselect all)
-:Lines [QUERY]   | Lines in loaded buffers
-:BLines [QUERY]  | Lines in the current buffer
-:Tags [QUERY]    | Tags in the project (`ctags -R`)
-:BTags [QUERY]   | Tags in the current buffer
-:Marks           | Marks
-:Windows         | Windows
-:Locate PATTERN  | `locate` command output
-:History         | `v:oldfiles` and open buffers
-:History:        | Command history
-:History/        | Search history
-:Snippets        | Snippets ({UltiSnips})
-:Commits         | Git commits (requires {fugitive.vim})
-:BCommits        | Git commits for the current buffer
-:Commands        | Commands
-:Maps            | Normal mode mappings
-:Helptags        | Help tags [1]
-:Filetypes       | File types
+:Files [PATH]         | Files (similar to `:FZF`)
+:GFiles [OPTS]        | Git files (git ls-files)
+:GFiles?              | Git files (git status)
+:Buffers              | Open buffers
+:Colors               | Color schemes
+:Ag [PATTERN]         | {ag} search result (ALT-A to select all, ALT-D to deselect all)
+:Lines [QUERY]        | Lines in loaded buffers
+:BLines [QUERY]       | Lines in the current buffer
+:Tags [QUERY] ( t)    | Tags in the project (`ctags -R`)
+:BTags [QUERY] ( tb)  | Tags in the current buffer
+:Marks                | Marks
+:Windows              | Windows
+:Locate PATTERN       | `locate` command output
+:History              | `v:oldfiles` and open buffers
+:History:             | Command history
+:History/             | Search history
+:Snippets             | Snippets ({UltiSnips})
+:Commits              | Git commits (requires {fugitive.vim})
+:BCommits             | Git commits for the current buffer
+:Commands             | Commands
+:Maps                 | Normal mode mappings
+:Helptags             | Help tags [1]
+:Filetypes            | File types
 
 === Unite
 :h unite
@@ -723,5 +817,46 @@ Commands:
   m?           Open location list and display markers from current buffer
   m<BS>        Remove all markers
 
+=== vim-autoformat
+Provide easy code formatting in Vim by integrating existing code formatters.
+:Autoformat - auto-formats the entire file. If no suitable formatter is present, file is re-indented instead.
+Check out https://github.com/Chiel92/vim-autoformat for list of format programs.
+Formatters:
+js-beautify for Javascript and JSON. It can be installed by running npm install -g js-beautify. Note that nodejs is needed for this to work. The python version version is also supported by default, which does not need nodejs to run. Here is the link to the repository: https://github.com/einars/js-beautify.
+JSCS for Javascript. http://jscs.info/
+standard for Javascript. It can be installed by running npm install -g standard (nodejs is required). No more configuration needed. More information about the style guide can be found here: http://standardjs.com/.
+ESlint for Javascript. http://eslint.org/ It can be installed by running npm install eslint for a local project or by running npm install -g eslint for global use. The linter is then installed locally at $YOUR_PROJECT/node_modules/.bin/eslint or globally at ~/.npm-global/bin/eslint. When running the formatter, vim will walk up from the current file to search for such local installation and a ESLint configuration file (either .eslintrc.js or eslintrc.json). When the local version is missing it will fallback to the global version in your home directory. When both requirements are found eslint is executed with the --fix argument. Note that the formatter's name is still eslint_local for legacy reasons even though it already supports global eslint. Currently only working on *nix like OS (Linux, MacOS etc.) as it requires the OS to provide sh like shell syntax.
+xo for Javascript. It can be installed by running npm install -g xo (nodejs is required). Here is the link to the repository: https://github.com/sindresorhus/xo.
+html-beautify for HTML. It is shipped with js-beautify, which can be installed by running npm install -g js-beautify. Note that nodejs is needed for this to work. Here is the link to the repository: https://github.com/einars/js-beautify.
+css-beautify for CSS. It is shipped with js-beautify, which can be installed by running npm install -g js-beautify. Note that nodejs is needed for this to work. Here is the link to the repository: https://github.com/einars/js-beautify.
+typescript-formatter for Typescript. typescript-formatter is a thin wrapper around the TypeScript compiler services. It can be installed by running npm install -g typescript-formatter. Note that nodejs is needed for this to work. Here is the link to the repository: https://github.com/vvakame/typescript-formatter.
+sass-convert for SCSS. It is shipped with sass, a CSS preprocessor written in Ruby, which can be installed by running gem install sass. Here is the link to the SASS homepage: http://sass-lang.com/.
+tidy for HTML, XHTML and XML. It's probably in your distro's repository, so you can download it as a regular package. For Ubuntu type sudo apt-get install tidy in a terminal.
+rbeautify for Ruby. It is shipped with ruby-beautify, which can be installed by running gem install ruby-beautify. Note that compatible ruby-beautify-0.94.0 or higher version. Here is the link to the repository: https://github.com/erniebrodeur/ruby-beautify. This beautifier developed and tested with ruby 2.0+, so you can have weird results with earlier ruby versions.
+rubocop for Ruby. It can be installed by running gem install rubocop. Here is the link to the repository: https://github.com/bbatsov/rubocop
+gofmt for Golang. The default golang formatting program is shipped with the golang distribution. Make sure gofmt is in your PATH (if golang is installed properly, it should be). Here is the link to the installation: https://golang.org/doc/install
+rustfmt for Rust. It can be installed using cargo, the Rust package manager. Up-to-date installation instructions are on the project page: https://github.com/nrc/rustfmt/#installation.
+dartfmt for Dart. Part of the Dart SDK (make sure it is on your PATH). See https://www.dartlang.org/tools/dartfmt/ for more info.
+perltidy for Perl. It can be installed from CPAN cpanm Perl::Tidy . See https://metacpan.org/pod/Perl::Tidy and http://perltidy.sourceforge.net/ for more info.
+stylish-haskell for Haskell It can be installed using cabal build tool. Installation instructions are available at https://github.com/jaspervdj/stylish-haskell#installation
+remark for Markdown. A Javascript based markdown processor that can be installed with npm install -g remark-cli. More info is available at https://github.com/wooorm/remark.
+fprettify for modern Fortran. Download from official repository. Install with ./setup.py install or ./setup.py install --user.
+mix format for Elixir. mix format is included with Elixir 1.6+.
+fixjson for JSON. It is a JSON file fixer/formatter for humans using (relaxed) JSON5. It fixes various failures while humans writing JSON and formats JSON codes. It can be installed with npm install -g fixjson. More info is available at https://github.com/rhysd/fixjson.
+shfmt for Shell. A shell formatter written in Go supporting POSIX Shell, Bash and mksh that can be installed with go get -u mvdan.cc/sh/cmd/shfmt. See https://github.com/mvdan/sh for more info.
+
+=== ALE
+Asynchronous Linting Engine
+:h ale
+:ALEInfo - shows relevant info - filetype, enabled linters, and various options.
+:ALEDetail - Show the full linter message for the current line (if the line has a linter message).
+:ALELint - run linting on current buffer.
+ALEReset, ALEResetBuffer - will remove all problems reported by ALE for all buffers or one buffer, respectively. Either command will leave ALE linting enabled, so ALE will report problems when linting is performed again.
+ALEFirst, ALELast, ALEPreviousWrap, ALENextWrap - moves between warnings & errors in the buffer.
+ALEToggle, ALEEnable, ALEDisable - enable or disable ALE linting
+ALEToggleBuffer, ALEEnableBuffer, ALEDisableBuffer - enable or disable ALE linting for the current buffer.
+ALEFix, ALEGoToDefinition, ALEGoToDefinitionInTab - promising commands, have not utilized them yetRequires the actual fixers to be installed.
+
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:
+

@@ -45,14 +45,12 @@ set scrolloff=3           " Start scrolling three lines before the horizontal wi
 set exrc                  " Enable per-directory .vimrc files
 set secure                " Disable unsafe commands in .vimrc files
 
-" Tabs and spaces --------------------------------------------------------------
+" Indents and tabs --------------------------------------------------------------
 set shiftwidth=4          " Spaces to use for each indent step (>>, <<, etc.)
 set shiftround            " Round indent to multiple of shiftwidth
 set softtabstop=4         " Spaces to use for <tab> and <BS> editing operations
 set expandtab             " Use appropriate # of spaces for <tab> in insert mode
 set tabstop=2             " Make tabs as wide as two spaces
-
-" Indents and wrapping
 set linebreak             " Soft-wrap at word instead of character
 set autoindent            " Copy indent from current line when starting new line
 set bs=indent,eol,start   " Backspace over autoindent, EOL, and start of insert
