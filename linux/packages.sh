@@ -24,6 +24,7 @@ sudo apt-get install -y rlwrap # readline feature command line wrapper
 sudo apt-get install -y screenfetch # Bash Screenshot Information Tool. Fetches system/theme information in terminal
 sudo apt-get install -y silversearcher-ag # very fast grep-like program, alternative to ack-grep
 sudo apt-get install -y shellcheck # lint tool for shell scripts
+sudo apt-get install -y tldr # Simplified and community-driven man pages
 sudo apt-get install -y tmux # terminal multiplexer
 sudo apt-get install -y tree # displays an indented directory tree, in color
 sudo apt-get install -y vim # Vi IMproved - enhanced vi editor
