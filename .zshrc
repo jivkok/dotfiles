@@ -1,3 +1,8 @@
+# To profile the zsh startup: export _ZSH_DEBUG=profile
+if [[ "$_ZSH_DEBUG" = profile ]]; then
+    zmodload zsh/zprof
+fi
+
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
@@ -104,4 +109,8 @@ for file in ~/{.path.sh,.zsh-theme.sh,.aliases.sh,.functions.sh,.fzf.zsh,.marks.
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
+
+if [[ "$_ZSH_DEBUG" = profile ]]; then
+    zprof
+fi
 
