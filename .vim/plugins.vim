@@ -51,6 +51,7 @@ Plug 'mattn/emmet-vim' " HTML/CSS high-speed coding
 " Plug 'editorconfig/editorconfig-vim' " standardized editing styles
 Plug 'sgur/vim-editorconfig' " standardized editing styles
 Plug 'terryma/vim-expand-region' " allows you to visually select increasingly larger regions of text using the same key combination
+Plug 'simnalamburt/vim-mundo' " Vim undo tree visualizer
 if has('mac')
   Plug 'junegunn/vim-xmark', { 'do': 'make' } " Markdown preview on OSX
 endif
