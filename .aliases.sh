@@ -15,6 +15,7 @@ alias paths='echo -e ${PATH//:/\\n}'
 alias e="subl"
 alias envs="printenv | sort"
 alias g="git"
+alias lg="lazygit"
 alias h="history"
 alias nh='unset HISTFILE'
 alias j="jobs"
@@ -145,7 +146,7 @@ elif [ "$os" = "Darwin" ]; then
     alias cask="brew cask"
 
     # Get OS X Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
-    alias osx_update='sudo softwareupdate --install --all --verbose; command -v os_update >/dev/null 2>&1 && os_update'
+    alias update_osx='sudo softwareupdate --install --all --verbose; command -v update_os >/dev/null 2>&1 && update_os'
 
     # Flush Directory Service cache
     alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"

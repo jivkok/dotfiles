@@ -85,6 +85,7 @@ brew install tcpflow # TCP flow recorder
 brew install tcpreplay # Replay saved tcpdump files at arbitrary speeds
 brew install tcptrace # Analyze tcpdump output
 brew install the_silver_searcher # Code-search similar to ack
+brew install tldr # Simplified and community-driven man pages
 brew install tmux # Terminal multiplexer
 brew install tree # Display directories as trees (with optional color/HTML output)
 brew install ucspi-tcp # Tools for building TCP client-server applications

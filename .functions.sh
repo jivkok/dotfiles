@@ -15,6 +15,14 @@ else
     colorflag=""
 fi
 
+function dot_trace () {
+    local msg="$1"
+    local timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
+    echo -e "\n$(tput setaf 2)$timestamp: $msg$(tput sgr0)\n"
+    touch ~/.dotfiles_history
+    echo "$timestamp: [INFO] $msg" >> ~/.dotfiles_history
+}
+
 function cdd () {
     cd "$1" || exit;
     ls -AlF $dirsflag $colorflag;
@@ -101,7 +109,7 @@ function emq() {
 }
 
 # system update
-function os_update() {
+function update_os() {
     echo -e "\nUpdating system ...\n"
 
     # dotfiles
@@ -159,12 +167,12 @@ function os_update() {
     fi
 
     if command -V pip >/dev/null 2>&1 ; then
-        # echo -e "\nUpdating Python system packages ...\n"
-        # pip list --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 sudo -H pip install --upgrade
-        # echo -e "\nUpdating Python system packages done.\n"
         echo -e "\nUpdating Python user packages ...\n"
         pip list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 pip install --user --upgrade
         echo -e "\nUpdating Python user packages done.\n"
+        echo -e "\nUpdating Python packages ...\n"
+        diff <(pip list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) <(pip list --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) | grep '> ' | cut -d ' ' -f 2 | xargs -n 1 sudo -H pip install --upgrade
+        echo -e "\nUpdating Python packages done.\n"
     fi
 
     if command -V npm >/dev/null 2>&1 ; then
