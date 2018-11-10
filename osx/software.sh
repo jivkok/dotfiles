@@ -21,6 +21,7 @@ brew cask install opera
 
 # development
 brew cask install atom # code/text editor
+brew cask install bitbar # Put anything in your Mac OS X menu bar
 brew cask install brackets # code/text editor
 brew cask install bwana # browser as man pager
 brew cask install dash # documentation sets, code snippets, and text expansion

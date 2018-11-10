@@ -16,13 +16,16 @@ sudo apt-get install -y jq # lightweight and flexible command-line JSON processo
 sudo apt-get install -y libwww-perl # simple and consistent interface to the world-wide web
 sudo apt-get install -y lnav # ncurses-based log file viewer
 sudo apt-get install -y ngrep # grep for network traffic
+sudo apt-get install -y nnn # Fast file browser
 sudo apt-get install -y mosh # Mobile shell that supports roaming and intelligent local echo
+sudo apt-get install -y mtr # traceroute and ping in a single tool
 sudo apt-get install -y python-pip # alternative Python package installer
 sudo apt-get install -y python-pygments # syntax highlighting package written in Python
 sudo apt-get install -y ranger # caca-utils highlight atool w3m poppler-utils mediainfo # File manager with an ncurses frontend written in Python
 sudo apt-get install -y rlwrap # readline feature command line wrapper
 sudo apt-get install -y screenfetch # Bash Screenshot Information Tool. Fetches system/theme information in terminal
 sudo apt-get install -y silversearcher-ag # very fast grep-like program, alternative to ack-grep
+sudo apt-get install -y speedtest_cli # Command-line interface for https://speedtest.net bandwidth tests
 sudo apt-get install -y shellcheck # lint tool for shell scripts
 sudo apt-get install -y tldr # Simplified and community-driven man pages
 sudo apt-get install -y tmux # terminal multiplexer

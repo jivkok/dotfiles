@@ -16,7 +16,7 @@ if [ "$os" = "Linux" ]; then
 elif [ "$os" = "Darwin" ]; then
     if ! brew ls --versions zsh >/dev/null 2>&1 ; then
         dot_trace "Installing ZSH ..."
-        brew install zsh
+        brew install --upgrade zsh
         dot_trace "Installing ZSH done."
     fi
 elif [[ "$os" == CYGWIN* ]]; then
@@ -44,23 +44,28 @@ else
     # https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh
     git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"
 
-
-    mkdir -p "$HOME/.oh-my-zsh/custom/plugins"
-    git clone https://github.com/zsh-users/zsh-completions "$HOME/.oh-my-zsh/custom/plugins/zsh-completions"
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
+    git clone https://github.com/supercrabtree/k "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/k"
+    git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
+    git clone https://github.com/zsh-users/zsh-completions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-completions"
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
     dot_trace "Installing oh-my-zsh done."
 fi
 
-_zsh=$(which zsh)
+_zsh=$(command -v zsh)
 
-if [ -z "$(grep $_zsh /etc/shells)" ] ; then
+if [ -z "$(grep "$_zsh" /etc/shells)" ] ; then
     dot_trace "Adding ZSH as supported shell"
-    sudo -s "echo $_zsh >> /etc/shells"
+    echo "$_zsh" | sudo tee -a /etc/shells
+else
+    dot_trace "Check: ZSH is supported shell"
 fi
 
 if [ "$SHELL" != "$_zsh" ]; then
     dot_trace "Switching to ZSH as default shell"
     chsh -s "$_zsh"
+else
+    dot_trace "Check: ZSH is default shell"
 fi
 
 unset _zsh
