@@ -37,6 +37,9 @@ Plug 'Xuyuanp/nerdtree-git-plugin' " show git status in NerdTree
 Plug 'xolox/vim-misc' " Required by xolox/vim-session
 Plug 'xolox/vim-session' " Extended session management for Vim (:mksession on steroids)
 
+" Editor - languages
+Plug 'OmniSharp/omnisharp-vim' " Omnicompletion (intellisense) and more for C#
+
 " Editing
 Plug 'msanders/snipmate.vim' " snippets mgmt for various languages
 Plug 'dhruvasagar/vim-table-mode' " tables creation

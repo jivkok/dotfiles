@@ -64,6 +64,7 @@ set gdefault              " Add the g flag to search/replace by default
 
 " Files and buffers ------------------------------------------------------------
 filetype on               " Enable file type detection
+filetype plugin on        " Enable loading plugins per file types
 set hidden                " Allows switching between buffers while they are unsaved
 set nobackup
 set swapfile
