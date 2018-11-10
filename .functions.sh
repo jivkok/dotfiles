@@ -129,7 +129,6 @@ function update_os() {
         brew prune
         brew cleanup
         brew doctor
-        cask cleanup
         cask doctor
         echo -e "\nUpdating Homebrew packages done.\n"
     fi
@@ -155,6 +154,12 @@ function update_os() {
         echo -e "\nUpdating oh-my-zsh done.\n"
     fi
 
+    if [ -d "$HOME/.tmux/plugins/tpm/bin/update_plugins" ]; then
+        echo -e "\nUpdating Tmux plugins ...\n"
+        "$HOME/.tmux/plugins/tpm/bin/update_plugins" all
+        echo -e "\nUpdating Tmux plugins done.\n"
+    fi
+
     if command -V vim >/dev/null 2>&1 ; then
         echo -e "\nUpdating Vim plugins ...\n"
         vim +PlugUpdate +qall
@@ -166,12 +171,17 @@ function update_os() {
         echo -e "\nUpdating NeoVim plugins done.\n"
     fi
 
-    if command -V pip >/dev/null 2>&1 ; then
+    if command -V pip3 >/dev/null 2>&1 ; then
+        pipcmd=pip3
+    elif command -V pip >/dev/null 2>&1 ; then
+        pipcmd=pip
+    fi
+    if [ -n "$pipcmd" ]; then
         echo -e "\nUpdating Python user packages ...\n"
-        pip list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 pip install --user --upgrade
+        $pipcmd list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 $pipcmd install --user --upgrade
         echo -e "\nUpdating Python user packages done.\n"
         echo -e "\nUpdating Python packages ...\n"
-        diff <(pip list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) <(pip list --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) | grep '> ' | cut -d ' ' -f 2 | xargs -n 1 sudo -H pip install --upgrade
+        diff <($pipcmd list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) <($pipcmd list --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) | grep '> ' | cut -d ' ' -f 2 | xargs -n 1 sudo -H $pipcmd install --upgrade
         echo -e "\nUpdating Python packages done.\n"
     fi
 
@@ -461,6 +471,29 @@ function tre() {
     tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
 }
 
+# https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/colorize/colorize.plugin.zsh
+colorize_via_pygmentize() {
+    if [ ! -x "$(which pygmentize)" ]; then
+        echo "package 'Pygments' is not installed!"
+        return -1
+    fi
+
+    if [ $# -eq 0 ]; then
+        pygmentize -g "$@"
+    fi
+
+    for FNAME in "$@"
+    do
+        filename=$(basename "$FNAME")
+        lexer=$(pygmentize -N "$filename")
+        if [ "Z$lexer" != "Ztext" ]; then
+            pygmentize -l "$lexer" "$FNAME"
+        else
+            pygmentize -g "$FNAME"
+        fi
+    done
+}
+
 # colorized man
 function man() {
     env \
@@ -547,6 +580,10 @@ function help() {
 
     echo -e "${RED}Could not find anything for: ${cmd}${DEFAULT}"
     return 1
+}
+
+function history-top-commands () {
+    history | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl | head -n20
 }
 
 function psgrep () {
