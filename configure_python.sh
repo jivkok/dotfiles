@@ -21,12 +21,12 @@ pip install --user --upgrade virtualenv
 pip install --user --upgrade virtualenvwrapper
 
 # Packages
+pip install --user --upgrade cdiff # color diff. Use it within a Git repo.
 pip install --user --upgrade glances # system stats
 pip install --user --upgrade httpie # curl-like with colorized output
+pip install --user --upgrade icdiff # improved color diff. Use it diffing two files.
 pip install --user --upgrade jsbeautifier # reformat and reindent JavaScript code. jsbeautifier.org. Use with 'js-beautify somefile.js'
-pip install --user --upgrade mitmproxy # http traffic interception
-pip install --user --upgrade Pygments # syntax highlighter
-pip install --user --upgrade pylint # Python linter
 pip install --user --upgrade jupyter # Jupyter Notebooks
-pip install --user --upgrade cdiff # color diff
-pip install --user --upgrade icdiff # improved color diff
+pip install --user --upgrade mitmproxy # http traffic interception
+pip install --user --upgrade pygments # syntax highlighter
+pip install --user --upgrade pylint # Python linter

@@ -39,6 +39,7 @@ brew install bash-completion
 
 # Packages
 brew install asciinema # Record and share terminal sessions
+brew install bat # cat-clone with syntax highlighting and Git integration
 brew install bfg # Remove large files or passwords from Git history like git-filter-branch
 brew install binutils # FSF/GNU ld, ar, readelf, etc. for native development
 brew install binwalk # Searches a binary image for embedded files and executable code
@@ -56,6 +57,7 @@ brew install git-extras # Small git utilities
 brew install graphviz # Graph visualization software from AT&T and Bell Labs
 brew install gzip # Popular GNU data compression program
 brew install htop-osx # Improved top (interactive process viewer)
+brew install ifstat # Tool to report network interface bandwidth
 brew install iftop # Display an interface's bandwidth usage
 brew install imagemagick --with-webp # Tools and libraries to manipulate images in many formats
 brew install jq # Lightweight and flexible command-line JSON processor
@@ -65,8 +67,10 @@ brew install lua # Powerful, lightweight programming language
 brew install lynx # Text-based web browser
 brew install m-cli # Swiss Army Knife for macOS
 brew install mas # Mac App Store command-line interface
+brew install mtr # traceroute and ping in a single tool
 brew install mobile-shell # Remote terminal application
 brew install ngrep # Network grep
+brew install nnn # Fast file browser
 brew install nmap # Port scanning utility for large networks
 brew install p7zip # 7-Zip (high compression file archiver) implementation
 brew install pigz # Parallel gzip

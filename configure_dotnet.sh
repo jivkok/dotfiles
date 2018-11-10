@@ -19,16 +19,20 @@ if [ "$os" = "Linux" ]; then
 elif [ "$os" = "Darwin" ]; then
     echo2 Prerequisites
     brew update
-    brew install openssl
+    brew install libuv openssl
     brew link --force openssl
 
     echo2 "Cleaning up previous DotNet versions"
-    curl -s https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/uninstall/dotnet-uninstall-pkgs.sh | sudo bash
+    curl -s https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/uninstall/dotnet-uninstall-pkgs.sh | sudo bash
 
     echo2 "Installing the DotNet package"
-    wget -O "${TMPDIR}dotnet.pkg" https://go.microsoft.com/fwlink/\?LinkID\=798400
+    wget -O "${TMPDIR}dotnet.pkg" "https://download.microsoft.com/download/E/8/A/E8AF2EE0-5DDA-4420-A395-D1A50EEFD83E/dotnet-sdk-2.1.401-osx-gs-x64.pkg"
     sudo installer -verboseR -pkg "${TMPDIR}dotnet.pkg" -target /
     rm "${TMPDIR}dotnet.pkg"
+
+    dotnet tool install --global coverlet.console
+
+    cask install visual-studio-code
 else
     echo2 "Unsupported OS: $os"
     return

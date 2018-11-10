@@ -59,7 +59,7 @@ export UPDATE_ZSH_DAYS=30
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(colored-man colorize encode64 httpie jsontools nmap npm pip python rsync urltools zsh-completions zsh-syntax-highlighting)
+plugins=(colored-man encode64 httpie jsontools k nmap npm pip python rsync urltools zsh-autosuggestions zsh-completions zsh-syntax-highlighting)
 if [[ "$OSTYPE" = darwin* ]]; then
     plugins=("${plugins[@]}" brew osx pod xcode)
 fi
@@ -94,6 +94,8 @@ zstyle ":completion:*" menu select=long
 zstyle ":completion:*" select-prompt %SScrolling active: current selection at %p%s
 zstyle ":completion:*" verbose true
 zstyle ":completion:*:default" list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
 
 zstyle ":completion:*:*:kill:*:processes" list-colors "=(#b) #([0-9]#)*=0=01;31"
 zstyle ":completion:*:kill:*" command "ps -u $USER -o pid,%cpu,tty,cputime,cmd"
