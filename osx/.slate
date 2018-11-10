@@ -133,7 +133,6 @@ bind [:${hyper}  throw previous # move to previous screen
 bind ]:${hyper}  throw next # move to next screen
 
 ## App bindings
-# These are laid out on the left hand
 bind z:${hyper}     focus 'Terminal' # iTerm2 already has Ctrl-apostrophe mapped
 bind space:${hyper} focus ${editor}
 bind b:${hyper}     focus ${browser}
