@@ -1,65 +1,54 @@
 # Easier navigation
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias -- -="cd -"
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -- -='cd -'
 
 # Directories
-alias md="mkdir"
-alias rd="rm -rf"
+alias md='mkdir'
+alias rd='rm -rf'
 alias tree2='tree -A -C -L 2 --dirsfirst'
 alias tree2a='tree -a -A -C -L 2 --dirsfirst'
 alias paths='echo -e ${PATH//:/\\n}'
 
 # Shortcuts
-alias e="subl"
-alias envs="printenv | sort"
-alias g="git"
-alias lg="lazygit"
-alias h="history"
+alias ccat='colorize_via_pygmentize'
+alias e='subl'
+alias envs='printenv | sort'
+alias g='git'
+alias h='history'
+alias j='jobs'
+alias lg='lazygit'
 alias nh='unset HISTFILE'
-alias j="jobs"
-alias vars="set | sort"
+alias rr='ranger'
+alias vars='set | sort'
 if command -v nvim >/dev/null 2>&1; then
-    alias v="nvim"
+    alias v='nvim'
 elif command -v gvim >/dev/null 2>&1; then
-    alias v="gvim"
+    alias v='gvim'
 elif command -v vim >/dev/null 2>&1; then
-    alias v="vim"
+    alias v='vim'
 else
-    alias v="vi"
+    alias v='vi'
 fi
-alias vimupd="v +PlugUpdate +qall"
+alias vg='vagrant'
+alias vimupd='v +PlugUpdate +qall'
 alias x='exit'
 
 # Listings
-if ls --group-directories-first ~ > /dev/null 2>&1; then
-    _dirsflag="--group-directories-first"
-else
-    _dirsflag=""
-fi
-if ls --color=auto ~ > /dev/null 2>&1; then
-    # GNU
-    _colorflag="--color=auto"
-elif ls -G ~ > /dev/null 2>&1; then
-    # OSX
-    _colorflag="-G"
-else
-    _colorflag=""
-fi
-alias l="ls -AF $_dirsflag $_colorflag"
-alias ll="ls -AlF $_dirsflag $_colorflag"
+alias l='ls -AF --color=auto --group-directories-first'
+alias ll='ls -AlFh --color=auto --group-directories-first'
 unset _dirsflag _colorflag
-alias recent='ls -Alt | head'   # Most recent files
+alias recent='ls -alt | head' # Most recent files
 export LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
 
 # Clipboard
 # copy output of last command to clipboard
-alias cl="fc -e -|pbcopy"
+alias cl='fc -e -|pbcopy'
 # copy the working directory path
 alias cpwd='pwd|tr -d "\n"|pbcopy'
 # show the current cliboard content
-alias cbp="pbpaste|less"
+alias cbp='pbpaste|less'
 
 # System info
 ## top processes by CPU
@@ -78,7 +67,7 @@ alias week='date +%V'
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
 
 # IP addresses
-alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias ip='dig +short myip.opendns.com @resolver1.opendns.com'
 alias localip="ifconfig | grep -Eo 'inet (addr:)?([0-9]+\.){3}[0-9]+' | grep -Eo '([0-9]+\.){3}[0-9]+' | grep -v '127.0.0.1'"
 
 # URL-encode strings
@@ -88,7 +77,7 @@ alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.ar
 alias reload='exec $SHELL -l'
 
 # Make Grunt print stack traces by default
-command -v grunt > /dev/null && alias grunt="grunt --stack"
+command -v grunt > /dev/null && alias grunt='grunt --stack'
 
 # Tmux auto-attach
 command -v tmux > /dev/null && alias t='(tmux has-session 2>/dev/null && tmux attach) || (tmux new-session)'
@@ -124,44 +113,52 @@ fi
 if [ "$os" = "Linux" ]; then
 
     # Packages
-    alias pkgsearch="apt-cache search"
-    alias pkginstall="sudo apt-get install -y"
-    alias pkgremove="sudo apt-get remove"
-    alias pkglist="apt-cache pkgnames"
-    alias pkgshow="apt-cache show"
-    alias pkgupdate="sudo apt-get update --fix-missing && sudo apt-get dist-upgrade && sudo apt-get clean && sudo apt-get autoremove"
+    alias pkgsearch='apt-cache search'
+    alias pkginstall='sudo apt-get install -y'
+    alias pkgremove='sudo apt-get remove'
+    alias pkglist='apt-cache pkgnames'
+    alias pkgshow='apt-cache show'
+    alias pkgupdate='sudo apt-get update --fix-missing && sudo apt-get dist-upgrade && sudo apt-get clean && sudo apt-get autoremove'
 
     # memory
     alias meminfo='free -m -l -t'
 
 elif [ "$os" = "Darwin" ]; then
 
+    if command -v gls >/dev/null 2>&1; then
+        alias l='gls -AF --color=auto --group-directories-first'
+        alias ll='gls -AlFh --color=auto --group-directories-first'
+    else
+        alias l='ls -AF -G'
+        alias ll='ls -AlFh -G'
+    fi
+
     # Packages
-    alias pkgsearch="brew search"
-    alias pkginstall="brew install"
-    alias pkgremove="brew uninstall"
-    alias pkglist="brew list"
-    alias pkgshow="brew info"
-    alias pkgupdate="brew update && brew upgrade --all && brew cleanup && brew doctor"
-    alias cask="brew cask"
+    alias pkgsearch='brew search'
+    alias pkginstall='brew install'
+    alias pkgremove='brew uninstall'
+    alias pkglist='brew list'
+    alias pkgshow='brew info'
+    alias pkgupdate='brew update && brew upgrade --all && brew cleanup && brew doctor'
+    alias cask='brew cask'
 
     # Get OS X Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
     alias update_osx='sudo softwareupdate --install --all --verbose; command -v update_os >/dev/null 2>&1 && update_os'
 
     # Flush Directory Service cache
-    alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
+    alias flush='dscacheutil -flushcache && killall -HUP mDNSResponder'
 
     # Clean up LaunchServices to remove duplicates in the “Open With” menu
-    alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
+    alias lscleanup='/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder'
 
     # OS X has no `md5sum`, so use `md5` as a fallback
-    command -v md5sum > /dev/null || alias md5sum="md5"
+    command -v md5sum > /dev/null || alias md5sum='md5'
 
     # OS X has no `sha1sum`, so use `shasum` as a fallback
-    command -v sha1sum > /dev/null || alias sha1sum="shasum"
+    command -v sha1sum > /dev/null || alias sha1sum='shasum'
 
     # JavaScriptCore REPL
-    jscbin="/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc";
+    jscbin='/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc';
     [ -e "${jscbin}" ] && alias jsc="${jscbin}";
     unset jscbin;
 
@@ -170,44 +167,44 @@ elif [ "$os" = "Darwin" ]; then
 
     # Empty the Trash on all mounted volumes and the main HDD
     # Also, clear Apple’s System Logs to improve shell startup speed
-    alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
+    alias emptytrash='sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl'
 
     # Show/hide hidden files in Finder
-    alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
-    alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
+    alias show='defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder'
+    alias hide='defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder'
 
     # Hide/show all desktop icons (useful when presenting)
-    alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
-    alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
+    alias hidedesktop='defaults write com.apple.finder CreateDesktop -bool false && killall Finder'
+    alias showdesktop='defaults write com.apple.finder CreateDesktop -bool true && killall Finder'
 
     # Merge PDF files
     # Usage: `mergepdf -o output.pdf input{1,2,3}.pdf`
     alias mergepdf='/System/Library/Automator/Combine\ PDF\ Pages.action/Contents/Resources/join.py'
 
     # Disable Spotlight
-    alias spotoff="sudo mdutil -a -i off"
+    alias spotoff='sudo mdutil -a -i off'
     # Enable Spotlight
-    alias spoton="sudo mdutil -a -i on"
+    alias spoton='sudo mdutil -a -i on'
 
     # PlistBuddy alias, because sometimes `defaults` just doesn’t cut it
-    alias plistbuddy="/usr/libexec/PlistBuddy"
+    alias plistbuddy='/usr/libexec/PlistBuddy'
 
     # Ring the terminal bell, and put a badge on Terminal.app’s Dock icon
     # (useful when executing time-consuming commands)
-    alias badge="tput bel"
+    alias badge='tput bel'
 
     # Kill all the tabs in Chrome to free up memory
     # [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
     alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
 
     # Lock the screen (when going AFK)
-    alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+    alias afk='/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend'
 
     alias of='open -a Finder ./'
-    alias ql="qlmanage -p &>/dev/null"
+    alias ql='qlmanage -p &>/dev/null'
 
-    if [ -f "/Applications/p4merge.app/Contents/Resources/launchp4merge" ]; then
-        alias p4diff="/Applications/p4merge.app/Contents/Resources/launchp4merge $*"
+    if [ -f '/Applications/p4merge.app/Contents/Resources/launchp4merge' ]; then
+        alias p4diff='/Applications/p4merge.app/Contents/Resources/launchp4merge $*'
     fi
 
     if [ -f "$HOME/.m-cli/m" ]; then
