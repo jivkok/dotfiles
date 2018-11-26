@@ -12,13 +12,17 @@ sudo apt-get install -y git-extras # Extra commands for git
 sudo apt-get install -y gitk # fast, scalable, distributed revision control system (revision tree visualizer)
 sudo apt-get install -y gitstats # statistics generator for git repositories
 sudo apt-get install -y graphviz # rich set of graph drawing tools
+sudo apt-get install -y grc # Colorize logfiles and command output
 sudo apt-get install -y jq # lightweight and flexible command-line JSON processor
 sudo apt-get install -y libwww-perl # simple and consistent interface to the world-wide web
 sudo apt-get install -y lnav # ncurses-based log file viewer
 sudo apt-get install -y ngrep # grep for network traffic
 sudo apt-get install -y nnn # Fast file browser
 sudo apt-get install -y mosh # Mobile shell that supports roaming and intelligent local echo
+sudo apt-get install -y miller # Like sed, awk, cut, join & sort for name-indexed data such as CSV
 sudo apt-get install -y mtr # traceroute and ping in a single tool
+sudo apt-get install -y ncdu # NCurses Disk Usage
+sudo apt-get install -y pandoc # markup converter
 sudo apt-get install -y python-pip # alternative Python package installer
 sudo apt-get install -y python-pygments # syntax highlighting package written in Python
 sudo apt-get install -y ranger # caca-utils highlight atool w3m poppler-utils mediainfo # File manager with an ncurses frontend written in Python
@@ -27,10 +31,12 @@ sudo apt-get install -y screenfetch # Bash Screenshot Information Tool. Fetches 
 sudo apt-get install -y silversearcher-ag # very fast grep-like program, alternative to ack-grep
 sudo apt-get install -y speedtest_cli # Command-line interface for https://speedtest.net bandwidth tests
 sudo apt-get install -y shellcheck # lint tool for shell scripts
+sudo apt-get install -y tig # Text interface for Git repositories
 sudo apt-get install -y tldr # Simplified and community-driven man pages
 sudo apt-get install -y tmux # terminal multiplexer
 sudo apt-get install -y tree # displays an indented directory tree, in color
 sudo apt-get install -y vim # Vi IMproved - enhanced vi editor
+sudo apt-get install -y watch # Executes a program periodically, showing output fullscreen
 sudo apt-get install -y wget # retrieves files from the web
 sudo apt-get install -y xsel # command line tool to access X clipboard and selection buffers
 

@@ -55,6 +55,7 @@ brew install fzf # Command-line fuzzy finder
 brew install git # Distributed revision control system
 brew install git-extras # Small git utilities
 brew install graphviz # Graph visualization software from AT&T and Bell Labs
+brew install grc # Colorize logfiles and command output
 brew install gzip # Popular GNU data compression program
 brew install htop-osx # Improved top (interactive process viewer)
 brew install ifstat # Tool to report network interface bandwidth
@@ -67,12 +68,15 @@ brew install lua # Powerful, lightweight programming language
 brew install lynx # Text-based web browser
 brew install m-cli # Swiss Army Knife for macOS
 brew install mas # Mac App Store command-line interface
+brew install miller # Like sed, awk, cut, join & sort for name-indexed data such as CSV
 brew install mtr # traceroute and ping in a single tool
 brew install mobile-shell # Remote terminal application
 brew install ngrep # Network grep
+brew install ncdu # NCurses Disk Usage
 brew install nnn # Fast file browser
 brew install nmap # Port scanning utility for large networks
 brew install p7zip # 7-Zip (high compression file archiver) implementation
+brew install pandoc # markup converter
 brew install pigz # Parallel gzip
 brew install pngcheck # Print info and check PNG, JNG, and MNG files
 brew install pv # Monitor data's progress through a pipe
@@ -89,6 +93,7 @@ brew install tcpflow # TCP flow recorder
 brew install tcpreplay # Replay saved tcpdump files at arbitrary speeds
 brew install tcptrace # Analyze tcpdump output
 brew install the_silver_searcher # Code-search similar to ack
+brew install tig # Text interface for Git repositories
 brew install tldr # Simplified and community-driven man pages
 brew install tmux # Terminal multiplexer
 brew install tree # Display directories as trees (with optional color/HTML output)
@@ -96,6 +101,7 @@ brew install ucspi-tcp # Tools for building TCP client-server applications
 brew install --HEAD universal-ctags/universal-ctags/universal-ctags # ctags
 brew install unix2dos # Convert text between DOS, UNIX, and Mac formats
 brew install vit # Front-end for Task Warrior
+brew install watch # Executes a program periodically, showing output fullscreen
 brew install webkit2png # Create screenshots of webpages from the terminal
 
 # Lxml and Libxslt
