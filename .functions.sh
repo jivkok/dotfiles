@@ -373,22 +373,58 @@ function json() {
     fi;
 }
 
-# UTF-8-encode a string of Unicode symbols
-function escape() {
-    printf "\\\x%s" $(printf "%s" "$@" | xxd -p -c1 -u);
-    # print a newline unless we’re piping the output to another program
-    if [ -t 1 ]; then
-        echo ""; # newline
-    fi;
+# Support multiple encodings (URL, base64, Unicode, etc.)
+function encode() {
+    local encoding="$1"
+    local string="$2"
+    local encoded=""
+
+    if [ -z "$encoding" ] || [ -z "$string" ]; then
+        echo "Encode string"
+        echo "Usage: encode <encoding> <string>"
+        echo " - encoding: url, html, base64, utf8"
+        return
+    fi
+
+    if [ "$encoding" = "url" ]; then
+        echo -n "$string" | perl -pe 's/([^-_.~A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg'
+    elif [ "$encoding" = "html" ]; then
+        echo -n "$string" | php -R 'echo htmlentities($argn);'
+    elif [ "$encoding" = "base64" ]; then
+        echo -n "$string" | base64
+    elif [ "$encoding" = "utf8" ]; then
+        printf "\\\x%s" $(printf "%s" "$string" | xxd -p -c1 -u)
+    else
+        echo "Unsupported encoding: $encoding"
+        return
+    fi
 }
 
-# Decode \x{ABCD}-style Unicode escape sequences
-function unidecode() {
-    perl -e "binmode(STDOUT, ':utf8'); print \"$*\"";
-    # print a newline unless we’re piping the output to another program
-    if [ -t 1 ]; then
-        echo ""; # newline
-    fi;
+# Support multiple encodings (URL, base64, Unicode, etc.)
+function decode() {
+    local encoding="$1"
+    local string="$2"
+    local encoded=""
+
+    if [ -z "$encoding" ] || [ -z "$string" ]; then
+        echo "Encode string"
+        echo "Usage: decode <encoding> <string>"
+        echo " - encoding: url, html, base64, utf8"
+        return
+    fi
+
+    if [ "$encoding" = "url" ]; then
+        echo -n "$string" | perl -pe 's/\+/ /g; s/%([0-9a-f]{2})/chr(hex($1))/eig'
+    elif [ "$encoding" = "html" ]; then
+        echo -n "$string" | php -R 'echo html_entity_decode($argn);'
+    elif [ "$encoding" = "base64" ]; then
+        echo -n "$string" | base64 -D
+    elif [ "$encoding" = "utf8" ]; then
+        perl -e "binmode(STDOUT, ':utf8'); print \"$string\""
+    else
+        echo "Unsupported encoding: $encoding"
+        return
+    fi
 }
 
 # encode a given image file as base64 and output css background property to clipboard
