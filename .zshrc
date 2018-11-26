@@ -59,7 +59,7 @@ export UPDATE_ZSH_DAYS=30
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(colored-man encode64 httpie jsontools k nmap npm pip python rsync urltools zsh-autosuggestions zsh-completions zsh-syntax-highlighting)
+plugins=(colored-man-pages encode64 httpie jsontools k nmap npm pip python rsync urltools zsh-autosuggestions zsh-completions zsh-syntax-highlighting)
 if [[ "$OSTYPE" = darwin* ]]; then
     plugins=("${plugins[@]}" brew osx pod xcode)
 fi
@@ -107,7 +107,7 @@ zstyle ":completion:*:kill:*" command "ps -u $USER -o pid,%cpu,tty,cputime,cmd"
 
 # Load the shell dotfiles
 #   ~/.profile_local.sh can be used for any local settings you don’t want to commit
-for file in ~/{.path.sh,.zsh-theme.sh,.aliases.sh,.functions.sh,.fzf.zsh,.marks.sh,.exports.sh,.profile_local.sh}; do
+for file in ~/{.path.sh,.zsh-theme.sh,.aliases.sh,.functions.sh,.fzf.zsh,.marks.sh,.exports.sh,.ls_colors.sh,.profile_local.sh}; do
     [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
