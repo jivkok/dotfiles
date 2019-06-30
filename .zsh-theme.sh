@@ -1,10 +1,10 @@
-ZSH_THEME_GIT_PROMPT_PREFIX=" %{$fg[blue]%}( "
-ZSH_THEME_GIT_PROMPT_SUFFIX=" )%{$reset_color%}"
-ZSH_THEME_GIT_PROMPT_DIRTY=" ⚡"
+ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[blue]%}("
+ZSH_THEME_GIT_PROMPT_SUFFIX=")%{$reset_color%}"
+ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[yellow]%}±%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_CLEAN=""
 
 function prompt_char {
-    if [ $UID -eq 0 ]; then echo "%{$fg[red]%}#%{$reset_color%}"; else echo $; fi
+  if [ $UID -eq 0 ]; then echo "%{$fg[red]%}#%{$reset_color%}"; else echo $; fi
 }
 PROMPT='%(?, ,%{$fg[red]%}errcode: $?%{$reset_color%}
 )
@@ -13,5 +13,5 @@ PROMPT='%(?, ,%{$fg[red]%}errcode: $?%{$reset_color%}
 
 RPROMPT='$(git_prompt_info)'
 if [[ ! -z "$SSH_CLIENT" ]]; then
-    RPROMPT="$RPROMPT ⇄" # ssh icon
+  RPROMPT="$RPROMPT ⇄" # ssh icon
 fi

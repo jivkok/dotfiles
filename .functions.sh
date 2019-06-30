@@ -310,7 +310,7 @@ function dataurl() {
 # Pull all repos in the current (or specified) directory
 function git_pull_all() {
     dir="${1:-.}"
-    find "$dir" -mindepth 1 -maxdepth 1 -type d | while read -r repodir; do
+    find "$dir" -mindepth 1 -maxdepth 2 -type d | while read -r repodir; do
         [ -d "$repodir/.git" ] && echo -e "\nRepo: $repodir" && git -C "$repodir" pull --prune;
     done
 }
