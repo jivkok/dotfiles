@@ -5,18 +5,30 @@ os=$(uname -s)
 echo "OS: $os"
 
 # Ensure git is present
-if ! command -V git >/dev/null 2>&1; then
-    if [ "$os" = "Linux" ]; then
+if [ "$os" = "Linux" ]; then
+    if ! command -V git >/dev/null 2>&1; then
         echo "Installing Git on Linux"
         sudo apt-get install -y git
-    elif [ "$os" = "Darwin" ]; then
+    fi
+elif [ "$os" = "Darwin" ]; then
+    xcode-select -p >/dev/null 2>&1
+    if [ $? != 0 ]; then
+        echo "Installing XCode command-line tools ..."
+        # xcode-select --install
+        touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress;
+        PROD=$(softwareupdate -l | grep "\*.*Command Line" | head -n 1 | awk -F"*" '{print $2}' | sed -e 's/^ *//' | tr -d '\n')
+        softwareupdate -i "$PROD"
+    fi
+    if ! command -V git >/dev/null 2>&1; then
         if ! command -V brew >/dev/null 2>&1; then
             echo "Installing HomeBrew ..."
             /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         fi
         echo "Installing Git on OSX"
         brew install -y git
-    elif [[ "$os" == CYGWIN* ]]; then
+    fi
+elif [[ "$os" == CYGWIN* ]]; then
+    if ! command -V git >/dev/null 2>&1; then
         if command -V pact >/dev/null 2>&1; then # Babun
             echo "Installing Git on Cygwin/Babun"
             pact install git
@@ -24,10 +36,10 @@ if ! command -V git >/dev/null 2>&1; then
             echo "Git not found. Please manually install Git and retry."
             return
         fi
-    else
-        echo "Unsupported OS: $os"
-        return
     fi
+else
+    echo "Unsupported OS: $os"
+    return
 fi
 
 # dotfiles location
