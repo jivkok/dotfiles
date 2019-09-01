@@ -13,6 +13,7 @@ brew tap caskroom/cask
 
 # browsers
 brew cask install google-chrome
+brew cask install chromium
 brew cask install firefox
 brew cask install opera
 
@@ -20,7 +21,6 @@ brew cask install opera
 # brew cask install osxfuse
 
 # development
-brew cask install atom # code/text editor
 brew cask install bitbar # Put anything in your Mac OS X menu bar
 brew cask install brackets # code/text editor
 brew cask install bwana # browser as man pager
@@ -29,7 +29,6 @@ brew cask install gimp # imaging
 brew cask install filezilla # file transfer
 brew cask install iterm2 # terminal
 brew cask install itsycal # calendar
-brew cask install kaleidoscope # file/directory diff/merge
 brew cask install kdiff3 # file/directory diff/merge
 brew cask install key-codes # key codes
 brew cask install p4merge # file diff/merge
@@ -39,6 +38,7 @@ brew cask install sourcetree # Git gui
 brew cask install sublime-text # code/text editor
 brew cask install uncrustifyx # Source Code Beautifier for C-style languages
 brew cask install virtualbox # virtual machines
+brew cask install visual-studio-code # code/text editor
 
 # other
 brew cask install alfred # Spotlight-replacement, workflow automation
@@ -51,7 +51,6 @@ brew cask install evernote # notes sync
 brew cask install etcher # burn images to USB drives & SD cards
 brew cask install flux # color adjustments
 brew cask install handbrake # video transcoder
-brew cask install hermes # Pandora.com
 brew cask install karabiner-elements # keyboard customization
 brew cask install keepassxc # passwords sync
 brew cask install kindle # books
@@ -72,16 +71,13 @@ brew cask install xrg # System Monitor for OSX
 # Developer-friendly quick-look plugins; see https://github.com/sindresorhus/quick-look-plugins
 brew cask install qlcolorcode qlstephen qlmarkdown quicklook-json qlprettypatch quicklook-csv betterzipql qlimagesize webpquicklook suspicious-package
 
-# Remove outdated versions from the cellar.
-brew prune
 brew cleanup
 
 # AppStore apps:
 mas install 576421334 # Converto - The Unit Converter
 mas install 921458519 # Dr. Cleaner: Disk, Mem Clean
 # mas install 442160987 # Flycut (Clipboard manager)
-mas install 715768417 # Microsoft Remote Desktop
-mas install 639968404 # Parcel - Delivery Tracking
+mas install 1295203466 # Microsoft Remote Desktop 10
 
 # Install these widget apps from the AppStore:
 
