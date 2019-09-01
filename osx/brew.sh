@@ -14,21 +14,34 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 brew update
 brew upgrade
 
-# Install GNU core utilities (those that come with OS X are outdated).
-# Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
+# Install GNU utilities (those that come with OS X are outdated).
+# Don’t forget their paths to $PATH. Example for coreutils: $(brew --prefix coreutils)/libexec/gnubin
 brew install coreutils
 rm -f /usr/local/bin/sha256sum && ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
-brew install moreutils
+brew install binutils # FSF/GNU ld, ar, readelf, etc. for native development
 brew install findutils # GNU `find`, `locate`, `updatedb`, and `xargs`
-brew install gnu-sed --with-default-names
-brew install gnu-tar --with-default-names
-brew install gnu-which --with-default-names
-brew install gawk
-brew install gnutls
-brew install wget --with-iri
-brew install grep --with-default-names
-brew install rsync
-brew install php56 --with-gmp
+brew install moreutils # Collection of tools that nobody wrote when UNIX was young
+brew install gnu-indent # C code prettifier
+brew install gnu-sed # GNU implementation of the famous stream editor
+brew install gnu-tar # GNU version of the tar archiving utility
+brew install gnu-which # GNU implementation of which utility
+brew install gawk # GNU awk utility
+brew install gdb # GNU debugger
+brew install gnutls # GNU Transport Layer Security (TLS) Library
+brew install gpatch # Apply a diff file to an original
+brew install grep # GNU grep, egrep and fgrep 
+brew install gzip # Popular GNU data compression program
+brew install file-formula # Utility to determine file types
+brew install less # Pager program similar to more
+brew install m4 # Macro processing language
+brew install make # Utility for directing compilation
+brew install nano # Free (GNU) replacement for the Pico text editor
+brew install openssh # OpenBSD freely-licensed SSH connectivity tools
+brew install rsync # Utility that provides fast incremental file transfer
+brew install unzip # Extraction utility for .zip compressed archives
+brew install watch # Executes a program periodically
+brew install wdiff # Display word differences between text files
+brew install wget # Internet file retriever
 
 # Install Bash 4.
 brew install bash
@@ -41,7 +54,6 @@ brew install bash-completion
 brew install asciinema # Record and share terminal sessions
 brew install bat # cat-clone with syntax highlighting and Git integration
 brew install bfg # Remove large files or passwords from Git history like git-filter-branch
-brew install binutils # FSF/GNU ld, ar, readelf, etc. for native development
 brew install binwalk # Searches a binary image for embedded files and executable code
 brew install ccat # Like cat but displays content with syntax highlighting
 brew install cifer # Work on automating classical cipher cracking in C
@@ -56,11 +68,10 @@ brew install git # Distributed revision control system
 brew install git-extras # Small git utilities
 brew install graphviz # Graph visualization software from AT&T and Bell Labs
 brew install grc # Colorize logfiles and command output
-brew install gzip # Popular GNU data compression program
 brew install htop-osx # Improved top (interactive process viewer)
 brew install ifstat # Tool to report network interface bandwidth
 brew install iftop # Display an interface's bandwidth usage
-brew install imagemagick --with-webp # Tools and libraries to manipulate images in many formats
+brew install imagemagick # Tools and libraries to manipulate images in many formats
 brew install jq # Lightweight and flexible command-line JSON processor
 brew install lnav # Curses-based tool for viewing and analyzing log files
 brew install lsof # Utility to list open files
@@ -77,6 +88,7 @@ brew install nnn # Fast file browser
 brew install nmap # Port scanning utility for large networks
 brew install p7zip # 7-Zip (high compression file archiver) implementation
 brew install pandoc # markup converter
+brew install php # Scripting language generally used for the web
 brew install pigz # Parallel gzip
 brew install pngcheck # Print info and check PNG, JNG, and MNG files
 brew install pv # Monitor data's progress through a pipe
@@ -101,7 +113,6 @@ brew install ucspi-tcp # Tools for building TCP client-server applications
 brew install --HEAD universal-ctags/universal-ctags/universal-ctags # ctags
 brew install unix2dos # Convert text between DOS, UNIX, and Mac formats
 brew install vit # Front-end for Task Warrior
-brew install watch # Executes a program periodically, showing output fullscreen
 brew install webkit2png # Create screenshots of webpages from the terminal
 
 # Lxml and Libxslt
@@ -111,13 +122,10 @@ brew link libxml2 --force
 brew link libxslt --force
 
 # Vim
-brew install vim --with-override-system-vi --with-lua
-brew install macvim --HEAD --with-cscope --with-lua --with-override-system-vim --with-luajit --with-python
-brew linkapps macvim
+brew install vim
 brew install neovim
 
 # Remove outdated versions from the cellar.
-brew prune
 brew cleanup
 
 # Previously used
@@ -138,4 +146,3 @@ brew cleanup
 # brew install xpdf # PDF viewer
 # brew install xz # General-purpose data compression with high compression ratio
 # brew install zopfli # New zlib (gzip, deflate) compatible compressor
-
