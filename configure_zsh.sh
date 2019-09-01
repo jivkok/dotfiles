@@ -16,7 +16,7 @@ if [ "$os" = "Linux" ]; then
 elif [ "$os" = "Darwin" ]; then
     if ! brew ls --versions zsh >/dev/null 2>&1 ; then
         dot_trace "Installing ZSH ..."
-        brew install --upgrade zsh
+        brew install zsh
         dot_trace "Installing ZSH done."
     fi
 elif [[ "$os" == CYGWIN* ]]; then

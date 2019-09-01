@@ -10,7 +10,7 @@ function dot_trace()
 {
     local msg="$1"
     local timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
-    echo -e "\n$(tput setaf 2)$timestamp: $msg$(tput sgr0)\n"
+    echo -e "$(tput setaf 2)$timestamp: $msg$(tput sgr0)"
     touch ~/.dotfiles_history
     echo "$timestamp: [INFO] $msg" >> ~/.dotfiles_history
 }
@@ -47,7 +47,7 @@ function pull_latest_dotfiles ()
     fi
     local dotdir="$1"
 
-    dot_trace "Pulling the latest dotfiles at $dotdir ..."
+    dot_trace "Pulling the latest dotfiles into $dotdir ..."
 
     git -C "$dotdir" pull --prune --recurse-submodules
     git -C "$dotdir" submodule update --init --recursive
@@ -62,12 +62,11 @@ function pull_latest_dotfiles ()
 #   None
 function confirm_and_run ()
 {
-    if [ ! -f "$1" ]; then return; fi
     local shh="$(ps -p $$ -oargs=)"
     if [[ "$shh" == *zsh* ]] ; then
         read -r "REPLY?Would you like to configure $2 ? "
     else
-        read -r -p "Would you like to configure $2 ? " -n 1
+        read -r -n 1 -p "Would you like to configure $2 ? " </dev/tty
     fi
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then return; fi
@@ -114,7 +113,9 @@ function make_dotfiles_symlinks ()
     local source_directory="$1"
     local target_directory="$2"
 
+    dot_trace "Symlinking all dotfiles from $source_directory into $target_directory ..."
     for dotfile in $(find "$source_directory" -mindepth 1 -maxdepth 1 -type f -iname ".*"); do
+        dot_trace "- dotfile: $dotfile"
         make_symlink "$dotfile" "$target_directory"
     done
 }
