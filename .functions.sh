@@ -1,20 +1,3 @@
-# ls dirs flag
-if ls ~ --group-directories-first > /dev/null 2>&1; then
-    dirsflag="--group-directories-first"
-else
-    dirsflag=""
-fi
-# ls color flag
-if ls --color ~ > /dev/null 2>&1; then
-    # GNU
-    colorflag="--color=auto"
-elif ls -G ~ > /dev/null 2>&1; then
-    # OSX
-    colorflag="-G"
-else
-    colorflag=""
-fi
-
 function dot_trace () {
     local msg="$1"
     local timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
@@ -25,7 +8,7 @@ function dot_trace () {
 
 function cdd () {
     cd "$1" || exit;
-    ls -AlF $dirsflag $colorflag;
+    ll;
 }
 unset dirsflag colorflag
 
@@ -582,7 +565,7 @@ function help() {
 
     # file
     local f
-    f="$(echo "$cmdtest" | sed -r 's/.+\ is\ (.*)/\1/')"
+    f="$(echo "$cmdtest" | sed -E 's/.+\ is\ (.*)/\1/')"
     if [ -f "$f" ]; then
         echo -e "${GREEN}${cmdtest}${DEFAULT}"
         file "$f"
