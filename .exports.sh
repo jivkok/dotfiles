@@ -52,3 +52,6 @@ if _has fzf; then
   fi
 fi
 
+# .Net
+[ -d "$HOME/.dotnet" ] && export DOTNET_ROOT="$HOME/.dotnet"
+

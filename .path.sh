@@ -26,6 +26,7 @@ if [[ "$OSTYPE" = darwin* ]]; then
     eval "$(/usr/libexec/path_helper -s)"
 fi
 
+_prepend_to_path "$HOME/.dotnet"
 _prepend_to_path "$HOME/dotfiles/bin"
 command -v python3 > /dev/null && _prepend_to_path "$(python3 -m site --user-base)/bin"
 _prepend_to_path "$HOME/go/bin"
