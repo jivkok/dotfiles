@@ -3,6 +3,8 @@
 
 os=$(uname -s)
 if [ "$os" = "Linux" ]; then
+    sudo add-apt-repository universe
+    sudo apt-get update
     sudo apt-get install -y python3
     sudo apt-get install -y python3-pip
     sudo -H pip3 install --upgrade pip setuptools
