@@ -655,7 +655,7 @@ usage() {
     _dusort="-n"
   fi
 
-  du $_dushow --max-depth="${2:-1}" "${1:-.}" | sort $_dusort -r | sed "s:\./::" | sed "s:$HOME:~:"
+  sudo du $_dushow --max-depth="${2:-1}" "${1:-.}" | sort $_dusort -r | sed "s:\./::" | sed "s:$HOME:~:"
 }
 
 # Git FZF functions ###########################################################
@@ -768,6 +768,28 @@ gitf() {
     else
         echo "Usage: gitf checkout/commits/sha/stashes"
     fi
+}
+
+# Docker
+
+# Run a bash shell in the specified container
+dexbash() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: $FUNCNAME CONTAINER_ID"
+        return 1
+    fi
+
+    docker exec -it $1 /bin/bash
+}
+
+# Run a bash shell in the specified container (with docker-compose)
+dcexbash() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: $FUNCNAME CONTAINER_ID"
+        return 1
+    fi
+
+    docker-compose exec $1 /bin/bash
 }
 
 # OS-specific functions ######################################################

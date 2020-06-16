@@ -89,6 +89,26 @@ alias lightytest='/usr/sbin/lighttpd -f /etc/lighttpd/lighttpd.conf -t'
 alias httpdreload='/usr/sbin/apachectl -k graceful'
 alias httpdtest='/usr/sbin/apachectl -t && /usr/sbin/apachectl -t -D DUMP_VHOSTS'
 
+# Docker
+alias datt='docker attach'
+alias ddiff='docker diff'
+alias dimg='docker images'
+alias dins='docker inspect'
+alias dps='docker ps'
+alias drm='docker rm'
+alias drmi='docker rmi'
+alias drun='docker run'
+alias dstart='docker start'
+alias dstop='docker stop'
+alias deb='dexbash'
+alias dceb='dcexbash'
+alias dcb='docker-compose build'
+alias dclogs='docker-compose logs'
+alias dcup='docker-compose up'
+alias dcdown='docker-compose down'
+alias dcstart='docker-compose start'
+alias dcstop='docker-compose stop'
+
 # Misc
 os=$(uname -s)
 
