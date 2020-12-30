@@ -16,12 +16,9 @@ make_symlink "$dotdir/.vim/.vimrc" "$HOME"
 
 os=$(uname -s)
 if [ "$os" = "Linux" ]; then
-    sudo add-apt-repository ppa:neovim-ppa/unstable
-    sudo apt-get update
-
     sudo apt-get install -y build-essential
     sudo apt-get install -y cmake
-    sudo apt-get install -y python-dev python-pip python3-dev python3-pip
+    sudo apt-get install -y python3-dev python3-pip
     sudo apt-get install -y vim
     sudo apt-get install -y neovim
 elif [ "$os" = "Darwin" ]; then
@@ -41,8 +38,7 @@ else
     return
 fi
 
-sudo -H pip2 install --upgrade neovim
-sudo -H pip3 install --upgrade neovim
+sudo -H python3 -m pip install --upgrade neovim
 
 if [ ! -f ~/.vim/autoload/plug.vim ] ; then
     dot_trace 'Downloading VimPlug'
