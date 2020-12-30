@@ -63,6 +63,7 @@ fi
 
 if [ "$SHELL" != "$_zsh" ]; then
     dot_trace "Switching to ZSH as default shell"
+    [ -f /etc/pam.d/chsh ] && sudo sed -ir 's/^\(auth\)\s\+\(required\)\s\+\(pam_shells\.so\)/\1 sufficient \3/' /etc/pam.d/chsh
     chsh -s "$_zsh"
 else
     dot_trace "Check: ZSH is default shell"

@@ -107,18 +107,16 @@ function update_os() {
 
     if command -V brew >/dev/null 2>&1 ; then
         echo -e "\nUpdating Homebrew packages ...\n"
-        brew update
+        brew update-reset
         brew upgrade
-        brew prune
         brew cleanup
-        brew doctor
-        cask doctor
+        brew doctor --verbose
         echo -e "\nUpdating Homebrew packages done.\n"
     fi
 
     if command -V apt-get >/dev/null 2>&1 ; then
         echo -e "\nUpdating apt-get packages ...\n"
-        sudo apt-get update --fix-missing
+        sudo apt-get update -y --fix-missing
         sudo apt-get dist-upgrade
         sudo apt-get clean
         sudo apt-get autoremove
@@ -154,17 +152,17 @@ function update_os() {
         echo -e "\nUpdating NeoVim plugins done.\n"
     fi
 
-    if command -V pip3 >/dev/null 2>&1 ; then
-        pipcmd=pip3
-    elif command -V pip >/dev/null 2>&1 ; then
-        pipcmd=pip
+    if command -V python3 >/dev/null 2>&1 ; then
+        pipcmd="pip3"
+    elif command -V python >/dev/null 2>&1 ; then
+        pipcmd="pip"
     fi
     if [ -n "$pipcmd" ]; then
         echo -e "\nUpdating Python user packages ...\n"
-        $pipcmd list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 $pipcmd install --user --upgrade
+        "$pipcmd" list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1 | xargs -n 1 "$pipcmd" install --user --upgrade
         echo -e "\nUpdating Python user packages done.\n"
         echo -e "\nUpdating Python packages ...\n"
-        diff <($pipcmd list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) <($pipcmd list --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) | grep '> ' | cut -d ' ' -f 2 | xargs -n 1 sudo -H $pipcmd install --upgrade
+        diff <("$pipcmd" list --user --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) <("$pipcmd" list --outdated --format=columns | tail -n +3 | cut -d ' ' -f 1) | grep '> ' | cut -d ' ' -f 2 | xargs -n 1 sudo -H "$pipcmd" install --upgrade
         echo -e "\nUpdating Python packages done.\n"
     fi
 
@@ -247,6 +245,11 @@ function calc() {
     printf "\n";
 }
 
+# Copy user's default ssh key to a remote machine
+function ssh_copy_id() {
+    cat ~/.ssh/id_rsa.pub | ssh "$1" -p "${2:-22}" "mkdir -p ~/.ssh && chmod 0700 ~/.ssh && touch ~/.ssh/authorized_keys && chmod 0644 ~/.ssh/authorized_keys && cat >> ~/.ssh/authorized_keys"
+}
+
 # Create a new directory and enter it
 function mkd() {
     mkdir -p "$@" && cd "$_" || exit;
@@ -294,7 +297,7 @@ function dataurl() {
 function git_pull_all() {
     dir="${1:-.}"
     find "$dir" -mindepth 1 -maxdepth 2 -type d | while read -r repodir; do
-        [ -d "$repodir/.git" ] && echo -e "\nRepo: $repodir" && git -C "$repodir" pull --prune;
+        [ -d "$repodir/.git" ] && echo -e "\nRepo: $repodir" && git -C "$repodir" pull --prune --rebase;
     done
 }
 
@@ -772,6 +775,27 @@ gitf() {
 
 # Docker
 
+# Lists tags for containers from the official Docker registry
+docker-tags() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: $FUNCNAME publisher/container"
+        return 1
+    fi
+
+    container_name="$1"
+    max_page_count=${2:-10}
+
+    # curl -s "https://registry.hub.docker.com/v2/repositories/"$1"/tags/" | jq '."results"[]["name","last_updated"]'
+    results='.'
+    i=0
+    while [[ -n "$results" && $i -lt $max_page_count ]]
+    do
+        i=$((i+1))
+        results=$(curl -s https://registry.hub.docker.com/v2/repositories/$container_name/tags/?page=$i |jq '."results"[]["name","last_updated"]')
+        echo "$results"
+    done
+}
+
 # Run a bash shell in the specified container
 dexbash() {
     if [ $# -ne 1 ]; then
@@ -779,7 +803,7 @@ dexbash() {
         return 1
     fi
 
-    docker exec -it $1 /bin/bash
+    docker exec -it "$1" /bin/bash
 }
 
 # Run a bash shell in the specified container (with docker-compose)
@@ -789,7 +813,7 @@ dcexbash() {
         return 1
     fi
 
-    docker-compose exec $1 /bin/bash
+    docker-compose exec "$1" /bin/bash
 }
 
 # OS-specific functions ######################################################

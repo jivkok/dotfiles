@@ -14,17 +14,13 @@ sudo apt-get install -y gitstats # statistics generator for git repositories
 sudo apt-get install -y graphviz # rich set of graph drawing tools
 sudo apt-get install -y grc # Colorize logfiles and command output
 sudo apt-get install -y jq # lightweight and flexible command-line JSON processor
-sudo apt-get install -y libwww-perl # simple and consistent interface to the world-wide web
 sudo apt-get install -y lnav # ncurses-based log file viewer
-sudo apt-get install -y ngrep # grep for network traffic
-sudo apt-get install -y nnn # Fast file browser
 sudo apt-get install -y mosh # Mobile shell that supports roaming and intelligent local echo
 sudo apt-get install -y miller # Like sed, awk, cut, join & sort for name-indexed data such as CSV
 sudo apt-get install -y mtr # traceroute and ping in a single tool
 sudo apt-get install -y ncdu # NCurses Disk Usage
+sudo apt-get install -y ngrep # grep for network traffic
 sudo apt-get install -y pandoc # markup converter
-sudo apt-get install -y python-pip # alternative Python package installer
-sudo apt-get install -y python-pygments # syntax highlighting package written in Python
 sudo apt-get install -y ranger # caca-utils highlight atool w3m poppler-utils mediainfo # File manager with an ncurses frontend written in Python
 sudo apt-get install -y rlwrap # readline feature command line wrapper
 sudo apt-get install -y screenfetch # Bash Screenshot Information Tool. Fetches system/theme information in terminal
@@ -40,11 +36,6 @@ sudo apt-get install -y watch # Executes a program periodically, showing output 
 sudo apt-get install -y wget # retrieves files from the web
 sudo apt-get install -y xsel # command line tool to access X clipboard and selection buffers
 
-# Dev
-sudo apt-get install -y libxml2-dev # Development files for the GNOME XML library
-sudo apt-get install -y libxslt1-dev # XSLT 1.0 processing library - development kit
-sudo apt-get install -y python-dev # header files and a static library for Python (default)
-
 # Diagnostics
 sudo apt-get install -y atop # Monitor for system resources and process activity
 # sudo apt-get install -y collectl # Utility to collect Linux performance data
@@ -57,10 +48,6 @@ sudo apt-get install -y nethogs # Net top tool grouping bandwidth per process
 # sudo apt-get install -y ntop # display network usage in web browser
 sudo apt-get install -y secure-delete # tools to wipe files, free disk space, swap and memory
 sudo apt-get install -y strace # System call tracer
-
-# TaskWarrior
-sudo apt-get install -y task # feature-rich console based todo list manager - transitional package
-sudo apt-get install -y vit # full-screen terminal interface for Taskwarrior
 
 sudo apt-get clean
 sudo apt-get autoremove
