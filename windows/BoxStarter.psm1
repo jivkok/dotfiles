@@ -49,8 +49,8 @@ function Disable-UAC {
 function Enable-RemoteDesktop
 {
     Write-Output "Enabling Remote Desktop ..."
-    $obj = Get-WmiObject -Class "Win32_TerminalServiceSetting" -Namespace root\cimv2\terminalservices
-    if ($obj -eq $null) {
+    $obj = Get-CimInstance -Class "Win32_TerminalServiceSetting" -Namespace root\cimv2\terminalservices
+    if ($null -eq $obj) {
         Write-Output "Unable to locate TerminalServices namespace. Remote Desktop is not enabled"
         return
     }
