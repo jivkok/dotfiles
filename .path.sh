@@ -15,6 +15,8 @@ _prepend_to_path /usr/local/bin
 _prepend_to_path /usr/local/sbin
 
 if [[ "$OSTYPE" = darwin* ]]; then
+    eval "$(/usr/libexec/path_helper -s)"
+
     for gnupath in /usr/local/Cellar/*/*/libexec/gnubin; do
         _prepend_to_path "$gnupath"
     done
@@ -22,15 +24,15 @@ if [[ "$OSTYPE" = darwin* ]]; then
     for gnupath in /usr/local/Cellar/*/*/libexec/gnuman; do
         _prepend_to_manpath "$gnupath"
     done
-
-    eval "$(/usr/libexec/path_helper -s)"
 fi
 
 _prepend_to_path "$HOME/.dotnet/tools"
 _prepend_to_path "$HOME/.dotnet"
-_prepend_to_path "$HOME/dotfiles/bin"
-command -v python3 > /dev/null && _prepend_to_path "$(python3 -m site --user-base)/bin"
+_prepend_to_path "$HOME/.cargo/bin"
+_prepend_to_path /usr/local/go/bin
 _prepend_to_path "$HOME/go/bin"
+command -v python3 > /dev/null && _prepend_to_path "$(python3 -m site --user-base)/bin"
+_prepend_to_path "$HOME/dotfiles/bin"
 _prepend_to_path "$HOME/.local/bin"
 _prepend_to_path "$HOME/bin"
 
