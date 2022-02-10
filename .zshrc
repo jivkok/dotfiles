@@ -61,7 +61,7 @@ export UPDATE_ZSH_DAYS=30
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(colored-man-pages encode64 httpie jsontools k nmap npm pip python rsync urltools zsh-autosuggestions zsh-completions zsh-syntax-highlighting)
 if [[ "$OSTYPE" = darwin* ]]; then
-    plugins=("${plugins[@]}" brew osx pod xcode)
+    plugins=("${plugins[@]}" brew macos pod xcode)
 fi
 
 # User configuration
