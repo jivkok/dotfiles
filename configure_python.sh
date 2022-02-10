@@ -11,6 +11,7 @@ if [ "$os" = "Linux" ]; then
 elif [ "$os" = "Darwin" ]; then
     ! brew ls --versions python3 >/dev/null 2>&1 && brew install python3 && brew postinstall python3 && brew link python3
     python3 -m pip install --upgrade pip setuptools
+    brew install jupyter
 else
     echo "Unsupported OS: $os"
     return
