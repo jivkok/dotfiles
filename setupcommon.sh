@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Configure computer environment - common steps
 
 [ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
@@ -19,15 +19,8 @@
 source "$dotdir/setupfunctions.sh"
 pull_latest_dotfiles "$dotdir"
 
-make_dotfiles_symlinks "$dotdir" "$HOME"
-
-mkdir -p "$HOME/bin"
-curl -s -o "$HOME/bin/git-prompt.sh" https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
-curl -s -o "$HOME/bin/diff-so-fancy" https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy
-chmod 755 "$HOME/bin/diff-so-fancy"
-curl -s -o "$HOME/bin/prettyping" https://raw.githubusercontent.com/denilsonsa/prettyping/master/prettyping
-chmod 755 "$HOME/bin/prettyping"
-
+confirm_and_run "$dotdir/configure_home_symlinks.sh" "Home symlinks"
+confirm_and_run "$dotdir/configure_home_bin.sh" "Home bin folder"
 confirm_and_run "$dotdir/configure_git.sh" "Git"
 confirm_and_run "$dotdir/configure_python.sh" "Python (plus packages)"
 confirm_and_run "$dotdir/configure_nodejs.sh" "NodeJS (plus packages)"
