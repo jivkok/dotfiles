@@ -1,35 +1,36 @@
 #!/usr/bin/env bash
 # Configure ZSH
 
-dotdir="$( cd "$( dirname "$0" )" && pwd )"
-source "$dotdir/setupfunctions.sh"
+dotdir="$( cd "$( dirname "$0" )/.." && pwd )"
+source "$dotdir/setup/setup_functions.sh"
 
 dot_trace "Configuring ZSH ..."
 
 os=$(uname -s)
-if [ "$os" = "Linux" ]; then
+if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
     if ! dpkg -s zsh >/dev/null 2>&1 ; then
         dot_trace "Installing ZSH ..."
         sudo apt-get install -y zsh
         dot_trace "Installing ZSH done."
     fi
+
+elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm zsh
+
 elif [ "$os" = "Darwin" ]; then
     if ! brew ls --versions zsh >/dev/null 2>&1 ; then
         dot_trace "Installing ZSH ..."
         brew install zsh
         dot_trace "Installing ZSH done."
     fi
-elif [[ "$os" == CYGWIN* ]]; then
-    if command -v pact >/dev/null 2>&1 ; then # Babun
-        dot_trace "Cygwin/Babun has ZSH pre-installed"
-    else
-        dot_error "No automatic ZSH install in Cygwin"
-        return
-    fi
+
 else
-    dot_error "Unsupported OS: $os"
-    return
+    dot_trace "Unsupported OS: $os"
+    return 1 >/dev/null 2>&1
+    exit 1
 fi
+
+make_symlink "$dotdir/zsh/.zsh" "$HOME"
 
 if [ -d "$HOME/.oh-my-zsh" ]; then
     dot_trace "Updating oh-my-zsh ..."
@@ -41,7 +42,7 @@ if [ -d "$HOME/.oh-my-zsh" ]; then
     dot_trace "Updating oh-my-zsh done."
 else
     dot_trace "Installing oh-my-zsh ..."
-    # https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh
+    # https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
     git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"
 
     mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Setup helper functions
 
 #######################################
 # Logs traces from dotfiles scripts
@@ -104,6 +105,7 @@ function make_symlink ()
         mv "$target_directory/$target_filename" "$target_directory/$target_filename.backup"
     fi
 
+    mkdir -p "$target_directory"
     ln -s "$source" "$target_directory/$target_filename"
 }
 

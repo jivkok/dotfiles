@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
 # Configure OSX environment
 
-# dotdir="$( cd "$( dirname "$0" )" && pwd )"
-[ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
-
-source "$dotdir/setupfunctions.sh"
-pull_latest_dotfiles "$dotdir"
+dotdir="$( cd "$( dirname "$0" )/.." && pwd )"
+source "$dotdir/setup/setup_functions.sh"
 
 dot_trace "Configuring OSX environment ..."
 
@@ -21,13 +18,12 @@ fi
 
 make_dotfiles_symlinks "$dotdir/osx" "$HOME"
 
-confirm_and_run "$dotdir/osx/brew.sh" "system packages"
-confirm_and_run "$dotdir/osx/software.sh" "GUI packages"
-confirm_and_run "$dotdir/osx/alfred.sh" "Alfred"
-confirm_and_run "$dotdir/osx/dotnet.sh" "dotNet"
-confirm_and_run "$dotdir/osx/osx_defaults" "sensible OSX defaults"
-confirm_and_run "$dotdir/configure_brackets.sh" "Brackets"
+source "$dotdir/osx/brew.sh"
+source "$dotdir/osx/software.sh"
+source "$dotdir/osx/alfred.sh"
+source "$dotdir/osx/dotnet.sh"
+source "$dotdir/osx/osx_defaults"
 
-source "$dotdir/setupcommon.sh"
+"$dotdir/setup/setup.sh"
 
 dot_trace "Configuring OSX environment done."
