@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Configure computer environment - common steps
+# Setup machine environment
 
-[ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
 # dotfiles location
 # dotdir="$( cd "$( dirname "$0" )" && pwd )"
 # Solution for executable scripts (not just sourced files):
@@ -16,17 +15,16 @@
 # done
 # DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-source "$dotdir/setupfunctions.sh"
+dotdir="$( cd "$( dirname "$0" )/.." && pwd )"
+source "$dotdir/setup/setup_functions.sh"
 pull_latest_dotfiles "$dotdir"
 
-confirm_and_run "$dotdir/configure_home_symlinks.sh" "Home symlinks"
-confirm_and_run "$dotdir/configure_home_bin.sh" "Home bin folder"
-confirm_and_run "$dotdir/configure_git.sh" "Git"
-confirm_and_run "$dotdir/configure_python.sh" "Python (plus packages)"
-confirm_and_run "$dotdir/configure_nodejs.sh" "NodeJS (plus packages)"
-confirm_and_run "$dotdir/configure_go.sh" "Go"
-confirm_and_run "$dotdir/configure_vim.sh" "Vim"
-confirm_and_run "$dotdir/configure_zsh.sh" "Zsh"
+"$dotdir/setup/configure_home_symlinks.sh"
+"$dotdir/setup/configure_home_bin.sh"
+"$dotdir/git/configure_git.sh"
+"$dotdir/python/configure_python.sh"
+"$dotdir/vim/configure_vim.sh"
+"$dotdir/zsh/configure_zsh.sh"
 
 dot_trace "Reloading shell $SHELL"
 exec $SHELL -l
