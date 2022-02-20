@@ -1,11 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Vim configuration
 
 # dotdir="$( cd "$( dirname "$0" )" && pwd )"
 [ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
 
 source "$dotdir/setupfunctions.sh"
-pull_latest_dotfiles "$dotdir"
 
 dot_trace 'Configuring Vim ...'
 
@@ -15,12 +14,16 @@ make_symlink "$dotdir/.vim" "$HOME/.config" "nvim"
 make_symlink "$dotdir/.vim/.vimrc" "$HOME"
 
 os=$(uname -s)
-if [ "$os" = "Linux" ]; then
-    sudo apt-get install -y build-essential
-    sudo apt-get install -y cmake
-    sudo apt-get install -y python3-dev python3-pip
-    sudo apt-get install -y vim
-    sudo apt-get install -y neovim
+if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
+    sudo apt-get install -y build-essential cmake # build helpers
+    sudo apt-get install -y python3 python3-dev python3-pip
+    sudo -H pip3 install --upgrade pip setuptools
+    sudo apt-get install -y vim neovim
+elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
+    sudo pacman -S --noconfirm cmake gcc # build helpers
+    sudo pacman -S --noconfirm python3 python-pip
+    sudo -H pip3 install --upgrade pip setuptools
+    sudo pacman -S --noconfirm vim neovim
 elif [ "$os" = "Darwin" ]; then
     xcode-select -p
     if [ $? != 0 ]; then
@@ -35,10 +38,11 @@ elif [ "$os" = "Darwin" ]; then
     ! brew ls --versions neovim >/dev/null 2>&1 && brew install neovim/neovim/neovim
 else
     dot_trace "Unsupported OS: $os"
-    return
+    return 1 >/dev/null 2>&1
+    exit 1
 fi
 
-sudo -H python3 -m pip install --upgrade neovim
+python3 -m pip install --user --upgrade pynvim
 
 if [ ! -f ~/.vim/autoload/plug.vim ] ; then
     dot_trace 'Downloading VimPlug'
@@ -58,7 +62,6 @@ if [ -d "$ycmdir" ]; then
         dot_trace 'Configuring YouCompleteMe ...'
 
         echo "YouCompleteMe support for:"
-        local supportC supportCsharp supportGo supportJavascript
         supportC="--clang-completer"
         supportCsharp="--omnisharp-completer"
         echo "- C-family: yes"

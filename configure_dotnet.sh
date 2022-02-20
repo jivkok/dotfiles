@@ -1,5 +1,5 @@
-#!/bin/bash
-# DotNet configuration
+#!/usr/bin/env bash
+# Install .Net
 
 # $1 - message
 function echo2 ()

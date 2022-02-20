@@ -73,6 +73,8 @@ brew install ifstat # Tool to report network interface bandwidth
 brew install iftop # Display an interface's bandwidth usage
 brew install imagemagick # Tools and libraries to manipulate images in many formats
 brew install jq # Lightweight and flexible command-line JSON processor
+brew install lazydocker # terminal ui for docker and docker-compose
+brew install lazygit # terminal ui for git
 brew install lnav # Curses-based tool for viewing and analyzing log files
 brew install lsof # Utility to list open files
 brew install lua # Powerful, lightweight programming language
@@ -97,6 +99,7 @@ brew install rename # Perl-powered file rename script with many helpful built-in
 brew install ripgrep # Search tool like grep and The Silver Searcher
 brew install screenfetch # Generate ASCII art with terminal, shell, and OS info
 brew install shellcheck # Static analysis and lint tool, for (ba)sh scripts
+brew install shfmt # shell parser, formatter, and interpreter
 brew install socat # netcat on steroids
 brew install speedtest_cli # Command-line interface for https://speedtest.net bandwidth tests
 brew install ssh-copy-id # Add a public key to a remote machine's authorized_keys file

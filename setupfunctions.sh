@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #######################################
 # Logs traces from dotfiles scripts
@@ -9,7 +9,9 @@
 function dot_trace()
 {
     local msg="$1"
-    local timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
+    local timestamp
+
+    timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
     echo -e "$(tput setaf 2)$timestamp: $msg$(tput sgr0)"
     touch ~/.dotfiles_history
     echo "$timestamp: [INFO] $msg" >> ~/.dotfiles_history
@@ -24,7 +26,9 @@ function dot_trace()
 function dot_error()
 {
     local msg="$1"
-    local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    local timestamp
+
+    timestamp=$(date "+%Y-%m-%d %H:%M:%S")
     echo -e "\n$(tput setaf 1)$timestamp: $msg$(tput sgr0)\n"
     echo "$timestamp: [ERROR] $msg" >> ~/.dotfiles_history
 }
@@ -62,7 +66,8 @@ function pull_latest_dotfiles ()
 #   None
 function confirm_and_run ()
 {
-    local shh="$(ps -p $$ -oargs=)"
+    local shh
+    shh="$(ps -p $$ -oargs=)"
     if [[ "$shh" == *zsh* ]] ; then
         read -r "REPLY?Would you like to configure $2 ? "
     else
@@ -72,6 +77,7 @@ function confirm_and_run ()
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then return; fi
 
     echo
+    # shellcheck source=/dev/null
     source "$1"
     echo
 }
@@ -179,5 +185,5 @@ function cask_install_package ()
 
 function ver
 {
-    printf "%04d%04d%04d%04d" $(echo "$1" | tr '.' ' ')
+    printf "%04d%04d%04d%04d" "$(echo "$1" | tr '.' ' ')"
 }

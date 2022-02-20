@@ -1,20 +1,18 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Configuring Go
 
 os=$(uname -s)
-if [ "$os" = "Linux" ]; then
-  sudo apt install golang-go
+if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
+  sudo apt install -y golang-go
+elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
+  sudo pacman -S --noconfirm go
 elif [ "$os" = "Darwin" ]; then
   ! brew ls --versions golang >/dev/null 2>&1 && brew install golang
 else
   echo "Unsupported OS: $os"
-  return
+  return 1 >/dev/null 2>&1
+  exit 1
 fi
 
 GOPATH="$HOME/go"
 mkdir -p "$GOPATH" "$GOPATH/src" "$GOPATH/pkg" "$GOPATH/bin"
-
-# Packages
-go get github.com/jesseduffield/lazygit
-go get github.com/jesseduffield/lazydocker
-go get -u mvdan.cc/sh/cmd/shfmt

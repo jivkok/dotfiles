@@ -1,6 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Configuring NodeJS (and NPM packages)
-# Note: this installs `npm` too.
 
 os=$(uname -s)
 if [ "$os" = "Linux" ] ; then

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Configure Linux environment (Debian-style)
 
 # dotdir="$( cd "$( dirname "$0" )" && pwd )"
@@ -10,7 +10,6 @@ pull_latest_dotfiles "$dotdir"
 dot_trace "Configuring Linux environment (Debian-style) ..."
 
 confirm_and_run "$dotdir/linux/packages.sh" "system packages"
-confirm_and_run "$dotdir/linux/software.sh" "GUI packages"
 
 source "$dotdir/setupcommon.sh"
 
