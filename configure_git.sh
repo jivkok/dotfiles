@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Configuring Git settings. Inspired by
 # https://git.wiki.kernel.org/index.php/Aliases
 # https://gist.github.com/bradwilson/4215933
@@ -8,26 +8,14 @@
 
 var="$(git config --global --get user.name)"
 if [ -z "$var" ]; then
-    read -r -p 'What name would you like to use for Git commits? ' -d $'\n' var
-
-    if [ -z "$var" ]; then
-        echo 'Skipping setting Git user.name'
-    else
-        git config --global user.name "$var"
-    fi
+    git config --global user.name "JK"
 else
     echo "Git user name: $var"
 fi
 
 var="$(git config --global --get user.email)"
 if [ -z "$var" ]; then
-    read -r -p 'What email would you like to use for Git commits? ' -d $'\n' var
-
-    if [ -z "$var" ]; then
-        echo 'Skipping setting Git user.email'
-    else
-        git config --global user.email "$var"
-    fi
+    git config --global user.email "jivkokgit@gmail.com"
 else
     echo "Git user email: $var"
 fi
@@ -48,6 +36,7 @@ git config --global color.branch.plain   normal
 git config --global color.branch.remote  "yellow bold"
 git config --global color.diff.meta       "yellow"
 git config --global color.diff.frag       "magenta bold"
+git config --global color.diff.func       "146 bold"
 git config --global color.diff.commit     "yellow bold"
 git config --global color.diff.old        "red bold"
 git config --global color.diff.new        "green bold"

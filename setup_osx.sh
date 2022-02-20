@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Configure OSX environment
 
 # dotdir="$( cd "$( dirname "$0" )" && pwd )"

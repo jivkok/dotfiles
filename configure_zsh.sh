@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Configure ZSH
 
 dotdir="$( cd "$( dirname "$0" )" && pwd )"
