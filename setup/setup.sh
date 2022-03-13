@@ -25,6 +25,7 @@ pull_latest_dotfiles "$dotdir"
 "$dotdir/python/configure_python.sh"
 "$dotdir/vim/configure_vim.sh"
 "$dotdir/zsh/configure_zsh.sh"
+"$dotdir/tmux/configure_tmux.sh"
 
 dot_trace "Reloading shell $SHELL"
 exec $SHELL -l
