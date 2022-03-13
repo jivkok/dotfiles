@@ -102,7 +102,7 @@ function make_symlink ()
     fi
 
     if [ -f "$target_directory/$target_filename" ] || [ -d "$target_directory/$target_filename" ] ; then
-        mv "$target_directory/$target_filename" "$target_directory/$target_filename.backup"
+        mv -f "$target_directory/$target_filename" "$target_directory/$target_filename.backup"
     fi
 
     mkdir -p "$target_directory"

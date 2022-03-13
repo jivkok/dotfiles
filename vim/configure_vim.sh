@@ -38,10 +38,12 @@ else
     exit 1
 fi
 
-mkdir -p "$HOME/.config"
+# Vim config
 make_symlink "$dotdir/vim/.vim" "$HOME"
-make_symlink "$dotdir/vim/.vim/.vimrc" "$HOME" # vim
-make_symlink "$dotdir/vim/.vim/.vimrc" "$HOME/.config/nvim" "init.vim" # nvim
+make_symlink "$dotdir/vim/.vim/.vimrc" "$HOME"
+# NVim config
+make_symlink "$dotdir/vim/.vim/.vimrc" "$HOME/.config/nvim" "init.vim"
+make_symlink "$dotdir/vim/.vim" "$HOME/.local/share/nvim" "site"
 
 python3 -m pip install --user --upgrade pynvim
 
