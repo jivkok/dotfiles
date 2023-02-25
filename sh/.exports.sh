@@ -1,6 +1,6 @@
 # Returns whether the given command is executable/aliased
-function _has() {
-  return $( command -v $1 >/dev/null 2>&1 )
+_has() {
+  return $( command -v "$1" >/dev/null 2>&1 )
 }
 
 # Make vim the default editor
@@ -33,7 +33,7 @@ export LESS_TERMCAP_md="${yellow}";
 
 # Enable colored `grep` output
 if echo zzz | grep --color=auto zzz > /dev/null 2>&1; then
-    export GREP_COLOR='1;31' # matches
+    export GREP_COLORS='mt1;31' # matches
 fi
 
 # fzf + rg/ag

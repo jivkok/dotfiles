@@ -1,0 +1,4 @@
+git-extras # Extra commands for git
+lazydocker # terminal ui for docker and docker-compose
+ripgrep # Fast regex text searching tool for files (recursively), respects .gitignore
+shfmt # shell parser, formatter, and interpreter

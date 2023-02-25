@@ -1,0 +1,9 @@
+gitstats # statistics generator for git repositories
+graphviz # rich set of graph drawing tools
+miller # Like sed, awk, cut, join & sort for name-indexed data such as CSV
+pandoc # markup converter
+screenfetch # Bash Screenshot Information Tool. Fetches system/theme information in terminal
+secure-delete # tools to wipe files, free disk space, swap and memory
+speedtest_cli # Command-line interface for https://speedtest.net bandwidth tests
+tldr # Simplified and community-driven man pages
+watch # Executes a program periodically, showing output fullscreen
