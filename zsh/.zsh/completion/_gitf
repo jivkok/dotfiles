@@ -4,32 +4,34 @@ typeset -A opt_args
 
 _arguments -C \
   '1:cmd:->cmds' \
-  '*:: :->args' \
-&& ret=0
+  '*:: :->args' &&
+  ret=0
 
 case "$state" in
-  (cmds)
-     local commands; commands=(
-      'co:Checkout'
-      'checkout:Checkout'
-      'commits:Commits browser'
-      'sha:Commits SHA browser'
-      'stashes:Stash manager'
-     )
+cmds)
+  local commands
+  commands=(
+    'co:Checkout'
+    'checkout:Checkout'
+    'commits:Commits browser'
+    'sha:Commits SHA browser'
+    'stashes:Stash manager'
+  )
 
-    _describe -t commands 'key commands' commands && ret=0
+  _describe -t commands 'key commands' commands && ret=0
   ;;
-  (args)
-    if [ $line[1] = "co" ] || [ $line[1] = "checkout" ]; then
-      local args2; args2=(
-          'br:branch'
-          'branch:branch'
-          'tag:tag'
-          'cm:commit'
-          'commit:commit'
-        )
-        _describe -t args2 'checkout arguments' args2 && ret=0
-    fi
+args)
+  if [ $line[1] = "co" ] || [ $line[1] = "checkout" ]; then
+    local args2
+    args2=(
+      'br:branch'
+      'branch:branch'
+      'tag:tag'
+      'cm:commit'
+      'commit:commit'
+    )
+    _describe -t args2 'checkout arguments' args2 && ret=0
+  fi
   ;;
 esac
 

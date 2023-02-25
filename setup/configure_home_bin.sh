@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 # Configure HOME bin directory content
 
-function download_to_home_bin ()
-{
-    local filename="$1"
-    local download_url="$2"
+function download_to_home_bin() {
+  local filename="$1"
+  local download_url="$2"
 
-    echo "$download_url"
-    curl -s -o "$HOME/bin/$filename" "$download_url"
-    chmod 755 "$HOME/bin/$filename"
+  echo "$download_url"
+  curl -s -o "$HOME/bin/$filename" "$download_url"
+  chmod 755 "$HOME/bin/$filename"
 }
 
-dotdir="$( cd "$( dirname "$0" )/.." && pwd )"
+dotdir="$(cd "$(dirname "$0")/.." && pwd)"
 source "$dotdir/setup/setup_functions.sh"
 
 dot_trace "Configuring HOME bin directory ..."
