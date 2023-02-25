@@ -1,0 +1,2 @@
+lazygit # terminal ui for git
+the_silver_searcher # very fast grep-like program, alternative to ack-grep

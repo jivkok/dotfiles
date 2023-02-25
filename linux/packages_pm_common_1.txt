@@ -1,0 +1,33 @@
+# Common
+bat # cat replacement with syntax highlighting, git integration
+cifs-utils # Common Internet File System utilities
+curl # command line tool for transferring data with URL syntax
+git # fast, scalable, distributed revision control system
+grc # Colorize logfiles and command output
+jq # lightweight and flexible command-line JSON processor
+lnav # ncurses-based log file viewer
+mosh # Mobile shell that supports roaming and intelligent local echo
+mtr # traceroute and ping in a single tool
+ncdu # NCurses Disk Usage
+ngrep # grep for network traffic
+ranger # caca-utils highlight atool w3m poppler-utils mediainfo # File manager with an ncurses frontend written in Python
+rlwrap # readline feature command line wrapper
+shellcheck # lint tool for shell scripts
+stow # I use it to manage my dotfiles symlinks
+tig # Text interface for Git repositories
+tmux # terminal multiplexer
+tree # displays an indented directory tree, in color
+universal-ctags # builds text indexes for source code files
+vim # Vi IMproved - enhanced vi editor
+wget # retrieves files from the web
+xsel # command line tool to access X clipboard and selection buffers
+# Diagnostics
+atop # Monitor for system resources and process activity
+dstat # versatile resource statistics tool
+htop # interactive processes viewer
+iftop # displays bandwidth usage information on an network interface
+iotop # simple top-like I/O monitor
+lsof # Utility to list open files
+ltrace # Tracks runtime library calls in dynamically linked programs
+nethogs # Net top tool grouping bandwidth per process
+strace # System call tracer

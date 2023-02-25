@@ -105,7 +105,10 @@ function update_os() {
         echo -e "\nUpdating dotfiles done.\n"
     fi
 
-    if command -V brew >/dev/null 2>&1 ; then
+    # Package manager updates
+    os=$(uname -s)
+
+    if [ "$os" = "Darwin" ] && command -V brew >/dev/null 2>&1 ; then
         echo -e "\nUpdating Homebrew packages ...\n"
         brew update-reset
         brew upgrade
@@ -114,13 +117,25 @@ function update_os() {
         echo -e "\nUpdating Homebrew packages done.\n"
     fi
 
-    if command -V apt-get >/dev/null 2>&1 ; then
+    if [ "$os" = "Linux" ] && command -V apt-get >/dev/null 2>&1 ; then
         echo -e "\nUpdating apt-get packages ...\n"
         sudo apt-get update -y --fix-missing
         sudo apt-get dist-upgrade
         sudo apt-get clean
         sudo apt-get autoremove
-        echo -e "\nUpdating system packages done.\n"
+        echo -e "\nUpdating apt-get packages done.\n"
+    fi
+
+    if [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1 ; then
+        echo -e "\nUpdating pacman packages ...\n"
+        sudo pacman -Syu --needed --noconfirm archlinux-keyring
+        sudo pacman -Syyu --overwrite "*"
+        echo -e "\nUpdating pacman packages done.\n"
+        if command -V yay >/dev/null 2>&1 ; then
+          echo -e "\nUpdating yay packages ...\n"
+          yay -Syu --answerupgrade None --answerclean None --answerdiff None
+          echo -e "\nUpdating yay packages done.\n"
+        fi
     fi
 
     [ -f /usr/local/opt/fzf/install ] && /usr/local/opt/fzf/install --key-bindings --completion --no-update-rc
@@ -777,13 +792,19 @@ gitf() {
 
 # Lists tags for containers from the official Docker registry
 docker-tags() {
-    if [ $# -ne 1 ]; then
-        echo "Usage: $FUNCNAME publisher/container"
+    if [ $# -lt 1 ]; then
+        echo "Usage: $FUNCNAME publisher/container <tag filter> <max page count>"
         return 1
     fi
 
-    container_name="$1"
-    max_page_count=${2:-10}
+    repository_name="$1"
+    tag_filter="$2"
+    max_page_count=${3:-10}
+
+    if [[ "$repository_name" != *"/"* ]]; then
+        # Official image, maintained by Docker
+        repository_name="library/$repository_name"
+    fi
 
     # curl -s "https://registry.hub.docker.com/v2/repositories/"$1"/tags/" | jq '."results"[]["name","last_updated"]'
     results='.'
@@ -791,8 +812,15 @@ docker-tags() {
     while [[ -n "$results" && $i -lt $max_page_count ]]
     do
         i=$((i+1))
-        results=$(curl -s https://registry.hub.docker.com/v2/repositories/$container_name/tags/?page=$i |jq '."results"[]["name","last_updated"]')
-        echo "$results"
+
+        results=$(curl -s https://registry.hub.docker.com/v2/repositories/$repository_name/tags/?page=$i |jq '."results"[]["name","last_updated"]')
+ 
+        if [[ -n "$tag_filter" ]]; then
+            echo "$results" | tr -d '"' | grep -i "$tag_filter"
+        else
+            echo "$results" | tr -d '"'
+        fi
+
     done
 }
 

@@ -1,0 +1,3 @@
+git-extras # Extra commands for git
+ripgrep # Fast regex text searching tool for files (recursively), respects .gitignore
+silversearcher-ag # very fast grep-like program, alternative to ack-grep
