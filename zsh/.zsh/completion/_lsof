@@ -4,47 +4,49 @@ typeset -A opt_args
 
 _arguments -C \
   '1:cmd:->cmds' \
-  '*:: :->args' \
-&& ret=0
+  '*:: :->args' &&
+  ret=0
 
 case "$state" in
-  (cmds)
-     local commands; commands=(
-      '-i:Network connections'
-      '-u:User information'
-      '-c:Named commands'
-      '-p:Process ids'
-      'some_file:Show everything interacting with a given file'
-      'some_dir:Show everything interacting with a given directory'
-      '-?:help'
-     )
+cmds)
+  local commands
+  commands=(
+    '-i:Network connections'
+    '-u:User information'
+    '-c:Named commands'
+    '-p:Process ids'
+    'some_file:Show everything interacting with a given file'
+    'some_dir:Show everything interacting with a given directory'
+    '-?:help'
+  )
 
-    _describe -t commands 'key commands' commands && ret=0
+  _describe -t commands 'key commands' commands && ret=0
   ;;
-  (args)
-    case $words[CURRENT-1] in
-    # case $line[2] in
-      (-i)
-        local args2; args2=(
-          '4:IPv4 traffic only'
-          '6:IPv6 traffic only'
-          'TCP:show only TCP connections'
-          'UDP:show only UDP connections'
-          '@1.2.3.4:show connections to a specific host'
-          '@1.2.3.4\:22:show connections to a specific host & port'
-          '\:22:show networking related to a given port'
-          '-sTCP\:LISTEN:find listening ports'
-          '-sTCP\:ESTABLISHED:find established connections'
-        )
-        _describe -t args2 'network connection arguments' args2 && ret=0
-      ;;
-      (-u)
-        _alternative 'users:users entry:_users'
-      ;;
-      (-p)
-        _alternative "pids:process IDs:($(ps -A -o pid=))"
-      ;;
-    esac
+args)
+  case $words[CURRENT-1] in
+  # case $line[2] in
+  -i)
+    local args2
+    args2=(
+      '4:IPv4 traffic only'
+      '6:IPv6 traffic only'
+      'TCP:show only TCP connections'
+      'UDP:show only UDP connections'
+      '@1.2.3.4:show connections to a specific host'
+      '@1.2.3.4\:22:show connections to a specific host & port'
+      '\:22:show networking related to a given port'
+      '-sTCP\:LISTEN:find listening ports'
+      '-sTCP\:ESTABLISHED:find established connections'
+    )
+    _describe -t args2 'network connection arguments' args2 && ret=0
+    ;;
+  -u)
+    _alternative 'users:users entry:_users'
+    ;;
+  -p)
+    _alternative "pids:process IDs:($(ps -A -o pid=))"
+    ;;
+  esac
   ;;
 esac
 
