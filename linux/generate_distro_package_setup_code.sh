@@ -85,6 +85,6 @@ fi
 
 # Manual install
 
-echo -e "\n# Non-packaged software:\n" >>"$setup_file"
-src_file="$setup_dir/packages_shell_common_1.sh"
-[ -f "$src_file" ] && cat "$src_file" >>"$setup_file"
+# echo -e "\n# Non-packaged software:\n" >>"$setup_file"
+# src_file="$setup_dir/packages_shell_common_1.sh"
+# [ -f "$src_file" ] && cat "$src_file" >>"$setup_file"

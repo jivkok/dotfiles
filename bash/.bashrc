@@ -94,7 +94,7 @@ elif [ "$OS" = "Darwin" ]; then
 fi
 
 # Load the shell dotfiles, (~/.profile_local.sh can be used for any local settings you do not want to commit)
-for file in ~/{.path.sh,.bash_prompt.sh,.aliases.sh,.functions.sh,.fzf.bash,.marks.sh,.exports.sh,.ls_colors.sh,.profile_local.sh}; do
+for file in ~/{.path.sh,.bash_prompt.sh,.aliases.sh,.functions.sh,.fzf.bash,bin/fzf-git.sh,.marks.sh,.exports.sh,.ls_colors.sh,.profile_local.sh}; do
   [ -r "$file" ] && [ -f "$file" ] && source "$file"
 done
 unset file

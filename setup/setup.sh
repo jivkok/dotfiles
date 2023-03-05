@@ -51,6 +51,7 @@ dot_trace "Configuring $os_description ..."
 "$dotdir/vim/configure_vim.sh"
 "$dotdir/zsh/configure_zsh.sh"
 "$dotdir/tmux/configure_tmux.sh"
+"$dotdir/fzf/configure_fzf.sh"
 
 dot_trace "Configuring $os_description done."
 
