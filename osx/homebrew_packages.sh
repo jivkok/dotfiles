@@ -3,7 +3,7 @@
 
 # Install homebrew
 if [ ! -f /usr/local/bin/brew ]; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 # Ask for the administrator password upfront.
@@ -31,7 +31,7 @@ brew install gawk # GNU awk utility
 brew install gdb # GNU debugger
 brew install gnutls # GNU Transport Layer Security (TLS) Library
 brew install gpatch # Apply a diff file to an original
-brew install grep # GNU grep, egrep and fgrep 
+brew install grep # GNU grep, egrep and fgrep
 brew install gzip # Popular GNU data compression program
 brew install file-formula # Utility to determine file types
 brew install less # Pager program similar to more
@@ -61,7 +61,9 @@ brew install cmake # Cross-platform make
 brew install dns2tcp # TCP over DNS tunnel
 brew install dos2unix # Convert text between DOS, UNIX, and Mac formats
 brew install duti # Select default apps for documents and URL schemes on macOS
+brew install exa # Modern replacement for ls
 brew install ffmpeg # Play, record, convert, and stream audio and video
+brew install fdfind # Simple, fast and user-friendly alternative to find
 brew install fzf # Command-line fuzzy finder
 [ -f /usr/local/opt/fzf/install ] && /usr/local/opt/fzf/install --key-bindings --completion --no-update-rc
 brew install git # Distributed revision control system

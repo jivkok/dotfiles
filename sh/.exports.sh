@@ -9,9 +9,6 @@ export VISUAL='vi'
 if command -v nvim >/dev/null 2>&1; then
   export EDITOR="nvim"
   export VISUAL='nvim'
-elif command -v gvim >/dev/null 2>&1; then
-  export EDITOR="gvim"
-  export VISUAL='gvim'
 elif command -v vim >/dev/null 2>&1; then
   export EDITOR="vim"
   export VISUAL='vim'
@@ -51,6 +48,9 @@ if _has fzf; then
     #'
   fi
 fi
+
+# bat colorizer
+export BAT_THEME="ansi"
 
 # .Net
 [ -d "$HOME/.dotnet" ] && export DOTNET_ROOT="$HOME/.dotnet"
