@@ -25,8 +25,6 @@ alias rr='ranger'
 alias vars='set | sort'
 if command -v nvim >/dev/null 2>&1; then
   alias v='nvim'
-elif command -v gvim >/dev/null 2>&1; then
-  alias v='gvim'
 elif command -v vim >/dev/null 2>&1; then
   alias v='vim'
 else
@@ -133,6 +131,11 @@ fi
 
 if [ "$os" = "Linux" ]; then
 
+  if command -v exa >/dev/null 2>&1; then
+    alias l='exa -aF --color=auto --group-directories-first'
+    alias ll='exa -alF --color=auto --group-directories-first'
+  fi
+
   # Packages
   alias pkgsearch='apt-cache search'
   alias pkginstall='sudo apt-get install -y'
@@ -146,7 +149,10 @@ if [ "$os" = "Linux" ]; then
 
 elif [ "$os" = "Darwin" ]; then
 
-  if command -v gls >/dev/null 2>&1; then
+  if command -v exa >/dev/null 2>&1; then
+    alias l='exa -aF --color=auto --group-directories-first'
+    alias ll='exa -alF --color=auto --group-directories-first'
+  elif command -v gls >/dev/null 2>&1; then
     alias l='gls -AF --color=auto --group-directories-first'
     alias ll='gls -AlFh --color=auto --group-directories-first'
   else
