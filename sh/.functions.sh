@@ -60,6 +60,19 @@ function fs() {
   grep -Hrn "$string_pattern" "$directory" --include "$file_pattern"
 }
 
+# 1. Search for text in files using Ripgrep
+# 2. Interactively narrow down the list using fzf
+# 3. Open the file in Vim
+function rfv() {
+  rg --color=always --line-number --no-heading --smart-case "${*:-}" |
+    fzf --ansi \
+        --color "hl:-1:underline,hl+:-1:underline:reverse" \
+        --delimiter : \
+        --preview 'bat --color=always {1} --highlight-line {2}' \
+        --preview-window 'up,60%,border-bottom,+{2}+3/3,~3' \
+        --bind 'enter:become(vim {1} +{2})'
+}
+
 # find and list processes matching a case-insensitive partial-match string
 function fp() {
   ps Ao pid,comm | awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}' | grep -i "$1" | grep -v grep
@@ -656,8 +669,9 @@ shell() {
 #######################################
 # Disk usage
 # Arguments:
-#   $1 - directory
-#   $2 - depth
+#   $1 - directory (default: current)
+#   $2 - count (default: 20)
+#   $3 - depth (default: 1)
 # Returns:
 #   List of directories and their cummulative size
 usage() {
@@ -670,7 +684,7 @@ usage() {
     _dusort="-n"
   fi
 
-  sudo du $_dushow --max-depth="${2:-1}" "${1:-.}" | sort $_dusort -r | sed "s:\./::" | sed "s:$HOME:~:"
+  du $_dushow -d "${3:-1}" -t 1K "${1:-.}" | sort $_dusort -r | head -n "${2:-20}"
 }
 
 # Git FZF functions ###########################################################
