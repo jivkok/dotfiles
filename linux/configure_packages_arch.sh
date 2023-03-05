@@ -9,6 +9,7 @@ sudo pacman -Syu --noconfirm
 sudo pacman -S --noconfirm bat # cat replacement with syntax highlighting, git integration
 sudo pacman -S --noconfirm cifs-utils # Common Internet File System utilities
 sudo pacman -S --noconfirm curl # command line tool for transferring data with URL syntax
+sudo pacman -S --noconfirm exa # Modern replacement for ls
 sudo pacman -S --noconfirm git # fast, scalable, distributed revision control system
 sudo pacman -S --noconfirm grc # Colorize logfiles and command output
 sudo pacman -S --noconfirm jq # lightweight and flexible command-line JSON processor
@@ -41,6 +42,7 @@ sudo pacman -S --noconfirm strace # System call tracer
 
 # Packages (arch-specific):
 
+sudo pacman -S --noconfirm fd # Simple, fast and user-friendly alternative to find
 sudo pacman -S --noconfirm lazygit # terminal ui for git
 sudo pacman -S --noconfirm the_silver_searcher # very fast grep-like program, alternative to ack-grep
 
@@ -50,16 +52,3 @@ yay -S --noconfirm git-extras # Extra commands for git
 yay -S --noconfirm lazydocker # terminal ui for docker and docker-compose
 yay -S --noconfirm ripgrep # Fast regex text searching tool for files (recursively), respects .gitignore
 yay -S --noconfirm shfmt # shell parser, formatter, and interpreter
-
-# Non-packaged software:
-
-dotrepos="$HOME/.repos"
-mkdir -p "$dotrepos"
-
-# FZF
-if [ -d $dotrepos/fzf/.git ]; then
-  git -C "$dotrepos/fzf" pull --prune
-else
-  git clone --depth 1 https://github.com/junegunn/fzf "$dotrepos/fzf"
-fi
-"$dotrepos/fzf/install" --key-bindings --completion --no-update-rc

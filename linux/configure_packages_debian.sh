@@ -9,6 +9,7 @@ sudo apt-get update -y --fix-missing
 sudo apt-get install -y bat # cat replacement with syntax highlighting, git integration
 sudo apt-get install -y cifs-utils # Common Internet File System utilities
 sudo apt-get install -y curl # command line tool for transferring data with URL syntax
+sudo apt-get install -y exa # Modern replacement for ls
 sudo apt-get install -y git # fast, scalable, distributed revision control system
 sudo apt-get install -y grc # Colorize logfiles and command output
 sudo apt-get install -y jq # lightweight and flexible command-line JSON processor
@@ -41,6 +42,7 @@ sudo apt-get install -y strace # System call tracer
 
 # Packages (debian-specific):
 
+sudo apt-get install -y fd-find # Simple, fast and user-friendly alternative to find
 sudo apt-get install -y git-extras # Extra commands for git
 sudo apt-get install -y ripgrep # Fast regex text searching tool for files (recursively), respects .gitignore
 sudo apt-get install -y silversearcher-ag # very fast grep-like program, alternative to ack-grep
@@ -52,16 +54,3 @@ go install github.com/jesseduffield/lazygit # terminal ui for git
 go install github.com/jesseduffield/lazydocker # terminal ui for docker and docker-compose
 go install mvdan.cc/sh/v3/cmd/shfmt # shell parser, formatter, and interpreter
 fi
-
-# Non-packaged software:
-
-dotrepos="$HOME/.repos"
-mkdir -p "$dotrepos"
-
-# FZF
-if [ -d $dotrepos/fzf/.git ]; then
-  git -C "$dotrepos/fzf" pull --prune
-else
-  git clone --depth 1 https://github.com/junegunn/fzf "$dotrepos/fzf"
-fi
-"$dotrepos/fzf/install" --key-bindings --completion --no-update-rc

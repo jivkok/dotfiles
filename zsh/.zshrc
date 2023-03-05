@@ -107,7 +107,7 @@ zstyle ":completion:*:kill:*" command "ps -u $USER -o pid,%cpu,tty,cputime,cmd"
 
 # Load the shell dotfiles
 #   ~/.profile_local.sh can be used for any local settings you don’t want to commit
-for file in ~/{.path.sh,.zsh-theme.sh,.aliases.sh,.functions.sh,.fzf.zsh,.marks.sh,.exports.sh,.ls_colors.sh,.profile_local.sh}; do
+for file in ~/{.path.sh,.zsh-theme.sh,.aliases.sh,.functions.sh,.fzf.zsh,bin/fzf-git.sh,.marks.sh,.exports.sh,.ls_colors.sh,.profile_local.sh}; do
   [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;

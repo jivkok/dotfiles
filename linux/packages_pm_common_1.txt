@@ -2,6 +2,7 @@
 bat # cat replacement with syntax highlighting, git integration
 cifs-utils # Common Internet File System utilities
 curl # command line tool for transferring data with URL syntax
+exa # Modern replacement for ls
 git # fast, scalable, distributed revision control system
 grc # Colorize logfiles and command output
 jq # lightweight and flexible command-line JSON processor
