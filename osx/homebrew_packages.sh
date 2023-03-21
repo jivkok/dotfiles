@@ -117,6 +117,7 @@ brew install ucspi-tcp # Tools for building TCP client-server applications
 brew install --HEAD universal-ctags/universal-ctags/universal-ctags # ctags
 brew install unix2dos # Convert text between DOS, UNIX, and Mac formats
 brew install webkit2png # Create screenshots of webpages from the terminal
+brew install zoxide # Shell extension to easily jump to frequently accessed directories
 
 # Vim
 brew install vim

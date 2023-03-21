@@ -32,3 +32,4 @@ lsof # Utility to list open files
 ltrace # Tracks runtime library calls in dynamically linked programs
 nethogs # Net top tool grouping bandwidth per process
 strace # System call tracer
+zoxide # Shell extension to easily jump to frequently accessed directories

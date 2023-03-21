@@ -39,6 +39,7 @@ sudo apt-get install -y lsof # Utility to list open files
 sudo apt-get install -y ltrace # Tracks runtime library calls in dynamically linked programs
 sudo apt-get install -y nethogs # Net top tool grouping bandwidth per process
 sudo apt-get install -y strace # System call tracer
+sudo apt-get install -y zoxide # Shell extension to easily jump to frequently accessed directories
 
 # Packages (debian-specific):
 
