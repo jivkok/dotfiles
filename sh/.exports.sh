@@ -50,6 +50,8 @@ if _has fzf; then
 fi
 
 # bat colorizer
+export BAT_PAGER="less -R"
+export BAT_STYLE="changes,numbers"
 export BAT_THEME="ansi"
 
 # .Net
