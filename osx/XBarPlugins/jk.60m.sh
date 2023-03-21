@@ -4,7 +4,7 @@
 # <xbar.version>v1.0</xbar.version>
 # <xbar.author>Jivko Kolev</xbar.author>
 # <xbar.author.github>jivkok</xbar.author.github>
-# <xbar.desc>Displays JK's custom bitbar plugins: dates, network, etc.</xbar.desc>
+# <xbar.desc>Displays JK's custom bitbar plugins: calendar, utilization (CPU, processes), network.</xbar.desc>
 # <xbar.image>https://media.giphy.com/media/zzz/giphy.gif</xbar.image>
 # <xbar.dependencies>bash</xbar.dependencies>
 
@@ -144,7 +144,7 @@ if [[ -e "$tmp_speedtest" ]]; then
      echo "--Last checked: $LAST"
      [[ "$PING" != "" ]] && echo "--⏱$PING ▼$DOWN ▲$UP" || echo "--No results..."
 else
-     echo "Last checked: Never"
+     echo "--Last checked: Never"
 fi
 
 # Find active interfaces
