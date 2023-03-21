@@ -11,11 +11,15 @@ case "$state" in
 cmds)
   local commands
   commands=(
-    'co:Checkout'
-    'checkout:Checkout'
+    'co:Checkout (by branch, commit, or tag)'
+    'checkout:Checkout (by branch, commit, or tag)'
+    'cm:Commits browser'
     'commits:Commits browser'
     'sha:Commits SHA browser'
     'stashes:Stash manager'
+    'st:Browse modified files'
+    'status:Browse modified files'
+    'tags:Tags'
   )
 
   _describe -t commands 'key commands' commands && ret=0

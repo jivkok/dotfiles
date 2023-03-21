@@ -1,3 +1,5 @@
+# Helpers
+
 function dot_trace() {
   local msg="$1"
   local timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
@@ -6,18 +8,25 @@ function dot_trace() {
   echo "$timestamp: [INFO] $msg" >>~/.dotfiles_history
 }
 
-function cdd() {
-  cd "$1" || exit
-  ll
-}
-unset dirsflag colorflag
+# File system
 
-function lsd() {
-  local dir=.
-  if [ -n "$1" ]; then
-    dir="$1"
-  fi
-  find "$dir" -mindepth 1 -maxdepth 1 -type d
+# Pass selected files as arguments to the given command
+# Usage: f echo
+# Usage: f vim
+f() {
+  IFS=$'\n'
+  files=($(fd . --type f --type l --follow --hidden "${@:2}" | fzf -0 -1 -m))
+  IFS=$' '
+  [[ -n "$files" ]] && $1 "${files[@]}"
+}
+
+# Pass selected directories as arguments to the given command
+# Usage: d ws
+d() {
+  IFS=$'\n'
+  dirs=($(fd . --type d --hidden "${@:2}" | fzf -0 -1 -m))
+  IFS=$' '
+  [[ -n "$dirs" ]] && $1 "${dirs[@]}"
 }
 
 function ff() {
@@ -33,7 +42,11 @@ function ff() {
     directory='.'
   fi
 
-  find "$directory" -iname "$file_pattern"
+  if command -V fd >/dev/null 2>&1; then
+    fd --hidden --follow "$file_pattern" "$directory"
+  else
+    find "$directory" -iname "$file_pattern"
+  fi
 }
 
 function fs() {
@@ -64,7 +77,7 @@ function fs() {
 # 2. Interactively narrow down the list using fzf
 # 3. Open the file in Vim
 function rfv() {
-  rg --color=always --line-number --no-heading --smart-case "${*:-}" |
+  rg --hidden --color=always --line-number --no-heading --smart-case "${*:-}" |
     fzf --ansi \
         --color "hl:-1:underline,hl+:-1:underline:reverse" \
         --delimiter : \
@@ -783,25 +796,40 @@ git-fzf-stashes() {
   done
 }
 
+# git modified files browser (with preview)
+git-fzf-status() {
+  preview="git diff --color=always -- {-1}"
+  git status -sb | fzf -m --ansi --preview $preview
+}
+
+# git tags
+git-fzf-tags() {
+  git tag | fzf -m --ansi
+}
+
 gitf() {
   if [ "$1" = "co" ] || [ "$1" = "checkout" ]; then
-    if [ "$2" = "br" ] || [ "$1" = "branch" ]; then
+    if [ "$2" = "br" ] || [ "$2" = "branch" ]; then
       git-fzf-checkout-branch
     elif [ "$2" = "tag" ]; then
       git-fzf-checkout-tag
-    elif [ "$2" = "cm" ] || [ "$1" = "commit" ]; then
+    elif [ "$2" = "cm" ] || [ "$2" = "commit" ]; then
       git-fzf-checkout-commit
     else
       echo "Usage: gitf checkout branch/tag/commit"
     fi
-  elif [ "$1" = "commits" ]; then
+  elif [ "$1" = "commits" ] || [ "$1" = "cm" ]; then
     git-fzf-commits
   elif [ "$1" = "sha" ]; then
     git-fzf-sha
   elif [ "$1" = "stashes" ]; then
     git-fzf-stashes
+  elif [ "$1" = "status" ] || [ "$1" = "st" ]; then
+    git-fzf-status
+  elif [ "$1" = "tags" ]; then
+    git-fzf-tags
   else
-    echo "Usage: gitf checkout/commits/sha/stashes"
+    echo "Usage: gitf checkout/commits/sha/stashes/status/tags"
   fi
 }
 

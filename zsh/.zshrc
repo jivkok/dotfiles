@@ -100,6 +100,10 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 zstyle ":completion:*:*:kill:*:processes" list-colors "=(#b) #([0-9]#)*=0=01;31"
 zstyle ":completion:*:kill:*" command "ps -u $USER -o pid,%cpu,tty,cputime,cmd"
 
+if command -V zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+
 # key bindings
 # Note: use 'cat' to easily see the escape sequences
 #bindkey "^[[1;5D" backward-word # ctrl-left
