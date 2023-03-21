@@ -39,6 +39,7 @@ sudo pacman -S --noconfirm lsof # Utility to list open files
 sudo pacman -S --noconfirm ltrace # Tracks runtime library calls in dynamically linked programs
 sudo pacman -S --noconfirm nethogs # Net top tool grouping bandwidth per process
 sudo pacman -S --noconfirm strace # System call tracer
+sudo pacman -S --noconfirm zoxide # Shell extension to easily jump to frequently accessed directories
 
 # Packages (arch-specific):
 
