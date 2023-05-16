@@ -1,0 +1,42 @@
+[username]
+style_user = "yellow bold"
+style_root = "red bold"
+format = "[$user]($style) "
+show_always = true
+disabled = false
+
+[hostname]
+ssh_only = false
+ssh_symbol = '⇄ '
+format = '@ [$ssh_symbol$hostname](bold yellow) '
+trim_at = "."
+disabled = false
+
+[character]
+success_symbol = "[\\$](green)"
+error_symbol = "[✗](bold red)"
+disabled = false
+
+[directory]
+truncation_length = 5
+truncate_to_repo = false
+format = ': [$path]($style)[$read_only]($read_only_style) '
+style = "bold italic green"
+use_os_path_sep = true
+disabled = false
+
+[cmd_duration]
+disabled = true
+
+[git_branch]
+always_show_remote = false
+format = '[$symbol$branch(:$remote_branch)]($style)'
+symbol = ':'
+style = 'bold blue'
+disabled = false
+
+[git_status]
+format = '[$all_status$ahead_behind]($style) '
+style = 'bold yellow'
+modified = '±'
+disabled = false
