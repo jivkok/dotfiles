@@ -11,7 +11,13 @@ echo2 'Configuring DotNet ...'
 os=$(uname -s)
 
 # https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script
+# https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script
+# https://learn.microsoft.com/en-us/dotnet/core/install/remove-runtime-sdk-versions
 if [ "$os" = "Linux" ]; then
+sudo rm -rf /usr/share/dotnet/
+sudo rm -rf /usr/lib/dotnet/
+rm -rf "$HOME/.dotnet"
+
   # bash <(curl -sSL https://dot.net/v1/dotnet-install.sh) --channel LTS --no-path --dry-run
   bash <(curl -sSL https://dot.net/v1/dotnet-install.sh) --channel LTS --no-path
 

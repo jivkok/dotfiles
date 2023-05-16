@@ -1,0 +1,6 @@
+source "$dotdir/sh/path.sh"
+source "$dotdir/sh/aliases.sh"
+source "$dotdir/sh/functions.sh"
+source "$dotdir/sh/marks.sh"
+source "$dotdir/sh/exports.sh"
+source "$dotdir/sh/ls_colors.sh"
