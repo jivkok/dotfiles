@@ -46,6 +46,7 @@ sudo pacman -S --noconfirm zoxide # Shell extension to easily jump to frequently
 sudo pacman -S --noconfirm fd # Simple, fast and user-friendly alternative to find
 sudo pacman -S --noconfirm lazygit # terminal ui for git
 sudo pacman -S --noconfirm the_silver_searcher # very fast grep-like program, alternative to ack-grep
+sudo pacman -S --noconfirm starship # shell-agnostic prompt
 
 # Packages (AUR):
 
