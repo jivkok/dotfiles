@@ -17,7 +17,7 @@ dot_trace "Configuring HOME bin directory ..."
 
 mkdir -p "$HOME/bin"
 
-download_to_home_bin "git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
+# download_to_home_bin "git-prompt.sh" "https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh"
 download_to_home_bin "diff-so-fancy" "https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy"
 download_to_home_bin "prettyping" "https://raw.githubusercontent.com/denilsonsa/prettyping/master/prettyping"
 

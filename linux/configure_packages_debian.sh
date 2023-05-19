@@ -48,6 +48,10 @@ sudo apt-get install -y git-extras # Extra commands for git
 sudo apt-get install -y ripgrep # Fast regex text searching tool for files (recursively), respects .gitignore
 sudo apt-get install -y silversearcher-ag # very fast grep-like program, alternative to ack-grep
 
+# Packages (Snap):
+
+sudo snap install starship --edge # shell-agnostic prompt
+
 # Go (debian-specific):
 
 if command -V go >/dev/null 2>&1; then

@@ -56,6 +56,28 @@ function pull_latest_dotfiles() {
 }
 
 #######################################
+# Clones or updates a repo
+# Arguments:
+#   $1 - repository url
+#   $2 - repository destination directory
+# Returns:
+#   None
+clone_or_update_repo() {
+  repo_url="$1"
+  repo_dir="$2"
+
+  if [ -d "$repo_dir" ]; then
+    dot_trace "Repository '$repo_dir' exists. Updating it."
+    git -C "$repo_dir" pull --prune --recurse-submodules
+    git -C "$repo_dir" submodule update --init --recursive
+  else
+      dot_trace "Cloning '$repo_url' into '$repo_dir'."
+      git clone "$repo_url" "$repo_dir"
+      git -C "$repo_dir" submodule update --init --recursive
+  fi
+}
+
+#######################################
 # Asks for confirmation running a script, and runs it if affirmative
 # Arguments:
 #   $1 - script
@@ -97,11 +119,13 @@ function make_symlink() {
   fi
 
   if [ -f "$target_directory/$target_filename" ] || [ -d "$target_directory/$target_filename" ]; then
-    mv -f "$target_directory/$target_filename" "$target_directory/$target_filename.backup"
+    timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+    dot_trace "Moving $target_directory/$target_filename to $target_directory/$target_filename.$timestamp"
+    mv -f "$target_directory/$target_filename" "$target_directory/$target_filename.$timestamp"
   fi
 
   mkdir -p "$target_directory"
-  ln -s "$source" "$target_directory/$target_filename"
+  ln -s -f "$source" "$target_directory/$target_filename"
 }
 
 #######################################
@@ -179,4 +203,28 @@ function cask_install_package() {
 
 function ver {
   printf "%04d%04d%04d%04d" "$(echo "$1" | tr '.' ' ')"
+}
+
+#######################################
+# Appends/merge content of a file into another
+# Arguments:
+#   $1 - source file
+#   $2 - target file
+# Returns:
+#   None
+append_or_merge_file() {
+  source_file="$1"
+  target_file="$2"
+
+  if [ ! -f "$target_file" ]; then
+    dot_trace "Copying '$source_file' into '$target_file'"
+    cp "$source_file" "$target_file"
+  else
+    dot_trace "Merging '$source_file' into '$target_file'"
+    while IFS= read -r line; do
+      if ! grep -Fxq "$line" "$target_file"; then
+        echo "$line" >> "$target_file"
+      fi
+    done < "$source_file"
+  fi
 }

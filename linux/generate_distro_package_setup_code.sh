@@ -57,34 +57,54 @@ echo -e "$pm_update_system" >>"$setup_file"
 
 # Package manager
 
-if [ -f "$setup_dir/packages_pm_common_1.txt" ]; then
+src_file="$setup_dir/packages_pm_common_1.txt"
+if [ -f "$src_file" ]; then
   echo -e '\n# Packages (distro-agnostic):\n' >>"$setup_file"
-  append_source_file_lines_with_prefix_into_dest_file "$setup_dir/packages_pm_common_1.txt" "$setup_file" "$pm_install_package"
+  append_source_file_lines_with_prefix_into_dest_file "$src_file" "$setup_file" "$pm_install_package"
 fi
 
-if [ -f "$setup_dir/packages_pm_${distro}_1.txt" ]; then
+src_file="$setup_dir/packages_pm_${distro}_1.txt"
+if [ -f "$src_file" ]; then
   echo -e "\n# Packages ($distro-specific):\n" >>"$setup_file"
-  append_source_file_lines_with_prefix_into_dest_file "$setup_dir/packages_pm_${distro}_1.txt" "$setup_file" "$pm_install_package"
+  append_source_file_lines_with_prefix_into_dest_file "$src_file" "$setup_file" "$pm_install_package"
+fi
+
+# Snap
+
+src_file="$setup_dir/packages_pm_snap_1.txt"
+if [ "$distro" = "debian" ] && [ -f "$src_file" ]; then
+  echo -e '\n# Packages (Snap):\n' >>"$setup_file"
+  append_source_file_lines_with_prefix_into_dest_file "$src_file" "$setup_file" "sudo snap install"
 fi
 
 # AUR
 
-if [ "$distro" = "arch" ] && [ -f "$setup_dir/packages_pm_aur_1.txt" ]; then
+src_file="$setup_dir/packages_pm_aur_1.txt"
+if [ "$distro" = "arch" ] && [ -f "$src_file" ]; then
   echo -e '\n# Packages (AUR):\n' >>"$setup_file"
-  append_source_file_lines_with_prefix_into_dest_file "$setup_dir/packages_pm_aur_1.txt" "$setup_file" "yay -S --noconfirm"
+  append_source_file_lines_with_prefix_into_dest_file "$src_file" "$setup_file" "yay -S --noconfirm"
 fi
 
 # Go-lang
 
-if [ -f "$setup_dir/packages_go_${distro}_1.txt" ]; then
+src_file="$setup_dir/packages_go_${distro}_1.txt"
+if [ -f "$src_file" ]; then
   echo -e "\n# Go ($distro-specific):\n" >>"$setup_file"
   echo 'if command -V go >/dev/null 2>&1; then' >>"$setup_file"
-  append_source_file_lines_with_prefix_into_dest_file "$setup_dir/packages_go_${distro}_1.txt" "$setup_file" "go install"
+  append_source_file_lines_with_prefix_into_dest_file "$src_file" "$setup_file" "go install"
   echo 'fi' >>"$setup_file"
 fi
 
 # Manual install
 
-# echo -e "\n# Non-packaged software:\n" >>"$setup_file"
-# src_file="$setup_dir/packages_shell_common_1.sh"
-# [ -f "$src_file" ] && cat "$src_file" >>"$setup_file"
+src_file="$setup_dir/packages_shell_common_1.sh"
+if [ -f "$src_file" ]; then
+  echo -e "\n# Non-packaged software (distro-agnostic):\n" >>"$setup_file"
+  cat "$src_file" >>"$setup_file"
+fi
+
+src_file="$setup_dir/packages_shell_${distro}_1.sh"
+if [ -f "$src_file" ]; then
+  echo -e "\n# Non-packaged software ($distro-specific):\n" >>"$setup_file"
+  cat "$src_file" >>"$setup_file"
+fi

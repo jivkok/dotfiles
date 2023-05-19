@@ -44,6 +44,7 @@ fi
 dot_trace "Configuring $os_description ..."
 "$os_setup_path"
 
+"$dotdir/setup/configure_shell_profiles.sh"
 "$dotdir/setup/configure_home_symlinks.sh"
 "$dotdir/setup/configure_home_bin.sh"
 "$dotdir/git/configure_git.sh"

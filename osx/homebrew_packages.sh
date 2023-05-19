@@ -105,6 +105,7 @@ brew install shfmt # shell parser, formatter, and interpreter
 brew install socat # netcat on steroids
 brew install speedtest_cli # Command-line interface for https://speedtest.net bandwidth tests
 brew install ssh-copy-id # Add a public key to a remote machine's authorized_keys file
+brew install starship # cross-shell prompt
 brew install tcpflow # TCP flow recorder
 brew install tcpreplay # Replay saved tcpdump files at arbitrary speeds
 brew install tcptrace # Analyze tcpdump output

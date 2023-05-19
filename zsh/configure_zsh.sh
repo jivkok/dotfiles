@@ -22,6 +22,10 @@ elif [ "$os" = "Darwin" ]; then
     dot_trace "Installing ZSH ..."
     brew install zsh
     dot_trace "Installing ZSH done."
+  else
+    dot_trace "Updating ZSH ..."
+    brew upgrade zsh
+    dot_trace "Updating ZSH done."
   fi
 
 else
@@ -30,28 +34,13 @@ else
   exit 1
 fi
 
-make_symlink "$dotdir/zsh/.zsh" "$HOME"
-
-if [ -d "$HOME/.oh-my-zsh" ]; then
-  dot_trace "Updating oh-my-zsh ..."
-  git -C "$HOME/.oh-my-zsh" pull --rebase --stat origin master
-
-  for dir in $(find "$HOME/.oh-my-zsh/custom/plugins" -mindepth 1 -maxdepth 1 -type d); do
-    [ -d "$dir/.git" ] && dot_trace "Updating $dir" && git -C "$dir" pull --prune
-  done
-  dot_trace "Updating oh-my-zsh done."
-else
-  dot_trace "Installing oh-my-zsh ..."
-  # https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-  git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh "$HOME/.oh-my-zsh"
-
-  mkdir -p "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins"
-  git clone https://github.com/supercrabtree/k "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/k"
-  git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
-  git clone https://github.com/zsh-users/zsh-completions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-completions"
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
-  dot_trace "Installing oh-my-zsh done."
-fi
+dot_trace "Installing zsh plugins ..."
+zpluginsdir="$HOME/.zsh/plugins"
+mkdir -p "$zpluginsdir"
+clone_or_update_repo "https://github.com/zsh-users/zsh-autosuggestions" "$zpluginsdir/zsh-autosuggestions"
+clone_or_update_repo "https://github.com/zsh-users/zsh-completions" "$zpluginsdir/zsh-completions"
+clone_or_update_repo "https://github.com/zsh-users/zsh-syntax-highlighting" "$zpluginsdir/zsh-syntax-highlighting"
+dot_trace "Installing zsh plugins done."
 
 _zsh=$(command -v zsh)
 

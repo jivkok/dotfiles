@@ -1,3 +1,4 @@
 fd # Simple, fast and user-friendly alternative to find
 lazygit # terminal ui for git
 the_silver_searcher # very fast grep-like program, alternative to ack-grep
+starship # shell-agnostic prompt
