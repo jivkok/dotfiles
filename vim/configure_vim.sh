@@ -33,7 +33,7 @@ elif [ "$os" = "Darwin" ]; then
   ! brew ls --versions neovim >/dev/null 2>&1 && brew install neovim/neovim/neovim
 
 else
-  dot_trace "Unsupported OS: $os"
+  dot_error "Unsupported OS: $os"
   return 1 >/dev/null 2>&1
   exit 1
 fi

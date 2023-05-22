@@ -10,3 +10,7 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
+# C-style files
+[*.{c,cpp,cs,csx,h,java,vb,vbx}]
+indent_size = 4
+

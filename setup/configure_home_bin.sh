@@ -5,7 +5,7 @@ function download_to_home_bin() {
   local filename="$1"
   local download_url="$2"
 
-  echo "$download_url"
+  dot_trace "Download: $download_url"
   curl -s -o "$HOME/bin/$filename" "$download_url"
   chmod 755 "$HOME/bin/$filename"
 }
