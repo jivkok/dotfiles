@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 # Configuring Python
 
+dotdir="$(cd "$(dirname "$0")/.." && pwd)"
+source "$dotdir/setup/setup_functions.sh"
+
+dot_trace "Configuring Python ..."
+
 os=$(uname -s)
 if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
-  sudo add-apt-repository universe
+  # sudo add-apt-repository universe
   sudo apt-get update
   sudo apt-get install -y python3 python3-pip
   sudo -H pip3 install --upgrade pip setuptools
@@ -13,7 +18,7 @@ elif [ "$os" = "Darwin" ]; then
   ! brew ls --versions python3 >/dev/null 2>&1 && brew install python3 && brew postinstall python3 && brew link python3
   python3 -m pip install --upgrade pip setuptools
 else
-  echo "Unsupported system:"
+  dot_error "Unsupported system:"
   uname -a
   return 1 >/dev/null 2>&1
   exit 1
@@ -31,3 +36,5 @@ python3 -m pip install --user --upgrade icdiff  # improved color diff. Use it fo
 # python3 -m pip install --user --upgrade pygments # syntax highlighter
 # python3 -m pip install --user --upgrade pylint # Python linter
 # python3 -m pip install --user --upgrade ydiff # color diff. Use it within a Git repo.
+
+dot_trace "Configuring Python done."

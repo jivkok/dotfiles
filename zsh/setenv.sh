@@ -7,11 +7,11 @@ optional() {
   [ -r "$file" ] && [ -f "$file" ] && source "$file";
 }
 
-source "$dotdir/zsh/plugins.sh"
-source "$dotdir/zsh/options.sh"
-source "$dotdir/zsh/completion.sh"
-source "$dotdir/zsh/prompt.sh"
 source "$dotdir/sh/setenv.sh"
+source "$dotdir/zsh/options.sh"
+source "$dotdir/zsh/plugins.sh"
+source "$dotdir/zsh/prompt.sh"
+source "$dotdir/zsh/completion.sh"
 optional "$HOME/.fzf.zsh"
 # optional "$HOME/bin/fzf-git.sh"
 
@@ -20,9 +20,11 @@ if command -V zoxide >/dev/null 2>&1; then
 fi
 
 # key bindings
-# Note: use 'cat' to easily see the escape sequences
-#bindkey "^[[1;5D" backward-word # ctrl-left
-#bindkey "^[[1;5C" forward-word # ctrl-right
+# Note: use `cat`` / `ctrl-v` to easily see the escape sequences
+# Note: in iTerm2, update "Option" key settings: Preferences -> Profiles -> Keys: for both Left and Right Option Key: choose option "Esc+" instead of "Normal".
+bindkey "^[^[[D" backward-word # alt-left
+bindkey "^[^[[C" forward-word # alt-right
+bindkey '\e^?' backward-kill-word # alt-backspace
 
 if [[ "$_ZSH_DEBUG" = profile ]]; then
   zprof

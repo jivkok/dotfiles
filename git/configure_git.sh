@@ -4,21 +4,26 @@
 # https://gist.github.com/bradwilson/4215933
 # https://gist.github.com/oli/1637874
 
+dotdir="$(cd "$(dirname "$0")/.." && pwd)"
+source "$dotdir/setup/setup_functions.sh"
+
+dot_trace "Configuring git ..."
+
 # Core
 
 var="$(git config --global --get user.name)"
 if [ -z "$var" ]; then
-  git config --global user.name "JK"
-else
-  echo "Git user name: $var"
+  var=JK
+  git config --global user.name "$var"
 fi
+dot_trace "Git user name: $var"
 
 var="$(git config --global --get user.email)"
 if [ -z "$var" ]; then
-  git config --global user.email "jivkokgit@gmail.com"
-else
-  echo "Git user email: $var"
+  var="jivkokgit@gmail.com"
+  git config --global user.email "$var"
 fi
+dot_trace "Git user email: $var"
 
 git config --global core.autocrlf input
 git config --global core.fscache true
@@ -90,7 +95,7 @@ git config --global alias.st 'status -sb'
 git config --global alias.stats 'diff --stat'
 git config --global alias.undo 'reset HEAD~'
 git config --global alias.undohard '!f() { \
-    git reset --hard $(git rev-parse --abbrev-ref HEAD)@{${1-1}}; \
+  git reset --hard $(git rev-parse --abbrev-ref HEAD)@{${1-1}}; \
 }; f'
 git config --global alias.unstage 'reset HEAD'
 git config --global alias.vimdiff 'difftool --tool=vimdiff --no-prompt'
@@ -139,3 +144,5 @@ if [ "$os" = "Darwin" ]; then
     git config --global difftool.kdiff3.path "/Applications/kdiff3.app/Contents/MacOS/kdiff3"
   fi
 fi
+
+dot_trace "Configuring git done."

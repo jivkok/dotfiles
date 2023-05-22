@@ -43,6 +43,7 @@ fi
 
 dot_trace "Configuring $os_description ..."
 "$os_setup_path"
+dot_trace "Configuring $os_description done."
 
 "$dotdir/setup/configure_shell_profiles.sh"
 "$dotdir/setup/configure_home_symlinks.sh"

@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-# Setup helper functions
+# Dotfiles helper functions
 
 #######################################
 # Logs traces from dotfiles scripts
@@ -119,6 +118,13 @@ function make_symlink() {
   fi
 
   if [ -f "$target_directory/$target_filename" ] || [ -d "$target_directory/$target_filename" ]; then
+    if [ -L "$target_directory/$target_filename" ]; then
+      symlink_pointer=$(readlink -f "$target_directory/$target_filename")
+      if [ "$symlink_pointer" = "$source" ]; then
+        return
+      fi
+    fi
+
     timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
     dot_trace "Moving $target_directory/$target_filename to $target_directory/$target_filename.$timestamp"
     mv -f "$target_directory/$target_filename" "$target_directory/$target_filename.$timestamp"
@@ -141,7 +147,7 @@ function make_dotfiles_symlinks() {
 
   dot_trace "Symlinking all dotfiles from $source_directory into $target_directory ..."
   for dotfile in $(find "$source_directory" -mindepth 1 -maxdepth 1 -type f -iname ".*"); do
-    dot_trace "- dotfile: $dotfile"
+    dot_trace "dotfile: $dotfile"
     make_symlink "$dotfile" "$target_directory"
   done
 }
