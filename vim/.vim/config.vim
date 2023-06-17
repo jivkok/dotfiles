@@ -5,7 +5,9 @@ set visualbell t_vb=      " Turn off bell: most annoying default ever created
 
 " UI ---------------------------------------------------------------
 set background=dark
-colorscheme OceanicNext
+if filereadable(expand("~/.vim/plugins/oceanic-next/colors/OceanicNext.vim"))
+  colorscheme OceanicNext
+endif
 " if filereadable(expand("~/.vim/colors/solarized.vim"))
 "     let g:solarized_termtrans=1
 "     colorscheme solarized
