@@ -15,7 +15,16 @@ if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
 elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
   sudo pacman -S --noconfirm python3 python-pip
 elif [ "$os" = "Darwin" ]; then
-  ! brew ls --versions python3 >/dev/null 2>&1 && brew install python3 && brew postinstall python3 && brew link python3
+  if ! brew ls --versions python3 >/dev/null 2>&1; then
+    dot_trace "Installing Python"
+    brew install python3
+    brew postinstall python3
+    brew link python3
+  else
+    dot_trace "Updating Python"
+    brew upgrade python3
+  fi
+  dot_trace "Installing/updating packages pip & setuptools (system-scope)"
   python3 -m pip install --upgrade pip setuptools
 else
   dot_error "Unsupported system:"
@@ -24,7 +33,7 @@ else
   exit 1
 fi
 
-# Packages installed by default
+dot_trace "Installing/updating packages (user-scope)"
 python3 -m pip install --user --upgrade glances # system stats      APT YAY BREW
 python3 -m pip install --user --upgrade httpie  # curl-like with colorized output    APT PACMAN BREW
 python3 -m pip install --user --upgrade icdiff  # improved color diff. Use it for diffing two files.     HOME_BIN

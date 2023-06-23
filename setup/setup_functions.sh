@@ -121,6 +121,7 @@ function make_symlink() {
     if [ -L "$target_directory/$target_filename" ]; then
       symlink_pointer=$(readlink -f "$target_directory/$target_filename")
       if [ "$symlink_pointer" = "$source" ]; then
+        dot_trace "Symlink ( $target_directory/$target_filename -> $source ) already exists."
         return
       fi
     fi
@@ -130,6 +131,7 @@ function make_symlink() {
     mv -f "$target_directory/$target_filename" "$target_directory/$target_filename.$timestamp"
   fi
 
+  dot_trace "Creating symlink ( $target_directory/$target_filename -> $source )."
   mkdir -p "$target_directory"
   ln -s -f "$source" "$target_directory/$target_filename"
 }
