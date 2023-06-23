@@ -1,0 +1,28 @@
+{
+    "diffEditor.renderSideBySide": false,
+
+    "editor.copyWithSyntaxHighlighting": false,
+    "editor.fontFamily": "'Inconsolata-g for Powerline', Menlo, Monaco, 'Courier New', monospace",
+    "editor.renderWhitespace": "boundary",
+
+    "explorer.confirmDragAndDrop": false,
+
+    "files.trimTrailingWhitespace": true,
+    "files.exclude": {
+        "**/.DS_Store": true
+    },
+
+    "remote.SSH.useFlock": false,
+
+    "search.exclude": {
+        ".build/**": true
+    },
+
+    "security.workspace.trust.untrustedFiles": "open",
+
+    "workbench.welcome.enabled": false,
+
+    "[python]": {
+        "editor.formatOnType": true
+    }
+}
