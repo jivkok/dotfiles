@@ -17,6 +17,7 @@
 
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
 source "$dotdir/setup/setup_functions.sh"
+
 pull_latest_dotfiles "$dotdir"
 
 os=$(uname -s)
@@ -33,7 +34,7 @@ elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
 
 elif [ "$os" = "Darwin" ]; then
   os_description="OSX"
-  os_setup_path="$dotdir/osx/configure_osx_specifics.sh"
+  os_setup_path="$dotdir/osx/configure_osx.sh"
 
 else
   dot_trace "Unsupported OS: $os"

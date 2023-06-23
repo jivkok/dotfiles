@@ -113,7 +113,7 @@ if [ "$os" = "Darwin" ]; then
   git config --global alias.opendiff 'difftool --tool=opendiff --no-prompt'
 
   if [ -f "/Applications/p4merge.app/Contents/Resources/launchp4merge" ]; then
-    echo Setting P4Merge as diff and merge tool
+    dot_trace "Setting P4Merge as diff&merge tool"
 
     git config --global mergetool.keepBackup false
     git config --global mergetool.keepTemporaries false
@@ -128,7 +128,7 @@ if [ "$os" = "Darwin" ]; then
     git config --global diff.tool p4mergetool
     git config --global difftool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$LOCAL \$REMOTE"
   elif [ -f "/Applications/kdiff3.app/Contents/MacOS/kdiff3" ]; then
-    echo Setting P4Merge as diff and merge tool
+    dot_trace "Setting KDiff3 as diff&merge tool"
 
     git config --global mergetool.keepBackup false
     git config --global mergetool.keepTemporaries false

@@ -6,21 +6,35 @@ source "$dotdir/setup/setup_functions.sh"
 
 dot_trace "Configuring FZF ..."
 
-mkdir -p "$HOME/.repos"
-fzfrepo="$HOME/.repos/fzf"
+os=$(uname -s)
+if [ "$os" = "Linux" ] >/dev/null 2>&1; then
+  # apt packages are somewhat behind picking up the latest fzf. Install it from source instead. TODO: decide on Arch.
+  mkdir -p "$HOME/.repos"
+  fzfrepo="$HOME/.repos/fzf"
 
-# FZF
-if [ -d "$fzfrepo/.git" ]; then
-  git -C "$fzfrepo" pull --prune
+  if [ -d "$fzfrepo/.git" ]; then
+    git -C "$fzfrepo" pull --prune
+  else
+    git clone --depth 1 https://github.com/junegunn/fzf "$fzfrepo"
+  fi
+
+  "$fzfrepo/install" --key-bindings --completion --no-update-rc
+
+elif [ "$os" = "Darwin" ]; then
+  ! brew ls --versions fzf >/dev/null 2>&1 && brew install fzf
+
+  "$(brew --prefix)/opt/fzf/install" --key-bindings --completion --no-update-rc >/dev/null
+
 else
-  git clone --depth 1 https://github.com/junegunn/fzf "$fzfrepo"
+  dot_error "Unsupported OS: $os"
+  return 1 >/dev/null 2>&1
+  exit 1
 fi
-"$fzfrepo/install" --key-bindings --completion --no-update-rc
 
 # fzf-git
 filename="fzf-git.sh"
 url="https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh"
-echo "Downloading $url"
+dot_trace "Downloading $url into $HOME/bin/$filename"
 curl -s -o "$HOME/bin/$filename" "$url"
 chmod 755 "$HOME/bin/$filename"
 

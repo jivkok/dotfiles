@@ -16,6 +16,13 @@ _prepend_to_path /usr/local/sbin
 
 if [[ "$OSTYPE" = darwin* ]]; then
   eval "$(/usr/libexec/path_helper -s)"
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+
+  if [[ "$SHELL" == *zsh* ]]; then
+    setopt null_glob
+  else
+    shopt -s nullglob
+  fi
 
   for gnupath in /usr/local/Cellar/*/*/libexec/gnubin; do
     _prepend_to_path "$gnupath"

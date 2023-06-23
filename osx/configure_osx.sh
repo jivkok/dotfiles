@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Configure OSX-specific software
+# Configure OSX
 
 dotdir="$( cd "$( dirname "$0" )/.." && pwd )"
 source "$dotdir/setup/setup_functions.sh"
 
-dot_trace "Configuring OSX-specific software ..."
+dot_trace "Configuring OSX ..."
 
 # Command-line tools (must be first since they install gcc)
 xcode-select -p >/dev/null 2>&1
@@ -18,11 +18,11 @@ fi
 
 make_dotfiles_symlinks "$dotdir/osx" "$HOME"
 
-source "$dotdir/osx/homebrew_packages.sh"
+"$dotdir/osx/configure_osx_packages.sh"
 # source "$dotdir/osx/osx_defaults" # https://raw.githubusercontent.com/mathiasbynens/dotfiles/main/.macos
 
 #curl "https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml" \
 #    | yq -r '{C,"C++","C#",Java,JavaScript,TypeScript,Python,Shell} | to_entries | (map(.value.extensions) | flatten) - [null] | unique | .[]' \
 #    | xargs -L 1 -I "{}" openwith com.microsoft.VSCode {} all
 
-dot_trace "Configuring OSX-specific software done."
+dot_trace "Configuring OSX done."
