@@ -95,6 +95,7 @@ install_brew_package bash-completion
 # chsh -s /usr/local/bin/bash
 
 # Misc
+install_brew_package ansible # Automate deployment, configuration, and upgrading
 install_brew_package bat # cat-clone with syntax highlighting and Git integration
 install_brew_package bfg # Remove large files or passwords from Git history like git-filter-branch
 install_brew_package binwalk # Searches a binary image for embedded files and executable code

@@ -5,9 +5,21 @@ _has() {
 
 # fzf + rg/ag
 if _has fzf; then
-  if _has rg; then
-    export FZF_DEFAULT_COMMAND="rg --smart-case --files --no-ignore --hidden --follow --glob '!{.git,node_modules}/*'"
+  if _has fd; then
+    export FZF_DEFAULT_COMMAND="fd --type f --type l --follow --hidden --exclude .git"
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    _fzf_compgen_path() {
+      fd --follow --hidden --exclude ".git" . "$1"
+    }
+    _fzf_compgen_dir() {
+      fd --type d --follow --hidden --exclude ".git" . "$1"
+    }
+  elif _has rg; then
+    export FZF_DEFAULT_COMMAND="rg --smart-case --files --no-ignore --hidden --follow --glob '!.git'"
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    _fzf_compgen_path() {
+      rg --smart-case --files --no-ignore --hidden --follow --glob '!.git' . "$1"
+    }
   elif _has ag; then
     export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
@@ -43,7 +55,7 @@ fi
 # Usage: f vim
 f() {
   IFS=$'\n'
-  files=($(fd . --type f --type l --follow --hidden "${@:2}" | fzf -0 -1 -m))
+  files=($(fd . --type f --type l --follow --hidden --exclude .git "${@:2}" | fzf -0 -1 -m))
   IFS=$' '
   [[ -n "$files" ]] && $1 "${files[@]}"
 }
@@ -52,7 +64,7 @@ f() {
 # Usage: d ws
 d() {
   IFS=$'\n'
-  dirs=($(fd . --type d --hidden "${@:2}" | fzf -0 -1 -m))
+  dirs=($(fd . --type d --hidden --exclude .git "${@:2}" | fzf -0 -1 -m))
   IFS=$' '
   [[ -n "$dirs" ]] && $1 "${dirs[@]}"
 }
@@ -71,7 +83,7 @@ ff() {
   fi
 
   if command -V fd >/dev/null 2>&1; then
-    fd --hidden --follow "$file_pattern" "$directory"
+    fd --hidden --follow --exclude .git "$file_pattern" "$directory"
   else
     find "$directory" -iname "$file_pattern"
   fi
@@ -94,24 +106,34 @@ fs() {
     directory='.'
   fi
 
-  # find "$directory" -type f -iname "$file_pattern" -exec grep -I -l -i "$string_pattern" {} \; -exec grep -I -n -i "$string_pattern" {} \;
-  # ack
-  # ag
-  # rg
-  grep -Hrn "$string_pattern" "$directory" --include "$file_pattern"
+  if command -V rg >/dev/null 2>&1; then
+    rg --color=always --line-number --no-heading --smart-case --no-ignore --hidden --follow --glob '!{.git,node_modules}/*' --glob "$file_pattern" "$string_pattern" "$directory"
+  else
+    # find "$directory" -type f -iname "$file_pattern" -exec grep -I -l -i "$string_pattern" {} \; -exec grep -I -n -i "$string_pattern" {} \;
+    grep -Hrn "$string_pattern" "$directory" --include "$file_pattern"
+  fi
 }
 
 # 1. Search for text in files using Ripgrep
 # 2. Interactively narrow down the list using fzf
 # 3. Open the file in Vim
 fsf() {
-  rg --hidden --color=always --line-number --no-heading --smart-case "${*:-}" |
+  if [ "$EDITOR" = *vim* ]; then
+    cmd="$EDITOR {1} +{2}"
+  elif [ "$EDITOR" = code ]; then
+    cmd="$EDITOR -g {1}:{2}"
+  else
+    cmd="$EDITOR {1}"
+  fi
+
+  rg --no-ignore --hidden --color=always --line-number --no-heading --smart-case "${*:-}" |
     fzf --ansi \
         --color "hl:-1:underline,hl+:-1:underline:reverse" \
         --delimiter : \
         --preview 'bat --color=always {1} --highlight-line {2}' \
         --preview-window 'up,60%,border-bottom,+{2}+3/3,~3' \
-        --bind 'enter:become(vim {1} +{2})'
+        --bind "enter:become($cmd)"
+#        --bind 'enter:become(vim {1} +{2})'
 }
 
 # find and list processes matching a case-insensitive partial-match string
