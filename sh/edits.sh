@@ -1,15 +1,15 @@
 export EDITOR="vi"
 export VISUAL='vi'
-if command -v nvim >/dev/null 2>&1; then
+if [ "$(uname -s)" = "Darwin" ] && command -v code >/dev/null 2>&1; then
+  export EDITOR="code"
+  export VISUAL='code'
+  alias e='code'
+elif command -v nvim >/dev/null 2>&1; then
   export EDITOR="nvim"
   export VISUAL='nvim'
 elif command -v vim >/dev/null 2>&1; then
   export EDITOR="vim"
   export VISUAL='vim'
-fi
-if [ "$(uname -s)" = "Darwin" ] && command -v code >/dev/null 2>&1; then
-  export VISUAL='code'
-  alias e='code'
 fi
 
 if command -v nvim >/dev/null 2>&1; then
