@@ -7,11 +7,16 @@ set visualbell t_vb=      " Turn off bell: most annoying default ever created
 set background=dark
 if filereadable(expand("~/.vim/plugins/oceanic-next/colors/OceanicNext.vim"))
   colorscheme OceanicNext
+elseif filereadable(expand("~/.vim/plugins/vim-code-dark/colors/codedark.vim"))
+  let g:codedark_modern=1
+  " let g:codedark_transparent=1 " Uses the shell background
+  colorscheme codedark
+elseif filereadable(expand("~/.vim/plugins/gruvbox/colors/gruvbox.vim"))
+  colorscheme gruvbox
+elseif filereadable(expand("~/.vim/colors/solarized.vim"))
+  let g:solarized_termtrans=1
+  colorscheme solarized
 endif
-" if filereadable(expand("~/.vim/colors/solarized.vim"))
-"     let g:solarized_termtrans=1
-"     colorscheme solarized
-" endif
 set title                 " Show the filename in the window titlebar
 set cursorline            " Highlight the line the cursor is on
 set showcmd               " Show the (partial) command as it’s being typed
@@ -67,6 +72,7 @@ set gdefault              " Add the g flag to search/replace by default
 " Files and buffers ------------------------------------------------------------
 filetype on               " Enable file type detection
 filetype plugin on        " Enable loading plugins per file types
+filetype indent plugin on
 set hidden                " Allows switching between buffers while they are unsaved
 set nobackup
 set swapfile
