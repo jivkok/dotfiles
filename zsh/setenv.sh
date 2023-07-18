@@ -9,6 +9,7 @@ optional() {
 
 source "$dotdir/sh/setenv.sh"
 source "$dotdir/zsh/options.sh"
+source "$dotdir/zsh/history.sh"
 source "$dotdir/zsh/plugins.sh"
 source "$dotdir/zsh/prompt.sh"
 source "$dotdir/zsh/completion.sh"
