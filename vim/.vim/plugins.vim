@@ -23,7 +23,6 @@ Plug 'ryanoasis/vim-devicons' " icons for various plugins
 Plug 'benmills/vimux' " tmux integration, runs shell commands
 Plug 'vim-airline/vim-airline' " status line
 Plug 'vim-airline/vim-airline-themes' " status line
-Plug 'mhartington/oceanic-next' " color scheme
 Plug 'airblade/vim-gitgutter' " git diff in the gutter and stages/reverts hunks
 Plug 'tpope/vim-fugitive' " Git wrapper
 Plug 'sheerun/vim-polyglot' " collection of language packs - syntax, indent, ftdetect
@@ -35,6 +34,11 @@ Plug 'Xuyuanp/nerdtree-git-plugin' " show git status in NerdTree
 
 " Editor - languages
 Plug 'OmniSharp/omnisharp-vim' " Omnicompletion (intellisense) and more for C#
+
+" Editor - themes
+" Plug 'mhartington/oceanic-next' " color scheme
+Plug 'tomasiser/vim-code-dark' " color scheme
+" Plug 'gruvbox-community/gruvbox' " color scheme
 
 " Editing
 Plug 'terryma/vim-multiple-cursors' " multiple selections
@@ -55,7 +59,7 @@ endif
 " Plug 'davidhalter/jedi-vim' " Python autocompletion
 
 " Linting engines
-Plug 'w0rp/ale' " Asynchronous lint engine
+Plug 'dense-analysis/ale' " Asynchronous lint engine
 
 " Linting, syntax-coloring, and auto-formatting
 Plug 'Chiel92/vim-autoformat' " code auto-formatting
