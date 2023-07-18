@@ -14,9 +14,9 @@ os=$(uname -s)
 # https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script
 # https://learn.microsoft.com/en-us/dotnet/core/install/remove-runtime-sdk-versions
 if [ "$os" = "Linux" ]; then
-sudo rm -rf /usr/share/dotnet/
-sudo rm -rf /usr/lib/dotnet/
-rm -rf "$HOME/.dotnet"
+  sudo rm -rf /usr/share/dotnet/
+  sudo rm -rf /usr/lib/dotnet/
+  rm -rf "$HOME/.dotnet"
 
   # bash <(curl -sSL https://dot.net/v1/dotnet-install.sh) --channel LTS --no-path --dry-run
   bash <(curl -sSL https://dot.net/v1/dotnet-install.sh) --channel LTS --no-path
@@ -28,9 +28,7 @@ rm -rf "$HOME/.dotnet"
 elif [ "$os" = "Darwin" ]; then
   bash <(curl -sSL https://dot.net/v1/dotnet-install.sh) --channel LTS --no-path
 
-  ~/.dotnet/dotnet tool install --global coverlet.console
-
-  cask install visual-studio-code
+  brew install --cask visual-studio-code
 else
   echo2 "Unsupported OS: $os"
   return
