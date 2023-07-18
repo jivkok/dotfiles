@@ -40,3 +40,7 @@ format = '[$all_status$ahead_behind]($style) '
 style = 'bold yellow'
 modified = '±'
 disabled = false
+
+[dotnet]
+format = ': [$symbol($version )(FX $tfm )]($style)'
+
