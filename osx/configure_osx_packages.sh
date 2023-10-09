@@ -101,6 +101,7 @@ install_brew_package bfg # Remove large files or passwords from Git history like
 install_brew_package binwalk # Searches a binary image for embedded files and executable code
 install_brew_package ccat # Like cat but displays content with syntax highlighting
 install_brew_package cmake # Cross-platform make
+install_brew_package diff-so-fancy # Improved diffs with diff-highlight and more
 install_brew_package dns2tcp # TCP over DNS tunnel
 install_brew_package dos2unix # Convert text between DOS, UNIX, and Mac formats
 install_brew_package duti # Select default apps for documents and URL schemes on macOS
@@ -108,6 +109,7 @@ install_brew_package exa # Modern replacement for ls
 install_brew_package ffmpeg # Play, record, convert, and stream audio and video
 install_brew_package fd # Simple, fast and user-friendly alternative to find
 install_brew_package git # Distributed revision control system
+install_brew_package git-delta # Syntax-highlighting pager for git and diff output
 install_brew_package git-extras # Small git utilities
 install_brew_package graphviz # Graph visualization software from AT&T and Bell Labs
 install_brew_package grc # Colorize logfiles and command output
