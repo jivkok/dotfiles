@@ -103,8 +103,16 @@ git config --global alias.wdiff 'diff --word-diff'
 git config --global alias.who 'shortlog -s -e --'
 git config --global alias.zap 'reset --hard HEAD'
 
-if command -V diff-so-fancy >/dev/null 2>&1; then
+if command -V delta >/dev/null 2>&1; then
+  git config --global core.pager "delta"
+  git config --global interactive.diffFilter "delta --color-only"
+  git config --bool --global delta.navigate true
+  git config --bool --global delta.light false
+  git config --global merge.conflictstyle "diff3"
+  git config --global diff.colorMoved "default"
+elif command -V diff-so-fancy >/dev/null 2>&1; then
   git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
+  git config --global interactive.diffFilter "diff-so-fancy --patch"
   git config --bool --global diff-so-fancy.markEmptyLines false
 fi
 
