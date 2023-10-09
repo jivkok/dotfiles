@@ -1,3 +1,7 @@
+if [[ ! -o interactive ]]; then
+  return
+fi
+
 if [[ "$_ZSH_DEBUG" = profile ]]; then
   zmodload zsh/zprof
 fi
@@ -11,8 +15,8 @@ source "$dotdir/sh/setenv.sh"
 source "$dotdir/zsh/options.sh"
 source "$dotdir/zsh/history.sh"
 source "$dotdir/zsh/plugins.sh"
-source "$dotdir/zsh/prompt.sh"
 source "$dotdir/zsh/completion.sh"
+source "$dotdir/zsh/prompt.sh"
 optional "$HOME/.fzf.zsh"
 # optional "$HOME/bin/fzf-git.sh"
 

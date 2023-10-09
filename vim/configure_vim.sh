@@ -11,15 +11,13 @@ if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
   dot_trace 'Installing Vim'
   sudo apt-get install -y build-essential cmake # build helpers
   sudo apt-get install -y python3 python3-dev python3-pip
-  sudo -H pip3 install --upgrade pip setuptools
-  sudo apt-get install -y vim neovim
+  sudo apt-get install -y vim neovim python3-pynvim
 
 elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
   dot_trace 'Installing Vim'
   sudo pacman -S --noconfirm cmake gcc # build helpers
   sudo pacman -S --noconfirm python3 python-pip
-  sudo -H pip3 install --upgrade pip setuptools
-  sudo pacman -S --noconfirm vim neovim
+  sudo pacman -S --noconfirm vim neovim python3-pynvim
 
 elif [ "$os" = "Darwin" ]; then
   xcode-select -p >/dev/null 2>&1
@@ -32,6 +30,7 @@ elif [ "$os" = "Darwin" ]; then
   ! brew ls --versions cmake >/dev/null 2>&1 && brew install cmake
   ! brew ls --versions vim >/dev/null 2>&1 && brew install vim --with-override-system-vi --with-lua
   ! brew ls --versions neovim >/dev/null 2>&1 && brew install neovim
+  python3 -m pip install --user --upgrade pynvim
 
 else
   dot_error "Unsupported OS: $os"
@@ -45,9 +44,6 @@ make_symlink "$dotdir/vim/.vim/.vimrc" "$HOME"
 dot_trace "Symlinking NVim configs"
 make_symlink "$dotdir/vim/.vim/.vimrc" "$HOME/.config/nvim" "init.vim"
 make_symlink "$dotdir/vim/.vim" "$HOME/.local/share/nvim" "site"
-
-dot_trace "Installing/updating python package pynvim"
-python3 -m pip install --user --upgrade pynvim
 
 if [ ! -f ~/.vim/autoload/plug.vim ]; then
   dot_trace 'Downloading VimPlug'

@@ -21,7 +21,7 @@ disabled = false
 truncation_length = 5
 truncate_to_repo = false
 format = ': [$path]($style)[$read_only]($read_only_style) '
-style = "bold italic green"
+style = "bold green"
 use_os_path_sep = true
 disabled = false
 

@@ -32,15 +32,10 @@ if _has fzf; then
 fi
 
 # bat colorizer
-if _has batcat; then # bat is batcat in Debian (when using apt)
-  alias cat="batcat"
-elif _has bat; then
-  alias cat="bat"
-fi
-if _has bat || _has batcat; then
+if _has bat || _has batcat; then # bat is batcat in Debian (when using apt)
   export BAT_PAGER="less -R"
   export BAT_STYLE="changes,numbers"
-  export BAT_THEME="ansi"
+  export BAT_THEME="Visual Studio Dark+"
 fi
 
 # Enable colored `grep` output
