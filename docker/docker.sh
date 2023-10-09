@@ -40,7 +40,7 @@ docker-tags() {
   while [[ -n "$results" && $i -lt $max_page_count ]]; do
     i=$((i + 1))
 
-    results=$(curl -s https://registry.hub.docker.com/v2/repositories/$repository_name/tags/?page=$i | jq '."results"[]["name","last_updated"]')
+    results=$(curl -s "https://registry.hub.docker.com/v2/repositories/$repository_name/tags/?page=$i" | jq '."results"[]["name","last_updated"]')
 
     if [[ -n "$tag_filter" ]]; then
       echo "$results" | tr -d '"' | grep -i "$tag_filter"

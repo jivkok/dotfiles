@@ -48,10 +48,6 @@ sudo apt-get install -y git-extras # Extra commands for git
 sudo apt-get install -y ripgrep # Fast regex text searching tool for files (recursively), respects .gitignore
 sudo apt-get install -y silversearcher-ag # very fast grep-like program, alternative to ack-grep
 
-# Packages (Snap):
-
-sudo snap install starship --edge # shell-agnostic prompt
-
 # Go (debian-specific):
 
 if command -V go >/dev/null 2>&1; then
@@ -59,3 +55,9 @@ go install github.com/jesseduffield/lazygit # terminal ui for git
 go install github.com/jesseduffield/lazydocker # terminal ui for docker and docker-compose
 go install mvdan.cc/sh/v3/cmd/shfmt # shell parser, formatter, and interpreter
 fi
+
+# Non-packaged software (debian-specific):
+
+# shell-agnostic prompt
+curl -sS https://starship.rs/install.sh | sudo sh -s -- --yes
+

@@ -10,22 +10,30 @@ os=$(uname -s)
 if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
   # sudo add-apt-repository universe
   sudo apt-get update
-  sudo apt-get install -y python3 python3-pip
-  sudo -H pip3 install --upgrade pip setuptools
+  sudo apt-get install -y python3 python3-pip pipx
 elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
-  sudo pacman -S --noconfirm python3 python-pip
+  sudo pacman -S --noconfirm python3 python-pip pipx
 elif [ "$os" = "Darwin" ]; then
   if ! brew ls --versions python3 >/dev/null 2>&1; then
     dot_trace "Installing Python"
     brew install python3
-    brew postinstall python3
-    brew link python3
   else
     dot_trace "Updating Python"
     brew upgrade python3
   fi
+  brew postinstall python3
+  brew link python3
+
   dot_trace "Installing/updating packages pip & setuptools (system-scope)"
   python3 -m pip install --upgrade pip setuptools
+
+  if ! brew ls --versions python3 >/dev/null 2>&1; then
+    dot_trace "Installing pipx"
+    brew install pipx
+  else
+    dot_trace "Updating pipx"
+    brew upgrade pipx
+  fi
 else
   dot_error "Unsupported system:"
   uname -a
@@ -34,9 +42,10 @@ else
 fi
 
 dot_trace "Installing/updating packages (user-scope)"
-python3 -m pip install --user --upgrade glances # system stats      APT YAY BREW
-python3 -m pip install --user --upgrade httpie  # curl-like with colorized output    APT PACMAN BREW
-python3 -m pip install --user --upgrade icdiff  # improved color diff. Use it for diffing two files.     HOME_BIN
+pipx upgrade-all
+pipx install glances # system stats      APT YAY BREW
+pipx install httpie  # curl-like with colorized output    APT PACMAN BREW
+pipx install icdiff  # improved color diff. Use it for diffing two files.     HOME_BIN
 
 # Packages used at one point
 # python3 -m pip install --user --upgrade jsbeautifier # reformat and reindent JavaScript code. jsbeautifier.org. Use with 'js-beautify somefile.js'

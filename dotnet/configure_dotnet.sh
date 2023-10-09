@@ -1,37 +1,38 @@
 #!/usr/bin/env bash
 # Install .Net
 
-# $1 - message
-function echo2() {
-  echo -e "\n$1\n"
+dotnet_install() {
+  script_path="${TMPDIR:-/tmp}/dotnet-install.sh"
+
+  wget https://dot.net/v1/dotnet-install.sh -O "$script_path"
+  chmod +x "$script_path"
+
+  "$script_path" --channel LTS --version latest
+  # "$script_path" --channel STS --version latest
 }
 
-echo2 'Configuring DotNet ...'
+echo 'Configuring DotNet ...'
 
 os=$(uname -s)
 
-# https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script
-# https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script
 # https://learn.microsoft.com/en-us/dotnet/core/install/remove-runtime-sdk-versions
+# https://learn.microsoft.com/en-us/dotnet/core/install/linux-scripted-manual#scripted-install
+# This script  installs artifacts for current user. Read docs for system-wide install:
+# https://learn.microsoft.com/en-us/dotnet/core/install/linux
 if [ "$os" = "Linux" ]; then
   sudo rm -rf /usr/share/dotnet/
   sudo rm -rf /usr/lib/dotnet/
   rm -rf "$HOME/.dotnet"
 
-  # bash <(curl -sSL https://dot.net/v1/dotnet-install.sh) --channel LTS --no-path --dry-run
-  bash <(curl -sSL https://dot.net/v1/dotnet-install.sh) --channel LTS --no-path
+  dotnet_install
 
-  # The above install all artifacts for the current user. Use this for system-wide install:
-  # wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O /tmp/packages-microsoft-prod.deb
-  # sudo dpkg -i /tmp/packages-microsoft-prod.deb
-  # sudo apt-get install -y dotnet-sdk-3.1
 elif [ "$os" = "Darwin" ]; then
-  bash <(curl -sSL https://dot.net/v1/dotnet-install.sh) --channel LTS --no-path
-
+  dotnet_install
   brew install --cask visual-studio-code
+
 else
-  echo2 "Unsupported OS: $os"
+  echo "Unsupported OS: $os"
   return
 fi
 
-echo2 'Configuring DotNet done.'
+echo 'Configuring DotNet done.'

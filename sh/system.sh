@@ -7,10 +7,8 @@ export HISTIGNORE="..:...:....:* --help:cd:cd -:clear:date:exit:ll:ls:pwd:reload
 
 # Prefer US English and use UTF-8
 export LANG="en_US.UTF-8"
+export LANGUAGE="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
-
-# Highlight section titles in manual pages
-export LESS_TERMCAP_md="${yellow}"
 
 # .Net
 [ -d "$HOME/.dotnet" ] && export DOTNET_ROOT="$HOME/.dotnet"

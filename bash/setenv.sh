@@ -1,12 +1,18 @@
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
 optional() {
   file="$1"
   [ -r "$file" ] && [ -f "$file" ] && source "$file";
 }
 
+source "$dotdir/sh/setenv.sh"
 source "$dotdir/bash/options.sh"
 source "$dotdir/bash/completion.sh"
 source "$dotdir/bash/prompt.sh"
-source "$dotdir/sh/setenv.sh"
 optional "$HOME/.fzf.bash"
 # optional "$HOME/bin/fzf-git.sh"
 
