@@ -22,12 +22,12 @@ config windowHintsSpread true
 alias hyper ctrl;shift;alt;cmd
 
 # Monitor Aliases
-alias mon-laptop    1440x900
+alias mon-laptop    1728x1117
 alias mon-4k        3840x2160
 
 ## Application aliases
 alias browser   'Google Chrome'
-alias editor    'Sublime Text'
+alias editor    'Code'
 alias terminal  'iTerm2'
 
 ## Position aliases
@@ -133,12 +133,11 @@ bind [:${hyper}  throw previous # move to previous screen
 bind ]:${hyper}  throw next # move to next screen
 
 ## App bindings
-bind z:${hyper}     focus 'Terminal' # iTerm2 already has Ctrl-apostrophe mapped
+bind z:${hyper}     focus ${terminal}
 bind space:${hyper} focus ${editor}
 bind b:${hyper}     focus ${browser}
 bind f:${hyper}     focus 'Finder'
 bind i:${hyper}     focus 'Safari'
-bind c:${hyper}     focus 'Code'
 bind x:${hyper}     focus 'Xcode'
 
 # Window Hints
