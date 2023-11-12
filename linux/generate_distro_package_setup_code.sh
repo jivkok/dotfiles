@@ -28,12 +28,12 @@ fi
 distro=$(echo "$distro" | tr '[:upper:]' '[:lower:]')
 
 if [ "$distro" = "debian" ]; then
-  pm_update_system='sudo apt-get update -y --fix-missing'
-  pm_install_package='sudo apt-get install -y'
+  pm_update_system='sudo apt-get update -y --fix-missing -qq && sudo apt-get upgrade -y -qq'
+  pm_install_package='sudo apt-get install -y -qq'
 
 elif [ "$distro" = "arch" ]; then
   pm_update_system='sudo pacman -Syu --noconfirm'
-  pm_install_package='sudo pacman -S --noconfirm'
+  pm_install_package='sudo pacman -S --noconfirm --needed'
 
 else
   echo "Unknown Linux distro: $distro"
