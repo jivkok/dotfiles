@@ -608,6 +608,8 @@
 	<string>43D4F1EB-935E-4E69-BB50-9FEACCAB410F</string>
 	<key>HapticFeedbackForEsc</key>
 	<false/>
+	<key>HideActivityIndicator</key>
+	<true/>
 	<key>HotkeyMigratedFromSingleToMulti</key>
 	<true/>
 	<key>IRMemory</key>
@@ -823,6 +825,8 @@
 				<key>Red Component</key>
 				<real>1</real>
 			</dict>
+			<key>Blink Allowed</key>
+			<true/>
 			<key>Blinking Cursor</key>
 			<false/>
 			<key>Blur</key>
@@ -1328,6 +1332,8 @@
 	</dict>
 	<key>SoundForEsc</key>
 	<false/>
+	<key>TabStyleWithAutomaticOption</key>
+	<integer>4</integer>
 	<key>VisualIndicatorForEsc</key>
 	<false/>
 </dict>

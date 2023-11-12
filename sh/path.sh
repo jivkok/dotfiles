@@ -1,10 +1,10 @@
-function _prepend_to_path() {
+_prepend_to_path() {
   if [[ -d "$1" && ! :$PATH: =~ :$1: ]]; then
     PATH=$1:$PATH
   fi
 }
 
-function _prepend_to_manpath() {
+_prepend_to_manpath() {
   if [[ -d "$1" && ! :$MANPATH: =~ :$1: ]]; then
     MANPATH=$1:$MANPATH
   fi
@@ -24,11 +24,11 @@ if [[ "$OSTYPE" = darwin* ]]; then
     shopt -s nullglob
   fi
 
-  for gnupath in /usr/local/Cellar/*/*/libexec/gnubin; do
+  for gnupath in ${HOMEBREW_CELLAR}/*/*/libexec/gnubin; do
     _prepend_to_path "$gnupath"
   done
 
-  for gnupath in /usr/local/Cellar/*/*/libexec/gnuman; do
+  for gnupath in ${HOMEBREW_CELLAR}/*/*/libexec/gnuman; do
     _prepend_to_manpath "$gnupath"
   done
 fi
@@ -43,5 +43,5 @@ _prepend_to_path "$HOME/dotfiles/bin"
 _prepend_to_path "$HOME/.local/bin"
 _prepend_to_path "$HOME/bin"
 
-export PATH=$PATH
-export MANPATH=$MANPATH
+export PATH
+export MANPATH

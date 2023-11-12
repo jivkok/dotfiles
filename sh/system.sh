@@ -24,7 +24,7 @@ alias rd='rm -rf'
 alias paths='echo -e ${PATH//:/\\n}'
 
 # Misc
-alias envs='printenv | sort'
+alias envs='env | sort'
 alias h='history'
 alias j='jobs'
 alias mk='make'
