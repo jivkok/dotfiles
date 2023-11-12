@@ -1,23 +1,3 @@
-alias datt='docker attach'
-alias ddiff='docker diff'
-alias dimg='docker images'
-alias dins='docker inspect'
-alias dps='docker ps'
-alias drm='docker rm'
-alias drmi='docker rmi'
-alias drun='docker run'
-alias dstart='docker start'
-alias dstop='docker stop'
-alias deb='dexbash'
-alias dceb='dcexbash'
-alias dc='docker-compose'
-alias dcb='docker-compose build'
-alias dclogs='docker-compose logs'
-alias dcup='docker-compose up'
-alias dcdown='docker-compose down'
-alias dcstart='docker-compose start'
-alias dcstop='docker-compose stop'
-
 # Lists tags for containers from the official Docker registry
 docker-tags() {
   if [ $# -lt 1 ]; then
@@ -51,22 +31,54 @@ docker-tags() {
   done
 }
 
-# Run a bash shell in the specified container
-dexbash() {
-  if [ $# -ne 1 ]; then
-    echo "Usage: $FUNCNAME CONTAINER_ID"
-    return 1
-  fi
+if command -v docker >/dev/null 2>&1; then
+  alias datt='docker attach'
+  alias ddiff='docker diff'
+  alias dimg='docker images'
+  alias dins='docker inspect'
+  alias dps='docker ps'
+  alias drm='docker rm'
+  alias drmi='docker rmi'
+  alias drun='docker run'
+  alias dstart='docker start'
+  alias dstop='docker stop'
+  alias deb='dexbash'
 
-  docker exec -it "$1" /bin/bash
-}
+  # Run a bash shell in the specified container
+  dexbash() {
+    if [ $# -ne 1 ]; then
+      echo "Usage: $FUNCNAME CONTAINER_ID"
+      return 1
+    fi
 
-# Run a bash shell in the specified container (with docker-compose)
-dcexbash() {
-  if [ $# -ne 1 ]; then
-    echo "Usage: $FUNCNAME CONTAINER_ID"
-    return 1
-  fi
+    docker exec -it "$1" /bin/bash
+  }
+fi
 
-  docker-compose exec "$1" /bin/bash
-}
+_dc=''
+if command -v "docker compose" >/dev/null 2>&1; then
+  _dc='docker compose'
+elif command -v "docker-compose" >/dev/null 2>&1; then
+  _dc='docker-compose'
+fi
+
+if [ -n "$_dc" ]; then
+  alias dc="$_dc"
+  alias dcb="$_dc build"
+  alias dclogs="$_dc logs"
+  alias dcup="$_dc up"
+  alias dcdown="$_dc down"
+  alias dcstart="$_dc start"
+  alias dcstop="$_dc stop"
+  alias dceb='dcexbash'
+
+  # Run a bash shell in the specified container (with docker compose)
+  dcexbash() {
+    if [ $# -ne 1 ]; then
+      echo "Usage: $FUNCNAME CONTAINER_ID"
+      return 1
+    fi
+
+    $_dc exec "$1" /bin/bash
+  }
+fi
