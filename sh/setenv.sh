@@ -1,6 +1,7 @@
 source "$dotdir/sh/path.sh"
 source "$dotdir/sh/system.sh"
 source "$dotdir/sh/ls.sh"
+source "$dotdir/sh/diffs.sh"
 source "$dotdir/sh/edits.sh"
 source "$dotdir/sh/finds.sh"
 source "$dotdir/sh/utils.sh"
