@@ -12,7 +12,7 @@ if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
   sudo apt-get update
   sudo apt-get install -y python3 python3-pip pipx
 elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
-  sudo pacman -S --noconfirm python3 python-pip pipx
+  sudo pacman -S --noconfirm python3 python-pip python-pipx
 elif [ "$os" = "Darwin" ]; then
   if ! brew ls --versions python3 >/dev/null 2>&1; then
     dot_trace "Installing Python"

@@ -56,7 +56,10 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 # Lock the screen (when going AFK)
 alias afk='/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend'
 
+# Open current directory in Finder
 alias of='open -a Finder ./'
+
+# QuickLook
 alias ql='qlmanage -p &>/dev/null'
 
 if [ -f '/Applications/p4merge.app/Contents/Resources/launchp4merge' ]; then
@@ -85,21 +88,6 @@ cdf() {
   else
     echo 'No Finder window found' >&2
   fi
-}
-
-# Query argument in Dash
-function dash() {
-  open "dash://$*"
-}
-
-# Open manpages in Dash
-function dman() {
-  open "dash://manpages:$*"
-}
-
-# Open manpages in browser
-function bman() {
-  open "man:$*"
 }
 
 # Quickly get image dimensions from the command line
