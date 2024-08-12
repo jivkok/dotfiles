@@ -33,12 +33,20 @@ if [[ "$OSTYPE" = darwin* ]]; then
   done
 fi
 
+# .Net
 _prepend_to_path "$HOME/.dotnet/tools"
 _prepend_to_path "$HOME/.dotnet"
+
+# Rust
 _prepend_to_path "$HOME/.cargo/bin"
-_prepend_to_path /usr/local/go/bin
+
+# Go
 _prepend_to_path "$HOME/go/bin"
+
+# Python3
 command -v python3 >/dev/null && _prepend_to_path "$(python3 -m site --user-base)/bin"
+
+# Local bins
 _prepend_to_path "$HOME/dotfiles/bin"
 _prepend_to_path "$HOME/.local/bin"
 _prepend_to_path "$HOME/bin"

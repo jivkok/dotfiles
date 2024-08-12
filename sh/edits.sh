@@ -4,6 +4,11 @@ if [ "$(uname -s)" = "Darwin" ] && command -v code >/dev/null 2>&1; then
   export EDITOR="code"
   export VISUAL='code'
   alias e='code'
+elif [ "$SSH_TTY" = "" ] && command -v lsb_release >/dev/null 2>&1 && [[ "$(lsb_release --id)" = *"Linuxmint" ]] && command -v code >/dev/null 2>&1; then
+  export EDITOR="code"
+  export VISUAL='code'
+  alias e='code'
+  echo zzz
 elif command -v nvim >/dev/null 2>&1; then
   export EDITOR="nvim"
   export VISUAL='nvim'
@@ -20,6 +25,11 @@ else
   alias v='vi'
 fi
 alias vimupd='v +PlugUpdate +qall'
+
+if [ "$(uname -s)" = "Linux" ] && command -v xsel >/dev/null 2>&1; then
+  alias pbcopy='xsel --clipboard --input'
+  alias pbpaste='xsel --clipboard --output'
+fi
 
 # open file/s in Emacs (in current session, if any) in new frame
 function em() {

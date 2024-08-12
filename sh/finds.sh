@@ -18,7 +18,7 @@ if _has fzf; then
     export FZF_DEFAULT_COMMAND="rg --smart-case --files --no-ignore --hidden --follow --glob '!.git'"
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
     _fzf_compgen_path() {
-      rg --smart-case --files --no-ignore --hidden --follow --glob '!.git' . "$1"
+      rg --ignore-case --files --no-ignore --hidden --follow --glob '!.git' . "$1"
     }
   elif _has ag; then
     export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
@@ -121,7 +121,7 @@ fsf() {
     cmd="$EDITOR {1}"
   fi
 
-  rg --no-ignore --hidden --color=always --line-number --no-heading --smart-case "${*:-}" |
+  rg --no-ignore --hidden --color=always --line-number --no-heading --ignore-case "${*:-}" |
     fzf --ansi \
         --color "hl:-1:underline,hl+:-1:underline:reverse" \
         --delimiter : \
