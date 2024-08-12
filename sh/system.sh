@@ -13,6 +13,12 @@ export LC_ALL="en_US.UTF-8"
 # .Net
 [ -d "$HOME/.dotnet" ] && export DOTNET_ROOT="$HOME/.dotnet"
 
+# Go
+if [ -d "$HOME/go" ]; then
+  export GOPATH="$HOME/go"
+  export GOBIN="$GOPATH/bin"
+fi
+
 # Easier navigation
 alias ..='cd ..'
 alias ...='cd ../..'

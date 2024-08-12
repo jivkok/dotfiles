@@ -27,9 +27,17 @@ fi
 # key bindings
 # Note: use `cat`` / `ctrl-v` to easily see the escape sequences
 # Note: in iTerm2, update "Option" key settings: Preferences -> Profiles -> Keys: for both Left and Right Option Key: choose option "Esc+" instead of "Normal".
+# macOS:
 bindkey "^[^[[D" backward-word # alt-left
 bindkey "^[^[[C" forward-word # alt-right
 bindkey '\e^?' backward-kill-word # alt-backspace
+
+# Linux:
+bindkey "\e[1;5D" backward-word # ctrl-left
+bindkey "\e[1;3D" backward-word # alt-left
+bindkey "\e[1;5C" forward-word # ctrl-right
+bindkey "\e[1;3C" forward-word # alt-right
+bindkey '^H' backward-kill-word # ctrl-backspace
 
 if [[ "$_ZSH_DEBUG" = profile ]]; then
   zprof
