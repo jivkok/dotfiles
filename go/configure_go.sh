@@ -3,7 +3,7 @@
 
 os=$(uname -s)
 if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
-  sudo apt install -y golang-go
+  sudo apt install -y golang
 elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
   sudo pacman -S --noconfirm go
 elif [ "$os" = "Darwin" ]; then
