@@ -20,7 +20,7 @@ function append_source_file_lines_with_prefix_into_dest_file() {
 distro="$1"
 
 if [ -z "$distro" ]; then
-  echo "First parameter (Linux distro) is required."
+  echo "First parameter (Linux distro) is required. Supported values: debian, arch."
   return 1 >/dev/null 2>&1
   exit 1
 fi

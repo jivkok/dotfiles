@@ -13,12 +13,20 @@ if [ "$os" = "Linux" ] >/dev/null 2>&1; then
   fzfrepo="$HOME/.repos/fzf"
 
   if [ -d "$fzfrepo/.git" ]; then
-    git -C "$fzfrepo" pull --prune
+    git_result=$(git -C "$fzfrepo" pull --prune)
+    if [ "$git_result" = "Already up to date." ]; then
+      run_install=0
+    else
+      run_install=1
+    fi
   else
+    run_install=1
     git clone --depth 1 https://github.com/junegunn/fzf "$fzfrepo"
   fi
 
-  "$fzfrepo/install" --key-bindings --completion --no-update-rc
+  if [ "$run_install" = "1" ]; then
+    "$fzfrepo/install" --key-bindings --completion --no-update-rc
+  fi
 
 elif [ "$os" = "Darwin" ]; then
   ! brew ls --versions fzf >/dev/null 2>&1 && brew install fzf
