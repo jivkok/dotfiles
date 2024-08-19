@@ -7,11 +7,11 @@ source "$dotdir/setup/setup_functions.sh"
 dot_trace 'Configuring Tmux ...'
 
 os=$(uname -s)
-if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
-  sudo apt-get install -y tmux
+if [ "$os" = "Linux" ] && command -V apt-get >/dev/null 2>&1; then
+  sudo apt-get install -y -qq tmux
 
 elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
-  sudo pacman -S --noconfirm tmux
+  sudo pacman -S --noconfirm --needed tmux
 
 elif [ "$os" = "Darwin" ]; then
   ! brew ls --versions tmux >/dev/null 2>&1 && brew install tmux

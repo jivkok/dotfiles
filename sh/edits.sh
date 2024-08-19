@@ -8,7 +8,6 @@ elif [ "$SSH_TTY" = "" ] && command -v lsb_release >/dev/null 2>&1 && [[ "$(lsb_
   export EDITOR="code"
   export VISUAL='code'
   alias e='code'
-  echo zzz
 elif command -v nvim >/dev/null 2>&1; then
   export EDITOR="nvim"
   export VISUAL='nvim'

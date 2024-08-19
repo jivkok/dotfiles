@@ -7,17 +7,17 @@ source "$dotdir/setup/setup_functions.sh"
 dot_trace 'Configuring Vim ...'
 
 os=$(uname -s)
-if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
+if [ "$os" = "Linux" ] && command -V apt-get >/dev/null 2>&1; then
   dot_trace 'Installing Vim'
-  sudo apt-get install -y build-essential cmake # build helpers
-  sudo apt-get install -y python3 python3-dev python3-pip
-  sudo apt-get install -y vim neovim python3-pynvim
+  sudo apt-get install -y -qq build-essential cmake # build helpers
+  sudo apt-get install -y -qq python3 python3-dev python3-pip
+  sudo apt-get install -y -qq vim neovim python3-pynvim
 
 elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
   dot_trace 'Installing Vim'
-  sudo pacman -S --noconfirm cmake gcc # build helpers
-  sudo pacman -S --noconfirm python3 python-pip
-  sudo pacman -S --noconfirm vim neovim python3-pynvim
+  sudo pacman -S --noconfirm --needed cmake gcc # build helpers
+  sudo pacman -S --noconfirm --needed python3 python-pip
+  sudo pacman -S --noconfirm --needed vim neovim python3-pynvim
 
 elif [ "$os" = "Darwin" ]; then
   xcode-select -p >/dev/null 2>&1
