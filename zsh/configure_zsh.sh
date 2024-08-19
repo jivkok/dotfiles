@@ -7,15 +7,15 @@ source "$dotdir/setup/setup_functions.sh"
 dot_trace "Configuring ZSH ..."
 
 os=$(uname -s)
-if [ "$os" = "Linux" ] && command -V apt >/dev/null 2>&1; then
+if [ "$os" = "Linux" ] && command -V apt-get >/dev/null 2>&1; then
   if ! dpkg -s zsh >/dev/null 2>&1; then
     dot_trace "Installing ZSH ..."
-    sudo apt-get install -y zsh
+    sudo apt-get install -y -qq zsh
     dot_trace "Installing ZSH done."
   fi
 
 elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
-  sudo pacman -S --noconfirm zsh
+  sudo pacman -S --noconfirm --needed zsh
 
 elif [ "$os" = "Darwin" ]; then
   if ! brew ls --versions zsh >/dev/null 2>&1; then

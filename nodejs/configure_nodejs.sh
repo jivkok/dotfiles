@@ -8,8 +8,8 @@ if [ "$os" = "Linux" ]; then
   # https://github.com/nodesource/distributions
   curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
 
-  sudo apt-get install -y nodejs # this package includes npm too
-  sudo apt-get install -y build-essential
+  sudo apt-get install -y -qq nodejs # this package includes npm too
+  sudo apt-get install -y -qq build-essential
 elif [ "$os" = "Darwin" ]; then
   ! brew ls --versions node >/dev/null 2>&1 && brew install node
   brew link --overwrite node

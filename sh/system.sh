@@ -104,7 +104,7 @@ function update_os() {
 
   if [ "$os" = "Linux" ] && command -V apt-get >/dev/null 2>&1; then
     echo -e "\nUpdating apt-get packages ...\n"
-    sudo apt-get update -y --fix-missing
+    sudo apt-get update -y -qq --fix-missing
     sudo apt-get dist-upgrade
     sudo apt-get clean
     sudo apt-get autoremove
