@@ -8,11 +8,10 @@ install_brew_package() {
   fi
 
   local package="$1"
-  local options="$2"
   local installed=$(brew list --versions "$package")
 
   if [ -z "$installed" ]; then
-    brew install "$options" "$package"
+    brew install "$package"
   fi
 }
 
@@ -21,7 +20,7 @@ install_cask_package() {
   local installed=$(brew list --versions --cask "$package")
 
   if [ -z "$installed" ]; then
-    install_brew_package "$package" "--cask"
+    brew install --cask "$package"
   fi
 }
 
@@ -52,11 +51,11 @@ if [ ! -f /opt/homebrew/bin/brew ]; then
   export PATH
 else
   dot_trace "Updating Homebrew."
-  brew update
+  brew update --quiet
 fi
 
 dot_trace "Updating existing brew/cask packages."
-brew upgrade
+brew upgrade --quiet
 
 dot_trace "Installing brew packages."
 
@@ -105,7 +104,7 @@ install_brew_package diff-so-fancy # Improved diffs with diff-highlight and more
 install_brew_package dns2tcp # TCP over DNS tunnel
 install_brew_package dos2unix # Convert text between DOS, UNIX, and Mac formats
 install_brew_package duti # Select default apps for documents and URL schemes on macOS
-install_brew_package exa # Modern replacement for ls
+install_brew_package eza # Modern replacement for ls
 install_brew_package ffmpeg # Play, record, convert, and stream audio and video
 install_brew_package fd # Simple, fast and user-friendly alternative to find
 install_brew_package git # Distributed revision control system
@@ -113,7 +112,7 @@ install_brew_package git-delta # Syntax-highlighting pager for git and diff outp
 install_brew_package git-extras # Small git utilities
 install_brew_package graphviz # Graph visualization software from AT&T and Bell Labs
 install_brew_package grc # Colorize logfiles and command output
-install_brew_package htop-osx # Improved top (interactive process viewer)
+install_brew_package htop # Improved top (interactive process viewer)
 install_brew_package ifstat # Tool to report network interface bandwidth
 install_brew_package iftop # Display an interface's bandwidth usage
 install_brew_package imagemagick # Tools and libraries to manipulate images in many formats
@@ -128,7 +127,7 @@ install_brew_package m-cli # Swiss Army Knife for macOS
 install_brew_package mas # Mac App Store command-line interface
 install_brew_package miller # Like sed, awk, cut, join & sort for name-indexed data such as CSV
 install_brew_package mtr # traceroute and ping in a single tool
-install_brew_package mobile-shell # Remote terminal application
+install_brew_package mosh # Remote terminal application
 install_brew_package ngrep # Network grep
 install_brew_package ncdu # NCurses Disk Usage
 install_brew_package nnn # Fast file browser
@@ -147,7 +146,7 @@ install_brew_package screenfetch # Generate ASCII art with terminal, shell, and 
 install_brew_package shellcheck # Static analysis and lint tool, for (ba)sh scripts
 install_brew_package shfmt # shell parser, formatter, and interpreter
 install_brew_package socat # netcat on steroids
-install_brew_package speedtest_cli # Command-line interface for https://speedtest.net bandwidth tests
+install_brew_package speedtest-cli # Command-line interface for https://speedtest.net bandwidth tests
 install_brew_package ssh-copy-id # Add a public key to a remote machine's authorized_keys file
 install_brew_package starship # cross-shell prompt
 install_brew_package tcpflow # TCP flow recorder
@@ -159,7 +158,7 @@ install_brew_package tldr # Simplified and community-driven man pages
 install_brew_package tmux # Terminal multiplexer
 install_brew_package tree # Display directories as trees (with optional color/HTML output)
 install_brew_package ucspi-tcp # Tools for building TCP client-server applications
-install_brew_package universal-ctags/universal-ctags/universal-ctags --HEAD # ctags
+install_brew_package universal-ctags --HEAD # ctags
 install_brew_package unix2dos # Convert text between DOS, UNIX, and Mac formats
 install_brew_package webkit2png # Create screenshots of webpages from the terminal
 install_brew_package zoxide # Shell extension to easily jump to frequently accessed directories
@@ -190,9 +189,12 @@ install_brew_package zoxide # Shell extension to easily jump to frequently acces
 dot_trace "Installing cask packages."
 
 # browsers
-install_cask_package google-chrome
+install_cask_package brave-browser
+install_cask_package google-chrome # brew reinstall google-chrome --no-quarantine
 install_cask_package chromium
 install_cask_package firefox
+install_cask_package librewolf # brew reinstall librewolf --no-quarantine
+install_cask_package duckduckgo
 install_cask_package opera
 
 # FUSE, requires reboot

@@ -1,21 +1,20 @@
 os=$(uname -s)
 
-if [ "$os" = "Linux" ]; then
+# ls aliases
 
-  if command -v exa >/dev/null 2>&1; then
-    alias l='exa -aF --color=auto --group-directories-first'
-    alias ll='exa -alF --color=auto --group-directories-first'
-  else
-    alias l='ls -AF --color=auto --group-directories-first'
-    alias ll='ls -AlFh --color=auto --group-directories-first'
-  fi
+if command -v eza >/dev/null 2>&1; then
+
+    alias l='eza -aF --color=auto --group-directories-first'
+    alias ll='eza -alF --color=auto --group-directories-first'
+
+elif [ "$os" = "Linux" ]; then
+
+  alias l='ls -AF --color=auto --group-directories-first'
+  alias ll='ls -AlFh --color=auto --group-directories-first'
 
 elif [ "$os" = "Darwin" ]; then
 
-  if command -v exa >/dev/null 2>&1; then
-    alias l='exa -aF --color=auto --group-directories-first'
-    alias ll='exa -alF --color=auto --group-directories-first'
-  elif command -v gls >/dev/null 2>&1; then
+  if command -v gls >/dev/null 2>&1; then
     alias l='gls -AF --color=auto --group-directories-first'
     alias ll='gls -AlFh --color=auto --group-directories-first'
   else
@@ -23,6 +22,8 @@ elif [ "$os" = "Darwin" ]; then
     alias ll='ls -AlFh -G'
   fi
 fi
+
+# LS_COLORS
 
 # Build the dircolors with: dircolors /path/to/dircolorsdb
 # https://github.com/seebi/dircolors-solarized/raw/master/dircolors.256dark
@@ -41,6 +42,8 @@ LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:
 [ -f "$HOME/bin/LS_COLORS" ] && LS_COLORS=$(cat "$HOME/bin/LS_COLORS")
 
 export LS_COLORS
+
+# exa/eza
 
 GREY_COLOR="38;5;248"
 GREY_COLOR_2="38;5;240"

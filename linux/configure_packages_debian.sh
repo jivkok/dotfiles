@@ -9,7 +9,7 @@ sudo apt-get update -y --fix-missing -qq && sudo apt-get upgrade -y -qq
 sudo apt-get install -y -qq bat # cat replacement with syntax highlighting, git integration
 sudo apt-get install -y -qq cifs-utils # Common Internet File System utilities
 sudo apt-get install -y -qq curl # command line tool for transferring data with URL syntax
-sudo apt-get install -y -qq exa # Modern replacement for ls
+sudo apt-get install -y -qq eza # Modern replacement for ls
 sudo apt-get install -y -qq git # fast, scalable, distributed revision control system
 sudo apt-get install -y -qq grc # Colorize logfiles and command output
 sudo apt-get install -y -qq jq # lightweight and flexible command-line JSON processor
