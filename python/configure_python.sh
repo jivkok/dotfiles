@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 # Configuring Python
 
+install_pipx_package() {
+  if [ -z "$1" ]; then
+    echo "Package name not specified."
+    return
+  fi
+
+  local package="$1"
+  local installed=$(pipx list | grep "package $package")
+
+  if [ -z "$installed" ]; then
+    pipx install --quiet "$package"
+  fi
+}
+
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
 source "$dotdir/setup/setup_functions.sh"
 
@@ -16,23 +30,20 @@ elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
 elif [ "$os" = "Darwin" ]; then
   if ! brew ls --versions python3 >/dev/null 2>&1; then
     dot_trace "Installing Python"
-    brew install python3
+    brew install --quiet python3
   else
     dot_trace "Updating Python"
-    brew upgrade python3
+    brew upgrade --quiet python3
   fi
-  brew postinstall python3
-  brew link python3
+  brew postinstall --quiet python3
+  brew link --quiet python3
 
-  dot_trace "Installing/updating packages pip & setuptools (system-scope)"
-  python3 -m pip install --upgrade pip setuptools
-
-  if ! brew ls --versions python3 >/dev/null 2>&1; then
+  if ! brew ls --versions pipx >/dev/null 2>&1; then
     dot_trace "Installing pipx"
-    brew install pipx
+    brew install --quiet pipx
   else
     dot_trace "Updating pipx"
-    brew upgrade pipx
+    brew upgrade --quiet pipx
   fi
 else
   dot_error "Unsupported system:"
@@ -42,10 +53,10 @@ else
 fi
 
 dot_trace "Installing/updating packages (user-scope)"
-pipx upgrade-all
-pipx install glances # system stats      APT YAY BREW
-pipx install httpie  # curl-like with colorized output    APT PACMAN BREW
-pipx install icdiff  # improved color diff. Use it for diffing two files.     HOME_BIN
+pipx upgrade-all --quiet # pipx reinstall-all --quiet
+install_pipx_package glances # system stats      APT YAY BREW
+install_pipx_package httpie  # curl-like with colorized output    APT PACMAN BREW
+install_pipx_package icdiff  # improved color diff. Use it for diffing two files.     HOME_BIN
 
 # Packages used at one point
 # python3 -m pip install --user --upgrade jsbeautifier # reformat and reindent JavaScript code. jsbeautifier.org. Use with 'js-beautify somefile.js'
