@@ -9,7 +9,7 @@ sudo pacman -Syu --noconfirm
 sudo pacman -S --noconfirm --needed bat # cat replacement with syntax highlighting, git integration
 sudo pacman -S --noconfirm --needed cifs-utils # Common Internet File System utilities
 sudo pacman -S --noconfirm --needed curl # command line tool for transferring data with URL syntax
-sudo pacman -S --noconfirm --needed exa # Modern replacement for ls
+sudo pacman -S --noconfirm --needed eza # Modern replacement for ls
 sudo pacman -S --noconfirm --needed git # fast, scalable, distributed revision control system
 sudo pacman -S --noconfirm --needed grc # Colorize logfiles and command output
 sudo pacman -S --noconfirm --needed jq # lightweight and flexible command-line JSON processor
