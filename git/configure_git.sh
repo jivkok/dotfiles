@@ -72,9 +72,11 @@ git config --global alias.cl 'clean -x -d -f'
 git config --global alias.cm 'commit -m'
 git config --global alias.co 'checkout'
 git config --global alias.df 'diff --word-diff=color --word-diff-regex=. -w --patience'
+git config --global alias.dft 'difftool'
 git config --global alias.dump 'cat-file -p'
 git config --global alias.files '! git ls-files | grep -i'
 git config --global alias.filelog 'log -u'
+git config --global alias.fza "! git ls-files -m -o --exclude-standard | fzf -m --print0 | xargs -0 git add"
 git config --global alias.hist "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue) [%an]%Creset' --abbrev-commit --date=relative"
 git config --global alias.l 'log --pretty=format:\"%h %ad | %s%d [%an]\" --date=short'
 git config --global alias.last 'log -p --max-count=1 --word-diff'
@@ -104,6 +106,8 @@ git config --global alias.who 'shortlog -s -e --'
 git config --global alias.zap 'reset --hard HEAD'
 
 if command -V delta >/dev/null 2>&1; then
+  dot_trace "Setting delta as pager"
+
   git config --global core.pager "delta"
   git config --global interactive.diffFilter "delta --color-only"
   git config --bool --global delta.navigate true
@@ -111,9 +115,20 @@ if command -V delta >/dev/null 2>&1; then
   git config --global merge.conflictstyle "diff3"
   git config --global diff.colorMoved "default"
 elif command -V diff-so-fancy >/dev/null 2>&1; then
+  dot_trace "Setting diff-so-fancy as pager"
+
   git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
   git config --global interactive.diffFilter "diff-so-fancy --patch"
   git config --bool --global diff-so-fancy.markEmptyLines false
+fi
+
+if command -V difft >/dev/null 2>&1; then
+  dot_trace "Setting difftastic as diff tool"
+
+  git config --bool --global pager.difftool true
+  git config --bool --global difftool.prompt false
+  git config --global diff.tool difftastic
+  git config --global difftool.difftastic.cmd "difft \$LOCAL \$REMOTE"
 fi
 
 os=$(uname -s)
