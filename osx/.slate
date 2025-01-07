@@ -24,6 +24,8 @@ alias hyper ctrl;shift;alt;cmd
 # Monitor Aliases
 alias mon-laptop    1728x1117
 alias mon-4k        3840x2160
+alias mon-desktop   3200x1800
+alias mon-portrait  1692x3008
 
 ## Application aliases
 alias browser   'Google Chrome'
@@ -80,11 +82,28 @@ layout 2monitors 'Kindle':REPEAT             ${leftthird}
 layout 2monitors 'Activity Monitor':REPEAT   ${full}        ${mon-laptop}
 layout 2monitors 'Console':REPEAT            ${full}        ${mon-laptop}
 
+## 3monitors
+layout 3monitors ${terminal}:REPEAT          ${tophalf} ${mon-portrait}
+layout 3monitors 'Terminal':REPEAT           ${full} ${mon-laptop}
+layout 3monitors 'Finder':REPEAT             ${full} ${mon-laptop}
+layout 3monitors 'SourceTree':REPEAT         ${lefthalf} ${mon-desktop}
+layout 3monitors ${editor}:REPEAT            ${righthalf} ${mon-desktop}
+layout 3monitors 'Xcode':REPEAT              ${righthalf} ${mon-desktop}
+layout 3monitors 'Google Chrome':REPEAT      ${lefthalf} ${mon-desktop}
+layout 3monitors 'Safari':REPEAT             ${lefthalf} ${mon-desktop}
+layout 3monitors 'Firefox':REPEAT            ${lefthalf} ${mon-desktop}
+layout 3monitors 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait}
+layout 3monitors 'Kindle':REPEAT             ${lefthalf} ${mon-desktop}
+layout 3monitors 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
+layout 3monitors 'Console':REPEAT            ${full} ${mon-laptop}
+layout 3monitors 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 3monitors 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+
 ## Default Layouts
 default 1monitor  resolutions:${mon-laptop}
 default 2monitors resolutions:${mon-laptop};${mon-4k}
-#default 1monitor count:1
-#default 2monitors count:2
+default 3monitors resolutions:${mon-laptop};${mon-desktop};${mon-portrait}
+# default 3monitors count:3
 
 # Bindings
 
