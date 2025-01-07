@@ -282,7 +282,7 @@ A location list is a window-local quickfix list. You get one after commands like
 :lclose ( lc) - close Locations window
 
 === Key mappings
-:nmap,vmap,imap - show key mappings for normal,visual,insert mode
+:map,nmap,vmap,imap - show key mappings for normal,visual,insert mode
 :Unite mapping - show all key mappings (requires Unite)
 
 === Folding

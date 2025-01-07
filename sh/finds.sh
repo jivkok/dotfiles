@@ -50,9 +50,9 @@ fi
 # Usage: f vim
 f() {
   IFS=$'\n'
-  files=($(fd . --type f --type l --follow --hidden --exclude .git "${@:2}" | fzf -0 -1 -m))
+  files=($(fd --type f --type l --follow --hidden --exclude .git "$2" . | fzf -0 -1 -m))
   IFS=$' '
-  [[ -n "$files" ]] && $1 "${files[@]}"
+  [[ -n "$files" ]] && "$1" "${files[@]}"
 }
 
 # Pass selected directories as arguments to the given command
