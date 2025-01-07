@@ -221,7 +221,6 @@ install_cask_package handbrake # video transcoder
 install_cask_package joplin # evernote-like note-taking and web clipper
 install_cask_package karabiner-elements # keyboard customization
 install_cask_package keepassxc # passwords sync
-install_cask_package kindle # books
 install_cask_package makemkv # video formats converter/transcoder
 install_cask_package mindforger # human mind inspired (Eisenhower matrix) personal knowledge management tool
 install_cask_package obsidian # Knowledge base that works on top of a local folder of plain text Markdown files
@@ -286,6 +285,7 @@ dot_trace "Installing AppStore apps."
 install_mas_package 1044484672 # ApolloOne - Photo Video Viewer. RAW files viewer & EXIF editor
 install_mas_package 1473079126 # Cleaner One: Disk Clean
 install_mas_package 1295203466 # Microsoft Remote Desktop
+install_mas_package 302584613 # Amazon Kindle
 # mas install 937984704 # Amphetamine - keep your Mac awake
 # mas install 576421334 # Converto - The Unit Converter
 # mas install 442160987 # Flycut (Clipboard manager)
