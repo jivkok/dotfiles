@@ -23,18 +23,14 @@ alias hyper ctrl;shift;alt;cmd
 
 # Monitor Aliases
 alias mon-laptop    1728x1117
-alias mon-4k        3840x2160
-alias mon-desktop   3200x1800
-alias mon-portrait  1692x3008
-
-## Application aliases
-alias browser   'Google Chrome'
-alias editor    'Code'
-alias terminal  'iTerm2'
+alias mon-landscape 3840x2160
+alias mon-portrait  2160x3840
+alias mon-portrait-lowres 1440x2560
 
 ## Position aliases
 alias full                  move screenOriginX;screenOriginY                                screenSizeX;screenSizeY
 alias lefthalf              move screenOriginX;screenOriginY                                screenSizeX/2;screenSizeY
+alias middlehalf            move screenOriginX+screenSizeX/4;screenOriginY                  screenSizeX/2;screenSizeY
 alias righthalf             move screenOriginX+screenSizeX/2;screenOriginY                  screenSizeX/2;screenSizeY
 alias tophalf               move screenOriginX;screenOriginY                                screenSizeX;screenSizeY/2
 alias bottomhalf            move screenOriginX;screenOriginY+screenSizeY/2                  screenSizeX;screenSizeY/2
@@ -54,56 +50,162 @@ alias bottom_rightthird     move screenOriginX+screenSizeX*2/3;screenOriginY+scr
 
 # Layouts
 
+## Default Layouts
+default 1monitor  resolutions:${mon-laptop}
+default 2monitors resolutions:${mon-laptop};${mon-landscape}
+default 2monitors-external resolutions:${mon-landscape};${mon-portrait-lowres}
+# default 3monitors-2p resolutions:${mon-laptop};${mon-landscape};${mon-portrait}
+# default 3monitors-2p-lowres resolutions:${mon-laptop};${mon-landscape};${mon-portrait-lowres}
+default 3monitors-3p resolutions:${mon-laptop};${mon-landscape};${mon-portrait}
+default 3monitors-3p-lowres resolutions:${mon-laptop};${mon-landscape};${mon-portrait-lowres}
+# default 3monitors-2p count:3
+
 ## 1monitor
-layout 1monitor ${terminal}:REPEAT          ${full}
+layout 1monitor 'iTerm2':REPEAT             ${full}
 layout 1monitor 'Terminal':REPEAT           ${full}
 layout 1monitor 'Finder':REPEAT             ${lefthalf}
 layout 1monitor 'SourceTree':REPEAT         ${lefthalf}
-layout 1monitor ${editor}:REPEAT            ${lefthalf}
+layout 1monitor 'Code':REPEAT               ${full}
+layout 1monitor 'Cursor':REPEAT             ${full}
+layout 1monitor 'VSCodium':REPEAT           ${full}
 layout 1monitor 'Xcode':REPEAT              ${full}
 layout 1monitor 'Google Chrome':REPEAT      ${full}
+layout 1monitor 'Chromium':REPEAT           ${full}
 layout 1monitor 'Safari':REPEAT             ${full}
 layout 1monitor 'Firefox':REPEAT            ${righthalf}
+layout 1monitor 'Brave Browser':REPEAT      ${full}
 layout 1monitor 'Kindle':REPEAT             ${righthalf}
 layout 1monitor 'Activity Monitor':REPEAT   ${full}
 layout 1monitor 'Console':REPEAT            ${full}
+layout 1monitor 'Messages':REPEAT           ${full}
+layout 1monitor 'KeePassXC':REPEAT          ${full}
+layout 1monitor 'KeePassium':REPEAT         ${full}
 
 ## 2monitors
-layout 2monitors ${terminal}:REPEAT          ${bottom_leftthird}
-layout 2monitors 'Terminal':REPEAT           ${full}        ${mon-laptop}
-layout 2monitors 'Finder':REPEAT             ${top_leftthird}
-layout 2monitors 'SourceTree':REPEAT         ${leftthird}
-layout 2monitors ${editor}:REPEAT            ${middlethird}
-layout 2monitors 'Xcode':REPEAT              ${middlethird}
-layout 2monitors 'Google Chrome':REPEAT      ${rightthird}
-layout 2monitors 'Safari':REPEAT             ${rightthird}
-layout 2monitors 'Firefox':REPEAT            ${rightthird}
-layout 2monitors 'Kindle':REPEAT             ${leftthird}
-layout 2monitors 'Activity Monitor':REPEAT   ${full}        ${mon-laptop}
-layout 2monitors 'Console':REPEAT            ${full}        ${mon-laptop}
+layout 2monitors 'iTerm2':REPEAT             ${bottom_leftthird} ${mon-landscape}
+layout 2monitors 'Terminal':REPEAT           ${full} ${mon-laptop}
+layout 2monitors 'Finder':REPEAT             ${top_leftthird} ${mon-landscape}
+layout 2monitors 'SourceTree':REPEAT         ${leftthird} ${mon-landscape}
+layout 2monitors 'Code':REPEAT               ${middlethird} ${mon-landscape}
+layout 2monitors 'Cursor':REPEAT             ${middlehalf} ${mon-landscape}
+layout 2monitors 'VSCodium':REPEAT           ${middlethird} ${mon-landscape}
+layout 2monitors 'Xcode':REPEAT              ${middlethird} ${mon-landscape}
+layout 2monitors 'Google Chrome':REPEAT      ${rightthird} ${mon-landscape}
+layout 2monitors 'Chromium':REPEAT           ${rightthird} ${mon-landscape}
+layout 2monitors 'Safari':REPEAT             ${rightthird} ${mon-landscape}
+layout 2monitors 'Firefox':REPEAT            ${rightthird} ${mon-landscape}
+layout 2monitors 'Brave Browser':REPEAT      ${rightthird} ${mon-landscape}
+layout 2monitors 'Kindle':REPEAT             ${leftthird} ${mon-landscape}
+layout 2monitors 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
+layout 2monitors 'Console':REPEAT            ${full} ${mon-laptop}
+layout 2monitors 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 2monitors 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 2monitors 'KeePassium':REPEAT         ${full} ${mon-laptop}
 
-## 3monitors
-layout 3monitors ${terminal}:REPEAT          ${tophalf} ${mon-portrait}
-layout 3monitors 'Terminal':REPEAT           ${full} ${mon-laptop}
-layout 3monitors 'Finder':REPEAT             ${full} ${mon-laptop}
-layout 3monitors 'SourceTree':REPEAT         ${lefthalf} ${mon-desktop}
-layout 3monitors ${editor}:REPEAT            ${righthalf} ${mon-desktop}
-layout 3monitors 'Xcode':REPEAT              ${righthalf} ${mon-desktop}
-layout 3monitors 'Google Chrome':REPEAT      ${lefthalf} ${mon-desktop}
-layout 3monitors 'Safari':REPEAT             ${lefthalf} ${mon-desktop}
-layout 3monitors 'Firefox':REPEAT            ${lefthalf} ${mon-desktop}
-layout 3monitors 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait}
-layout 3monitors 'Kindle':REPEAT             ${lefthalf} ${mon-desktop}
-layout 3monitors 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
-layout 3monitors 'Console':REPEAT            ${full} ${mon-laptop}
-layout 3monitors 'Messages':REPEAT           ${full} ${mon-laptop}
-layout 3monitors 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+## 2monitors-external
+layout 2monitors-external 'iTerm2':REPEAT             ${leftthird} ${mon-landscape}
+layout 2monitors-external 'Terminal':REPEAT           ${tophalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Finder':REPEAT             ${top_leftthird} ${mon-landscape}
+layout 2monitors-external 'SourceTree':REPEAT         ${leftthird} ${mon-landscape}
+layout 2monitors-external 'Code':REPEAT               ${middlethird} ${mon-landscape}
+layout 2monitors-external 'Cursor':REPEAT             ${middlehalf} ${mon-landscape}
+layout 2monitors-external 'VSCodium':REPEAT           ${middlethird} ${mon-landscape}
+layout 2monitors-external 'Xcode':REPEAT              ${middlethird} ${mon-landscape}
+layout 2monitors-external 'Google Chrome':REPEAT      ${rightthird} ${mon-landscape}
+layout 2monitors-external 'Chromium':REPEAT           ${rightthird} ${mon-landscape}
+layout 2monitors-external 'Safari':REPEAT             ${rightthird} ${mon-landscape}
+layout 2monitors-external 'Firefox':REPEAT            ${rightthird} ${mon-landscape}
+layout 2monitors-external 'Brave Browser':REPEAT      ${rightthird} ${mon-landscape}
+layout 2monitors-external 'Kindle':REPEAT             ${leftthird} ${mon-landscape}
+layout 2monitors-external 'Activity Monitor':REPEAT   ${tophalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Console':REPEAT            ${tophalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Messages':REPEAT           ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'KeePassXC':REPEAT          ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'KeePassium':REPEAT         ${bottomhalf} ${mon-portrait-lowres}
 
-## Default Layouts
-default 1monitor  resolutions:${mon-laptop}
-default 2monitors resolutions:${mon-laptop};${mon-4k}
-default 3monitors resolutions:${mon-laptop};${mon-desktop};${mon-portrait}
-# default 3monitors count:3
+## 3monitors-2p
+layout 3monitors-2p 'iTerm2':REPEAT             ${tophalf} ${mon-portrait}
+layout 3monitors-2p 'Terminal':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-2p 'Finder':REPEAT             ${full} ${mon-laptop}
+layout 3monitors-2p 'SourceTree':REPEAT         ${lefthalf} ${mon-landscape}
+layout 3monitors-2p 'Code':REPEAT               ${righthalf} ${mon-landscape}
+layout 3monitors-2p 'Cursor':REPEAT             ${righthalf} ${mon-landscape}
+layout 3monitors-2p 'VSCodium':REPEAT           ${righthalf} ${mon-landscape}
+layout 3monitors-2p 'Xcode':REPEAT              ${righthalf} ${mon-landscape}
+layout 3monitors-2p 'Google Chrome':REPEAT      ${lefthalf} ${mon-landscape}
+layout 3monitors-2p 'Chromium':REPEAT           ${lefthalf} ${mon-landscape}
+layout 3monitors-2p 'Safari':REPEAT             ${lefthalf} ${mon-landscape}
+layout 3monitors-2p 'Firefox':REPEAT            ${lefthalf} ${mon-landscape}
+layout 3monitors-2p 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait}
+layout 3monitors-2p 'Kindle':REPEAT             ${lefthalf} ${mon-landscape}
+layout 3monitors-2p 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
+layout 3monitors-2p 'Console':REPEAT            ${full} ${mon-laptop}
+layout 3monitors-2p 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-2p 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 3monitors-2p 'KeePassium':REPEAT         ${full} ${mon-laptop}
+
+## 3monitors-2p-lowres
+layout 3monitors-2p-lowres 'iTerm2':REPEAT             ${tophalf} ${mon-portrait-lowres}
+layout 3monitors-2p-lowres 'Terminal':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'Finder':REPEAT             ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'SourceTree':REPEAT         ${lefthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Code':REPEAT               ${righthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Cursor':REPEAT             ${righthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'VSCodium':REPEAT           ${righthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Xcode':REPEAT              ${righthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Google Chrome':REPEAT      ${lefthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Chromium':REPEAT           ${lefthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Safari':REPEAT             ${lefthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Firefox':REPEAT            ${lefthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait-lowres}
+layout 3monitors-2p-lowres 'Kindle':REPEAT             ${lefthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'Console':REPEAT            ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'KeePassium':REPEAT         ${full} ${mon-laptop}
+
+## 3monitors-3p
+layout 3monitors-3p 'iTerm2':REPEAT             ${leftthird} ${mon-landscape}
+layout 3monitors-3p 'Terminal':REPEAT           ${tophalf} ${mon-portrait}
+layout 3monitors-3p 'Finder':REPEAT             ${full} ${mon-laptop}
+layout 3monitors-3p 'SourceTree':REPEAT         ${rightthird} ${mon-landscape}
+layout 3monitors-3p 'Code':REPEAT               ${middlethird} ${mon-landscape}
+layout 3monitors-3p 'Cursor':REPEAT             ${middlehalf} ${mon-landscape}
+layout 3monitors-3p 'VSCodium':REPEAT           ${middlethird} ${mon-landscape}
+layout 3monitors-3p 'Xcode':REPEAT              ${middlethird} ${mon-landscape}
+layout 3monitors-3p 'Google Chrome':REPEAT      ${rightthird} ${mon-landscape}
+layout 3monitors-3p 'Chromium':REPEAT           ${rightthird} ${mon-landscape}
+layout 3monitors-3p 'Safari':REPEAT             ${rightthird} ${mon-landscape}
+layout 3monitors-3p 'Firefox':REPEAT            ${rightthird} ${mon-landscape}
+layout 3monitors-3p 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait}
+layout 3monitors-3p 'Kindle':REPEAT             ${middlethird} ${mon-landscape}
+layout 3monitors-3p 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
+layout 3monitors-3p 'Console':REPEAT            ${full} ${mon-laptop}
+layout 3monitors-3p 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-3p 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 3monitors-3p 'KeePassium':REPEAT         ${full} ${mon-laptop}
+
+## 3monitors-3p-lowres
+layout 3monitors-3p-lowres 'iTerm2':REPEAT             ${leftthird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Terminal':REPEAT           ${tophalf} ${mon-portrait-lowres}
+layout 3monitors-3p-lowres 'Finder':REPEAT             ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'SourceTree':REPEAT         ${rightthird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Code':REPEAT               ${middlethird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Cursor':REPEAT             ${middlehalf} ${mon-landscape}
+layout 3monitors-3p-lowres 'VSCodium':REPEAT           ${middlethird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Xcode':REPEAT              ${middlethird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Google Chrome':REPEAT      ${rightthird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Chromium':REPEAT           ${rightthird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Safari':REPEAT             ${rightthird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Firefox':REPEAT            ${rightthird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait-lowres}
+layout 3monitors-3p-lowres 'Kindle':REPEAT             ${middlethird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'Console':REPEAT            ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'KeePassium':REPEAT         ${full} ${mon-laptop}
 
 # Bindings
 
@@ -134,20 +236,20 @@ bind f3:${hyper}  ${bottomleft}
 bind f4:${hyper}  ${bottomright}
 
 ## Layout bindings
-bind f11:${hyper} layout 1monitor
-bind f12:${hyper} layout 2monitors
+bind f11:${hyper} layout 3monitors-2p-lowres
+bind f12:${hyper} layout 3monitors-3p-lowres
 
 ## Monitor bindings
 bind [:${hyper}  throw previous # move to previous screen
 bind ]:${hyper}  throw next # move to next screen
 
 ## App bindings
-bind z:${hyper}     focus ${terminal}
-bind space:${hyper} focus ${editor}
-bind b:${hyper}     focus ${browser}
+bind z:${hyper}     focus 'iTerm2'
+bind space:${hyper} focus 'VSCodium'
+bind b:${hyper}     focus 'Google Chrome'
 bind f:${hyper}     focus 'Finder'
 bind i:${hyper}     focus 'Safari'
-bind x:${hyper}     focus 'Xcode'
+bind x:${hyper}     focus 'Code'
 
 # Window Hints
 bind esc:${hyper} hint
