@@ -1,0 +1,36 @@
+## Navigation
+alefragnani.bookmarks ## Add/manage bookmarks in code for quick navigation.
+lucax88x.codeacejumper ## Rapid cursor movement and jumping between positions.
+
+## Editing, Linting, Formatting
+editorconfig.editorconfig ## Apply `.editorconfig` settings to keep consistent coding styles.
+fnando.linter ## General-purpose linting helper for multiple languages.
+foxundermoon.shell-format ## Shell script formatter (uses `shfmt` under the hood).
+
+## Themes, Appearance
+monokai.theme-monokai-pro-vscode ## Monokai Pro color theme.
+naumovs.theme-oceanicnext ## Oceanic Next color theme.
+
+## Languages: C#
+ms-dotnettools.csharp ## C# language support (IntelliSense, debugging, etc.).
+ms-dotnettools.vscode-dotnet-runtime ## Installs/manages .NET runtime for .NET-based tools/extensions.
+
+## Languages: Python
+ms-python.python ## Core Python extension (language features and tooling).
+ms-python.vscode-pylance ## Python language server (Pylance) for IntelliSense and type checking.
+ms-python.debugpy ## Python debugger backend used by the Python extension.
+ms-python.vscode-python-envs ## Python environment discovery/management support.
+
+## Languages: Misc
+yzhang.markdown-all-in-one ## Markdown editing, TOC, shortcuts, and preview enhancements.
+redhat.vscode-yaml ## YAML language support, validation, and schemas.
+
+## Tools: misc
+ms-vscode.makefile-tools ## Makefile language support and task integration.
+humao.rest-client ## Send HTTP requests and inspect responses directly in VS Code.
+ms-vscode.live-server ## Live reloading web server for static or simple web apps.
+
+## Containers
+docker.docker ## Docker tooling (build, run, manage containers).
+ms-azuretools.vscode-docker ## Microsoft’s Docker integration (images, containers, registries).
+ms-azuretools.vscode-containers ## Azure containers/Dev Containers integration.

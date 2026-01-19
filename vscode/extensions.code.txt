@@ -1,0 +1,2 @@
+## AI/Code Assistants
+saoudrizwan.claude-dev ## Claude-based coding/chat assistant inside VS Code.

@@ -1,0 +1,7 @@
+## Remote
+ms-vscode-remote.remote-ssh ## Open remote folders over SSH.
+ms-vscode-remote.remote-ssh-edit ## Edit SSH configuration files and related remote settings.
+ms-vscode.remote-explorer ## Remote Explorer view for SSH/containers/WSL.
+
+## AI/Code Assistants
+continue.continue ## AI-powered coding assistant and chat.

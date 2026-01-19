@@ -1,28 +1,70 @@
 {
-    "diffEditor.renderSideBySide": false,
+  // Editor
+  "diffEditor.renderSideBySide": false,
+  "editor.codeLens": true,
+  "editor.copyWithSyntaxHighlighting": false,
+  "editor.cursorBlinking": "solid",
+  "editor.dragAndDrop": false,
+  "editor.fontFamily": "'Inconsolata-g for Powerline', Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontSize": 12,
+  "editor.fontLigatures": false,
+  "editor.hideCursorInOverviewRuler": false,
+  "editor.renderWhitespace": "boundary",
+  "explorer.compactFolders": false,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "workbench.hover.delay": 3000,
 
-    "editor.copyWithSyntaxHighlighting": false,
-    "editor.fontFamily": "'Inconsolata-g for Powerline', Menlo, Monaco, 'Courier New', monospace",
-    "editor.renderWhitespace": "boundary",
+  // Use simple navigation
+  "editor.gotoLocation.multipleDeclarations": "goto",
+  "editor.gotoLocation.multipleDefinitions": "goto",
+  "editor.gotoLocation.multipleImplementations": "goto",
+  "editor.gotoLocation.multipleReferences": "goto",
+  "editor.gotoLocation.multipleTypeDefinitions": "goto",
 
-    "explorer.confirmDragAndDrop": false,
+  "files.trimTrailingWhitespace": true,
+  "files.exclude": {
+    "**/.DS_Store": true
+  },
 
-    "files.trimTrailingWhitespace": true,
-    "files.exclude": {
-        "**/.DS_Store": true
-    },
+  "remote.SSH.useFlock": false,
 
-    "remote.SSH.useFlock": false,
+  "search.exclude": {
+    ".build/**": true
+  },
 
-    "search.exclude": {
-        ".build/**": true
-    },
+  "security.workspace.trust.untrustedFiles": "open",
 
-    "security.workspace.trust.untrustedFiles": "open",
+  "telemetry.telemetryLevel": "off",
 
-    "workbench.welcome.enabled": false,
+  // Terminal
+  "terminal.integrated.fontFamily": "'Inconsolata-g for Powerline', Menlo, Monaco, 'Courier New', monospace",
+  "terminal.integrated.fontSize": 12,
+  "workbench.colorCustomizations": {
+    "terminal.background": "#1B2B34",
+    "terminal.foreground": "#C0C5CE",
+    "terminalCursor.foreground": "#C0C5CE",
+    "terminal.ansiBlack": "#1B2B34",
+    "terminal.ansiRed": "#EC5F67",
+    "terminal.ansiGreen": "#99C794",
+    "terminal.ansiYellow": "#FAC863",
+    "terminal.ansiBlue": "#6699CC",
+    "terminal.ansiMagenta": "#C594C5",
+    "terminal.ansiCyan": "#5FB3B3",
+    "terminal.ansiWhite": "#C0C5CE",
+    "terminal.ansiBrightBlack": "#65737E",
+    "terminal.ansiBrightRed": "#EC5F67",
+    "terminal.ansiBrightGreen": "#99C794",
+    "terminal.ansiBrightYellow": "#FAC863",
+    "terminal.ansiBrightBlue": "#6699CC",
+    "terminal.ansiBrightMagenta": "#C594C5",
+    "terminal.ansiBrightCyan": "#5FB3B3",
+    "terminal.ansiBrightWhite": "#D8DEE9"
+  },
 
-    "[python]": {
-        "editor.formatOnType": true
-    }
+  "[python]": {
+    "editor.formatOnType": true
+  },
+
+  "docker.extension.enableComposeLanguageServer": false
 }
