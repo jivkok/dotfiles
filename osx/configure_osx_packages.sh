@@ -232,7 +232,6 @@ install_cask_package tunnelblick # OpenVPN client
 install_cask_package vlc # media player
 install_cask_package wireshark # network capture / monitor, depends on xquartz
 install_cask_package xrg # System Monitor for OSX
-install_cask_package zenmap # nmap GUI
 
 # Developer-friendly quick-look plugins; see https://github.com/sindresorhus/quick-look-plugins
 # brew cask install qlcolorcode qlstephen qlmarkdown quicklook-json qlprettypatch quicklook-csv betterzipql qlimagesize webpquicklook suspicious-package

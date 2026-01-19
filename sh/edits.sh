@@ -1,13 +1,16 @@
 export EDITOR="vi"
 export VISUAL='vi'
-if [ "$(uname -s)" = "Darwin" ] && command -v code >/dev/null 2>&1; then
-  export EDITOR="code"
-  export VISUAL='code'
+
+if [ "$SSH_TTY" = "" ] && { command -v code >/dev/null 2>&1 || command -v codium >/dev/null 2>&1; }; then
   alias e='code'
-elif [ "$SSH_TTY" = "" ] && command -v lsb_release >/dev/null 2>&1 && [[ "$(lsb_release --id)" = *"Linuxmint" ]] && command -v code >/dev/null 2>&1; then
-  export EDITOR="code"
-  export VISUAL='code'
-  alias e='code'
+  alias ee='codium'
+  if command -v codium >/dev/null 2>&1; then # prefer VSCodium
+    export EDITOR="codium"
+    export VISUAL='codium'
+  elif command -v code >/dev/null 2>&1; then
+    export EDITOR="code"
+    export VISUAL='code'
+  fi
 elif command -v nvim >/dev/null 2>&1; then
   export EDITOR="nvim"
   export VISUAL='nvim'

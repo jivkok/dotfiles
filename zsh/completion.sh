@@ -1,7 +1,10 @@
 [ -d $dotdir/zsh/completion ] && fpath=($dotdir/zsh/completion $fpath)
 
 autoload -Uz compinit
-compinit
+if [ "$(find ~/.zcompdump -mtime 1)" ] ; then
+    compinit
+fi
+compinit -C
 
 zstyle ":completion:*" auto-description "specify: %d"
 zstyle ":completion:*" completer _expand _complete _correct _approximate

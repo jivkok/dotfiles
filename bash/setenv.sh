@@ -22,4 +22,9 @@ optional "$HOME/.fzf.bash"
 
 if command -V zoxide >/dev/null 2>&1; then
   eval "$(zoxide init bash)"
+
+  zp() {
+    pushd . > /dev/null || return
+    z "$@"
+  }
 fi

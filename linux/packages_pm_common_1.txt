@@ -5,6 +5,7 @@ curl # command line tool for transferring data with URL syntax
 eza # Modern replacement for ls
 git # fast, scalable, distributed revision control system
 grc # Colorize logfiles and command output
+hexyl # Terminal hex viewer
 jq # lightweight and flexible command-line JSON processor
 lnav # ncurses-based log file viewer
 mosh # Mobile shell that supports roaming and intelligent local echo

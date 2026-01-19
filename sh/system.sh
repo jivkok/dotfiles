@@ -3,7 +3,7 @@ export HISTSIZE=32768
 export HISTFILESIZE=$HISTSIZE
 export HISTCONTROL=ignoreboth
 # Make some commands not show up in history
-export HISTIGNORE="..:...:....:* --help:cd:cd -:clear:date:exit:ll:ls:pwd:reload:rr:v:x"
+export HISTIGNORE="..:...:....:* --help:cd:cd -:clear:date:exit:ll:ls:pwd:reload:rr:x"
 
 # Prefer US English and use UTF-8
 export LANG="en_US.UTF-8"
@@ -37,7 +37,6 @@ alias mk='make'
 alias nh='unset HISTFILE'
 alias rr='ranger'
 alias vars='set | sort'
-alias vg='vagrant'
 alias x='exit'
 
 # System info
@@ -184,7 +183,6 @@ function update_os() {
     npm update -g
     sudo -E env "PATH=$PATH" n stable
     npm cache verify
-    bower cache clean
     echo -e "\nUpdating Node packages done.\n"
   fi
 
@@ -208,8 +206,8 @@ function help() {
   fi
 
   local DEFAULT="\033[0;39m" RED="\033[0;31m" GREEN="\033[0;32m"
-  local hasPygmentize=0
-  command -V pygmentize >/dev/null 2>&1 && hasPygmentize=1
+  local hasBat=0
+  command -V bat >/dev/null 2>&1 && hasBat=1
 
   local cmdtest
   cmdtest="$(type "$cmd")" # command -V, which
@@ -217,19 +215,15 @@ function help() {
   # alias
   if [[ $cmdtest == *"is an alias for"* ]]; then
     echo -e "${GREEN}Alias${DEFAULT}"
-    if [[ $hasPygmentize == 1 ]]; then
-      alias "$cmd" | pygmentize -l sh
-    else
-      alias "$cmd"
-    fi
+    alias "$cmd"
     return
   fi
 
   # function
   if [[ $cmdtest == *"is a shell function"* ]]; then
     echo -e "${GREEN}${cmdtest}${DEFAULT}"
-    if [[ $hasPygmentize == 1 ]]; then
-      which "$cmd" | pygmentize -l sh
+    if [[ $hasBat == 1 ]]; then
+      which "$cmd" | bat -l sh
     else
       which "$cmd"
     fi

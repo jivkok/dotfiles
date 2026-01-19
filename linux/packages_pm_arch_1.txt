@@ -1,4 +1,5 @@
 fd # Simple, fast and user-friendly alternative to find
+git-delta # Syntax-highlighting pager for git and diff output
 lazygit # terminal ui for git
 the_silver_searcher # very fast grep-like program, alternative to ack-grep
 starship # shell-agnostic prompt
