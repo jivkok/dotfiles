@@ -1,0 +1,65 @@
+# Global gitignore
+# - OS
+# - editor specific files
+# - archives
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# Vim
+*.swp
+*.swo
+*.swn
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+.#*
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Tags
+tags
+TAGS
+.tags
+
+# Python virtual environments
+.venv/
+venv/
+
+# Node (local debug/test)
+npm-debug.log
+
+# Archives (accidentally created)
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# AI tools
+.claude/

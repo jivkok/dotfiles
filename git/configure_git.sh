@@ -34,6 +34,21 @@ git config --global pack.packSizeLimit 2g
 git config --global push.default current
 git config --global rebase.autosquash true
 
+# Global gitignore
+gitignore_src="$(dirname "$0")/.gitignore.global"
+gitignore_dest="$HOME/.gitignore.global"
+if [ -f "$gitignore_src" ]; then
+  mkdir -p "$(dirname "$gitignore_dest")"
+  if [ -f "$gitignore_dest" ]; then
+    mv "$gitignore_dest" "$gitignore_dest.$(date +%s)"
+  fi
+  cp "$gitignore_src" "$gitignore_dest"
+  git config --global core.excludesfile "$gitignore_dest"
+  dot_trace "Global gitignore installed: $gitignore_dest"
+else
+  dot_trace "Warning: Global gitignore template not found: $gitignore_src"
+fi
+
 # Colors
 git config --global color.branch.current "red bold"
 git config --global color.branch.local normal
