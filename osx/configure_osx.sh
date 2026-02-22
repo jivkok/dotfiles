@@ -19,6 +19,7 @@ fi
 make_dotfiles_symlinks "$dotdir/osx" "$HOME"
 
 "$dotdir/osx/configure_osx_packages.sh"
+"$dotdir/bin/configure_fonts.sh"
 # source "$dotdir/osx/osx_defaults" # https://raw.githubusercontent.com/mathiasbynens/dotfiles/main/.macos
 
 #curl "https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml" \

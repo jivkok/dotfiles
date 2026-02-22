@@ -44,6 +44,8 @@ tags
 TAGS
 .tags
 
+# Python compiled files
+*.pyc
 # Python virtual environments
 .venv/
 venv/
@@ -60,6 +62,3 @@ npm-debug.log
 *.rar
 *.tar
 *.zip
-
-# AI tools
-.claude/
