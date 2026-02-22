@@ -212,6 +212,7 @@ install_cask_package sourcetree # Git gui
 install_cask_package tableplus # relational databases (MySQL, PostgreSQL, SQLite, etc.) management
 install_cask_package uncrustifyx # Source Code Beautifier for C-style languages
 install_cask_package visual-studio-code # code/text editor
+install_cask_package vscodium # Binary releases of VS Code without MS branding/telemetry/licensing
 install_cask_package xbar # Put anything in your Mac OS X menu bar
 
 # misc
@@ -225,13 +226,17 @@ install_cask_package makemkv # video formats converter/transcoder
 install_cask_package mindforger # human mind inspired (Eisenhower matrix) personal knowledge management tool
 install_cask_package obsidian # Knowledge base that works on top of a local folder of plain text Markdown files
 install_cask_package omnidisksweeper # disk space utilization
-# install_cask_package fertigt-slate # window management. Note: ARM binaries: https://github.com/fertigt/slate_arm64/releases/download/1.0/Slate.zip
+install_cask_package fertigt-slate # window management. Note: ARM binaries: https://github.com/fertigt/slate_arm64/releases/download/1.0/Slate.zip
 install_cask_package suspicious-package # inspecting macOS installer packages
 install_cask_package the-unarchiver # unarchive many archive formats
 install_cask_package tunnelblick # OpenVPN client
 install_cask_package vlc # media player
 install_cask_package wireshark # network capture / monitor, depends on xquartz
 install_cask_package xrg # System Monitor for OSX
+
+# ai
+install_cask_package docker-desktop # Docker Desktop
+install_cask_package claude # Anthropic's Claude AI desktop app
 
 # Developer-friendly quick-look plugins; see https://github.com/sindresorhus/quick-look-plugins
 # brew cask install qlcolorcode qlstephen qlmarkdown quicklook-json qlprettypatch quicklook-csv betterzipql qlimagesize webpquicklook suspicious-package
