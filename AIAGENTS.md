@@ -10,5 +10,6 @@ This repository bootstraps my machines (macOS, Linux, Windows) by:
 ## Docs for refactoring (read next)
 
 - `docs/structure.md` — repo layout, flows, invariants
-- `docs/rules.md` — rules, conventions, refactoring playbook
+- `docs/rules.md` — repo rules, conventions, refactoring playbook
 - `docs/os-matrix.md` — cross-platform differences and mappings
+- `docs/coding-conventions/coding-conventions.md` - coding conventions

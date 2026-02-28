@@ -36,7 +36,7 @@ This avoids duplication by defining shared and distro-specific packages in `linu
 
 ## Conventions
 
-### Bash scripting conventions
+### Bash scripting conventions (dotfiles specific)
 - Use `#!/usr/bin/env bash`
 - Determine repo root consistently: `dotdir="$(cd "$(dirname "$0")/.." && pwd)"`
 - Source helpers early: `source "$dotdir/setup/setup_functions.sh"`

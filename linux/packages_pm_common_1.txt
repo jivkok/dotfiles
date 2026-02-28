@@ -23,6 +23,8 @@ universal-ctags # builds text indexes for source code files
 vim # Vi IMproved - enhanced vi editor
 wget # retrieves files from the web
 xsel # command line tool to access X clipboard and selection buffers
+zoxide # Shell extension to easily jump to frequently accessed directories
+
 # Diagnostics
 atop # Monitor for system resources and process activity
 dstat # versatile resource statistics tool
@@ -33,4 +35,3 @@ lsof # Utility to list open files
 ltrace # Tracks runtime library calls in dynamically linked programs
 nethogs # Net top tool grouping bandwidth per process
 strace # System call tracer
-zoxide # Shell extension to easily jump to frequently accessed directories
