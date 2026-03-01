@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "docker": {
+      "command": "uvx",
+      "args": ["mcp-server-docker"],
+      "env": {
+        "DOCKER_HOST": "unix:///Users/jivko/.docker/run/docker.sock"
+      }
+    },
+    "homebrew": {
+      "command": "brew",
+      "args": ["mcp-server"]
+    },
+    "arch-linux": {
+      "command": "uvx",
+      "args": ["arch-ops-server"]
+    }
+  }
+}

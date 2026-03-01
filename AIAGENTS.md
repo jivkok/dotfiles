@@ -18,3 +18,4 @@ Follow the process in `docs/development.md` — including the mandatory testing 
 - `docs/development.md` — conventions, rules, refactoring playbook, and validation checklists
 - `docs/testing.md` — testing approach, workflow, environments, and scripts reference
 - `docs/coding-conventions.md` — coding conventions (detail files in `docs/coding-conventions/`)
+- `docs/mcp-servers.md` — MCP servers configured for AI agents
