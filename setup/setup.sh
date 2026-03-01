@@ -16,48 +16,54 @@
 # DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
-source "$dotdir/setup/setup_functions.sh"
+# shellcheck source=setup/setup_functions.sh disable=SC1091
+source "${dotdir}/setup/setup_functions.sh"
 
-pull_latest_dotfiles "$dotdir"
+DOT_PULL_DOTFILES="${DOT_PULL_DOTFILES:-1}"
+if [[ "${DOT_PULL_DOTFILES}" == "1" ]]; then
+  pull_latest_dotfiles "${dotdir}"
+fi
 
 os=$(uname -s)
 os_description=""
 os_setup_path=""
 
-if [ "$os" = "Linux" ] && command -V apt-get >/dev/null 2>&1; then
+if [[ "${os}" == "Linux" ]] && command -V apt-get >/dev/null 2>&1; then
   os_description="Linux (Debian and derivative distros)"
-  os_setup_path="$dotdir/linux/configure_packages_debian.sh"
+  os_setup_path="${dotdir}/linux/configure_packages_debian.sh"
 
-elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
+elif [[ "${os}" == "Linux" ]] && command -V pacman >/dev/null 2>&1; then
   os_description="Linux (Arch and derivative distros)"
-  os_setup_path="$dotdir/linux/configure_packages_arch.sh"
+  os_setup_path="${dotdir}/linux/configure_packages_arch.sh"
 
-elif [ "$os" = "Darwin" ]; then
+elif [[ "${os}" == "Darwin" ]]; then
   os_description="OSX"
-  os_setup_path="$dotdir/osx/configure_osx.sh"
+  os_setup_path="${dotdir}/osx/configure_osx.sh"
 
 else
-  dot_trace "Unsupported OS: $os"
-  return 1 >/dev/null 2>&1
+  dot_error "Unsupported OS: ${os}"
   exit 1
 fi
 
-dot_trace "Configuring $os_description ..."
-"$os_setup_path"
-dot_trace "Configuring $os_description done."
+dot_trace "Configuring ${os_description} ..."
+"${os_setup_path}"
+dot_trace "Configuring ${os_description} done."
 
-"$dotdir/setup/configure_shell_profiles.sh"
-"$dotdir/setup/configure_home_symlinks.sh"
-"$dotdir/setup/configure_home_bin.sh"
-"$dotdir/setup/configure_locale.sh"
-"$dotdir/git/configure_git.sh"
-"$dotdir/python/configure_python.sh"
-"$dotdir/vim/configure_vim.sh"
-"$dotdir/zsh/configure_zsh.sh"
-"$dotdir/tmux/configure_tmux.sh"
-"$dotdir/fzf/configure_fzf.sh"
+"${dotdir}/setup/configure_shell_profiles.sh"
+"${dotdir}/setup/configure_home_symlinks.sh"
+"${dotdir}/setup/configure_home_bin.sh"
+"${dotdir}/setup/configure_locale.sh"
+"${dotdir}/git/configure_git.sh"
+"${dotdir}/python/configure_python.sh"
+"${dotdir}/vim/configure_vim.sh"
+"${dotdir}/zsh/configure_zsh.sh"
+"${dotdir}/tmux/configure_tmux.sh"
+"${dotdir}/fzf/configure_fzf.sh"
 
-dot_trace "Configuring $os_description done."
+dot_trace "Configuring ${os_description} done."
 
-dot_trace "Reloading shell $SHELL"
-exec $SHELL -l
+DOT_RELOAD_SHELL="${DOT_RELOAD_SHELL:-1}"
+if [[ "${DOT_RELOAD_SHELL}" == "1" ]]; then
+  dot_trace "Reloading shell ${SHELL}"
+  exec ${SHELL} -l
+fi

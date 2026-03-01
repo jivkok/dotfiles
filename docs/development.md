@@ -11,6 +11,8 @@ The distro setup scripts (`linux/configure_packages_debian.sh` and `linux/config
 
 This avoids duplication by defining shared and distro-specific packages in `linux/*.txt` files. The generator consolidates shared packages and applies distro-specific differences, producing the appropriate install script for each platform.
 
+If any files in `linux/` except `linux/configure*` are modified, re-generate the configure scripts by running: `generate_distro_package_setup_code.sh debian && generate_distro_package_setup_code.sh arch`.
+
 ### Merge rules (shell profiles)
 - Linux/macOS: Use `append_or_merge_file` for `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`.
 - Windows: Avoid breaking `$PROFILE` injection logic (it searches for `SetEnv.ps1` and appends if missing).
@@ -87,7 +89,17 @@ Low risk:
    - Bash: `shellcheck` on changed scripts
    - PowerShell: syntax check / run in a clean session if possible
    - Ensure no duplicated lines in profiles after re-run
-5) Document the change (brief note in commit message or docs).
+5) Run tests (see Testing section below).
+6) Document the change (brief note in commit message or docs).
+
+### Testing
+After any code change, run `/run-tests` to verify nothing is broken.
+
+If setup files changed (see `docs/testing.md` — Setup Files Per OS), first run `/setup-test-envs` to rebuild affected environments, then run `/run-tests`.
+
+**Policy on test modifications:**
+- If tests fail: investigate and fix the code. Do not modify tests to make them pass.
+- Tests may only be modified when the change intentionally alters observable behaviour (e.g. adding a new expected tool, changing a config path). Explain the reason in the commit message.
 
 ### Validation checklist (Unix)
 - `setup/setup.sh` still detects OS correctly.

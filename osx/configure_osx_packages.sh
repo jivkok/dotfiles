@@ -126,6 +126,7 @@ install_brew_package lynx # Text-based web browser
 install_brew_package m-cli # Swiss Army Knife for macOS
 install_brew_package mas # Mac App Store command-line interface
 install_brew_package miller # Like sed, awk, cut, join & sort for name-indexed data such as CSV
+install_brew_package mitmproxy # Intercept, modify, replay, save HTTP/S traffic
 install_brew_package mtr # traceroute and ping in a single tool
 install_brew_package mosh # Remote terminal application
 install_brew_package ngrep # Network grep

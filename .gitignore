@@ -1,1 +1,3 @@
 /fonts/
+/tests/.testenv
+/.claude/settings.local.json
