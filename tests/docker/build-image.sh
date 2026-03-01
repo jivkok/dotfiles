@@ -8,7 +8,7 @@ DOCKERFILE_PATH="${DOCKERFILE_PATH:-}"
 DOCKER_RUN_ARGS="${DOCKER_RUN_ARGS:-}"
 # ------------------------
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "ERROR: docker not found in PATH" >&2

@@ -112,7 +112,7 @@ for os in "${TARGET_OSES[@]}"; do
     echo "  Skipping ${os}: Docker target not supported."
   else
     image_name="dotfiles-test-${os,,}-${OS_SETUP_HASHES[$os]}"
-    if docker image inspect "${image_name}" >/dev/null 2>&1; then
+    if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
       echo "  Docker image already exists: ${image_name}"
     else
       echo "  Building Docker image: ${image_name}..."
@@ -126,7 +126,7 @@ done
 for os in "${TARGET_OSES[@]}"; do
   [[ "${os}" == "OSX" ]] && continue
   image_name="dotfiles-test-${os,,}-${OS_SETUP_HASHES[$os]}"
-  if docker image inspect "${image_name}" >/dev/null 2>&1; then
+  if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
     LATEST_DOCKER_IMAGES[$os]="${image_name}"
     echo "${os}_DOCKER_IMAGE=${LATEST_DOCKER_IMAGES[$os]}"
   fi

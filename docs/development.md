@@ -2,8 +2,15 @@
 
 ## Rules
 
+### Mandatory testing after every change
+After any code change, run `/run-tests` to verify nothing is broken.
+
+If setup files changed (see `docs/testing.md` — Setup Files Per OS), first run `/setup-test-envs` to rebuild affected environments, then run `/run-tests`.
+
+These commands are part of the inner dev loop. If either fails, do not move on — investigate the failure, fix the code, and re-run until all tests pass. A change is not complete until the full test cycle is green.
+
 ### Setup idempotency
-Setup / configure scripts must be idempotent.
+Setup & configure scripts must be idempotent.
 They should be safe to run multiple times and always converge the system to the same desired state. Re-running them must not duplicate work, corrupt configuration, or produce different results.
 
 ### Code generation for Linux packages setup scripts

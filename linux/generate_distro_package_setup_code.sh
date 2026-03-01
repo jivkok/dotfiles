@@ -11,6 +11,8 @@ function append_source_file_lines_with_prefix_into_dest_file() {
   while IFS= read -r line; do
     if [[ "$line" =~ ^#.* ]]; then # Leave comments unchanged
       echo "$line" >>"$dest_file"
+    elif [[ -z "${line// }" ]]; then # Skip blank lines
+      echo "" >>"$dest_file"
     else
       echo "$line_prefix $line" >>"$dest_file"
     fi

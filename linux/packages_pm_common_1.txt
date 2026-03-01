@@ -13,6 +13,7 @@ mtr # traceroute and ping in a single tool
 ncdu # NCurses Disk Usage
 ngrep # grep for network traffic
 ranger # caca-utils highlight atool w3m poppler-utils mediainfo # File manager with an ncurses frontend written in Python
+ripgrep # Fast regex text searching tool for files (recursively), respects .gitignore
 rlwrap # readline feature command line wrapper
 shellcheck # lint tool for shell scripts
 stow # I use it to manage my dotfiles symlinks
@@ -20,6 +21,7 @@ tig # Text interface for Git repositories
 tmux # terminal multiplexer
 tree # displays an indented directory tree, in color
 universal-ctags # builds text indexes for source code files
+neovim # Vim-fork focused on extensibility and usability
 vim # Vi IMproved - enhanced vi editor
 wget # retrieves files from the web
 xsel # command line tool to access X clipboard and selection buffers
