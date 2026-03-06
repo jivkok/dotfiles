@@ -1,3 +1,7 @@
+/.claude/settings.local.json
 /fonts/
 /tests/.testenv
-/.claude/settings.local.json
+/tasks/clarifying/
+/tasks/in-progress/
+/tasks/inbox/
+/tasks/ready/

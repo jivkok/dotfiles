@@ -81,18 +81,18 @@ Triage moves tasks lacking this to clarifying/.
 
 **1. Task submission** — run `/new-task <description>`. The command generates a structured task file in `tasks/inbox/` from the one-liner, immediately runs triage on it, and reports whether it went to `ready/` or `clarifying/`. Tasks can also be dropped manually into `tasks/inbox/` using the template in `tasks/templates/task.md`.
 
-**2. Triage** (`/project:triage`) — the orchestrator reads all inbox tasks and routes each one:
+**2. Triage** (`/triage`) — the orchestrator reads all inbox tasks and routes each one:
 - Has description + acceptance criteria with unambiguous scope → `tasks/ready/`
 - Missing required fields or scope is unclear → `tasks/clarifying/`, with a `## Questions` section added listing what is needed.
 
-**3. Requirements agent** (`/project:clarify`) — picks up tasks in `clarifying/`, picks the highest-priority one, and resolves ambiguity. Prefers making documented assumptions over asking the user — only escalates when genuinely blocked. Fills in acceptance criteria, out-of-scope items, edge cases, and test scenarios, then moves the file to `tasks/ready/`.
+**3. Requirements agent** (`/clarify`) — picks up tasks in `clarifying/`, picks the highest-priority one, and resolves ambiguity. Prefers making documented assumptions over asking the user — only escalates when genuinely blocked. Fills in acceptance criteria, out-of-scope items, edge cases, and test scenarios, then moves the file to `tasks/ready/`.
 
-**4. Development agent** (`/project:implement`) — picks up tasks in `ready/`, picks the highest-priority one, **atomically claims it by moving it to `tasks/in-progress/`** (prevents concurrent agents from double-picking), then runs the dev loop (build → test → fix → commit). On success: moves to `tasks/done/` and appends `## Implementation Notes`. On unresolvable blocker: moves to `tasks/failed/` and appends `## Failure Reason`.
+**4. Development agent** (`/implement`) — picks up tasks in `ready/`, picks the highest-priority one, **atomically claims it by moving it to `tasks/in-progress/`** (prevents concurrent agents from double-picking), then runs the dev loop (build → test → fix → commit). On success: moves to `tasks/done/` and appends `## Implementation Notes`. On unresolvable blocker: moves to `tasks/failed/` and appends `## Failure Reason`.
 
 #### Mode 2: Full-auto
 
 1. Task submission: run `/new-task <description>`.
-2. Start orchestrator: `/project:run-pipeline`
+2. Start orchestrator: `/run-pipeline`
 
 ---
 
@@ -197,18 +197,3 @@ mkdir -p .claude/{commands,agents}
 ```
 
 Then create the template (`tasks/templates/task.md`), the command files under `.claude/commands/`, and the agent system prompts under `.claude/agents/`. Commit the whole structure — including `tasks/done/` and `tasks/failed/` — so the task history is git-tracked.
-
-## Misc
-
-### Claude's Commands Convention
-
-The location of a command determines how (what prefix is needed) to invoke the command.
-The prefix is added by Claude Code automatically based on which directory the command file lives in — it is not part of the command filename.
-
-The convention from Claude Code:
-
-| File location | Invocation prefix | Example |
-|---|---|---|
-| .claude/commands/ | /project: | triage.md → /project:triage |
-| ~/.claude/commands/ | /user: | triage.md → /user:triage |
-| Built-ins | none | /help, /clear |
