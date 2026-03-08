@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 # Larger bash history (allow 32³ entries; default is 500)
 export HISTSIZE=32768
 export HISTFILESIZE=$HISTSIZE
@@ -69,7 +71,8 @@ command -v tmux >/dev/null && alias t='(tmux has-session 2>/dev/null && tmux att
 
 function dot_trace() {
   local msg="$1"
-  local timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
+  local timestamp
+  timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
   echo -e "\n$(tput setaf 2)$timestamp: $msg$(tput sgr0)\n"
   touch ~/.dotfiles_history
   echo "$timestamp: [INFO] $msg" >>~/.dotfiles_history
@@ -293,7 +296,7 @@ function man() {
     man "$@"
 }
 
-function history-top-commands() {
+function history_top_commands() {
   history | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl | head -n20
 }
 

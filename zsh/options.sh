@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 # set -o vi               # vi keys
 set -o noclobber        # prevent overwriting files with cat
 setopt no_BEEP

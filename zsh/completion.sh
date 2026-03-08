@@ -1,3 +1,6 @@
+# shellcheck shell=bash
+
+# shellcheck disable=SC2086,SC2206  # zsh array assignment; $dotdir unquoted for glob, fpath is a zsh array
 [ -d $dotdir/zsh/completion ] && fpath=($dotdir/zsh/completion $fpath)
 
 autoload -Uz compinit
@@ -17,6 +20,7 @@ zstyle ":completion:*" menu select=2
 zstyle ":completion:*" menu select=long
 zstyle ":completion:*" select-prompt %SScrolling active: current selection at %p%s
 zstyle ":completion:*" verbose true
+# shellcheck disable=SC2086,SC2296  # zsh parameter flag syntax ${(s.:.)...} is valid in zsh
 zstyle ":completion:*:default" list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache

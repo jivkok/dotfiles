@@ -1,7 +1,4 @@
-# Returns whether the given command is executable/aliased
-_has() {
-  return $(command -v "$1" >/dev/null 2>&1)
-}
+# shellcheck shell=bash
 
 # fzf + rg/ag
 if _has fzf; then
@@ -50,6 +47,7 @@ fi
 # Usage: f vim
 f() {
   IFS=$'\n'
+  # shellcheck disable=SC2207  # IFS-split fzf output into array; mapfile not available in zsh
   files=($(fd --type f --type l --follow --hidden --exclude .git "$2" . | fzf -0 -1 -m))
   IFS=$' '
   [[ -n "$files" ]] && "$1" "${files[@]}"
@@ -59,6 +57,7 @@ f() {
 # Usage: d ws
 d() {
   IFS=$'\n'
+  # shellcheck disable=SC2207  # IFS-split fzf output into array; mapfile not available in zsh
   dirs=($(fd . --type d --hidden --exclude .git "${@:2}" | fzf -0 -1 -m))
   IFS=$' '
   [[ -n "$dirs" ]] && $1 "${dirs[@]}"
@@ -113,7 +112,7 @@ fs() {
 # 2. Interactively narrow down the list using fzf
 # 3. Open the file in Vim
 fsf() {
-  if [ "$EDITOR" = *vim* ]; then
+  if [[ "$EDITOR" = *vim* ]]; then
     cmd="$EDITOR {1} +{2}"
   elif [ "$EDITOR" = code ]; then
     cmd="$EDITOR -g {1}:{2}"

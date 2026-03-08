@@ -1,0 +1,4 @@
+# SC1090/SC1091: dynamic source paths ($dotdir/...) appear in both sourced and executable files
+# SC2128: $FUNCNAME without index is idiomatic in bash to get current function name
+# SC2154: dotdir and similar ambient variables are set by the calling shell before sourcing
+disable=SC1090,SC1091,SC2128,SC2154

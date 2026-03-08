@@ -1,5 +1,7 @@
+# shellcheck shell=bash
+
 # Lists tags for containers from the official Docker registry
-docker-tags() {
+docker_tags() {
   if [ $# -lt 1 ]; then
     echo "Usage: $FUNCNAME publisher/container <tag filter> <max page count>"
     return 1
@@ -62,6 +64,7 @@ elif command -v "docker-compose" >/dev/null 2>&1; then
   _dc='docker-compose'
 fi
 
+# shellcheck disable=SC2139  # $_dc intentionally expands at definition time to capture the compose command
 if [ -n "$_dc" ]; then
   alias dc="$_dc"
   alias dcb="$_dc build"

@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 # lazy man extract - example: ex tarball.tar
 function ex() {
   if [ -f "$1" ]; then
@@ -47,9 +49,11 @@ function calc() {
   if [[ "$result" == *.* ]]; then
     # improve the output for decimal numbers
     echo "$result" |
-      sed -e 's/^\./0./' \ # add "0" for cases like ".5"
-    -e 's/^-\./-0./' \ # add "0" for cases like "-.5"
-    -e 's/0*$//;s/\.$//' # remove trailing zeros
+      sed \
+        -e 's/^\./0./' \
+        -e 's/^-\./-0./' \
+        -e 's/0*$//;s/\.$//'\
+        # add "0" for cases like ".5", "-.5"; remove trailing zeros
   else
     echo "$result"
   fi
@@ -113,7 +117,6 @@ function json() {
 function encode() {
   local encoding="$1"
   local string="$2"
-  local encoded=""
 
   if [ -z "$encoding" ] || [ -z "$string" ]; then
     echo "Encode string"
@@ -125,10 +128,12 @@ function encode() {
   if [ "$encoding" = "url" ]; then
     echo -n "$string" | perl -pe 's/([^-_.~A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg'
   elif [ "$encoding" = "html" ]; then
+    # shellcheck disable=SC2016  # PHP code in single quotes; $ is PHP syntax, not shell
     echo -n "$string" | php -R 'echo htmlentities($argn);'
   elif [ "$encoding" = "base64" ]; then
     echo -n "$string" | base64
   elif [ "$encoding" = "utf8" ]; then
+    # shellcheck disable=SC2046  # word splitting is intentional: each hex byte becomes a separate arg
     printf "\\\x%s" $(printf "%s" "$string" | xxd -p -c1 -u)
   else
     echo "Unsupported encoding: $encoding"
@@ -140,7 +145,6 @@ function encode() {
 function decode() {
   local encoding="$1"
   local string="$2"
-  local encoded=""
 
   if [ -z "$encoding" ] || [ -z "$string" ]; then
     echo "Encode string"
@@ -152,6 +156,7 @@ function decode() {
   if [ "$encoding" = "url" ]; then
     echo -n "$string" | perl -pe 's/\+/ /g; s/%([0-9a-f]{2})/chr(hex($1))/eig'
   elif [ "$encoding" = "html" ]; then
+    # shellcheck disable=SC2016  # PHP code in single quotes; $ is PHP syntax, not shell
     echo -n "$string" | php -R 'echo html_entity_decode($argn);'
   elif [ "$encoding" = "base64" ]; then
     echo -n "$string" | base64 -D
@@ -170,7 +175,7 @@ function img2base64() {
 }
 
 # encode a given font file as base64 and output css src property to clipboard
-function 64font() {
+function font_base64() {
   openssl base64 -in "$1" | awk -v ext="${1#*.}" '{ str1=str1 $0 }END{ print "src:url(\"data:font/"ext";base64,"str1"\")  format(\"woff\");" }' | pbcopy
   echo "$1 encoded as font and copied as css src property to clipboard"
 }
@@ -221,7 +226,7 @@ function getcertnames() {
 }
 
 # MAC lookup
-function mac-lookup() {
+function mac_lookup() {
   local mac="$1"
   if [ -z "$mac" ]; then
     echo "MAC vendor lookup"

@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 _prepend_to_path() {
   if [[ -d "$1" && ! :$PATH: =~ :$1: ]]; then
     PATH=$1:$PATH
@@ -24,10 +26,12 @@ if [[ "$OSTYPE" = darwin* ]]; then
     shopt -s nullglob
   fi
 
+  # shellcheck disable=SC2231  # glob over Homebrew cellar; paths won't contain spaces
   for gnupath in ${HOMEBREW_CELLAR}/*/*/libexec/gnubin; do
     _prepend_to_path "$gnupath"
   done
 
+  # shellcheck disable=SC2231  # glob over Homebrew cellar; paths won't contain spaces
   for gnupath in ${HOMEBREW_CELLAR}/*/*/libexec/gnuman; do
     _prepend_to_manpath "$gnupath"
   done

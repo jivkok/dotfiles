@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 alias g='git'
 alias lg='lazygit'
 
@@ -82,6 +84,7 @@ git-fzf-checkout-commit() {
 }
 
 # git commits browser
+# shellcheck disable=SC2120  # accepts optional args; called without args by gitf
 git-fzf-commits() {
   git log --graph --color=always \
     --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
@@ -99,7 +102,7 @@ git-fzf-sha() {
   local commits commit
   commits=$(git log --color=always --pretty=oneline --abbrev-commit --reverse) &&
     commit=$(echo "$commits" | fzf --tac +s +m -e --ansi --reverse) &&
-    echo -n $(echo "$commit" | sed "s/ .*//")
+    echo -n "${commit%% *}"
 }
 
 # git stash manager
@@ -133,7 +136,7 @@ git-fzf-stashes() {
 # git modified files browser (with preview)
 git-fzf-status() {
   preview="git diff --color=always -- {-1}"
-  git status -sb | fzf -m --ansi --preview $preview
+  git status -sb | fzf -m --ansi --preview "$preview"
 }
 
 # git tags
@@ -153,6 +156,7 @@ gitf() {
       echo "Usage: gitf checkout branch/tag/commit"
     fi
   elif [ "$1" = "commits" ] || [ "$1" = "cm" ]; then
+    # shellcheck disable=SC2119  # intentionally called without args here
     git-fzf-commits
   elif [ "$1" = "sha" ]; then
     git-fzf-sha

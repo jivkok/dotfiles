@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 export EDITOR="vi"
 export VISUAL='vi'
 
@@ -35,7 +37,7 @@ fi
 
 # open file/s in Emacs (in current session, if any) in new frame
 function em() {
-  if ! pgrep -f -u $USER "emacs --daemon" >/dev/null 2>&1; then
+  if ! pgrep -f -u "$USER" "emacs --daemon" >/dev/null 2>&1; then
     emacs --daemon
   fi
 
@@ -44,7 +46,7 @@ function em() {
 
 # open file/s in Emacs in existing frame/session
 function ems() {
-  if ! pgrep -f -u $USER "emacs --daemon" >/dev/null 2>&1; then
+  if ! pgrep -f -u "$USER" "emacs --daemon" >/dev/null 2>&1; then
     emacs --daemon "$@"
     emacsclient "$@"
   else
@@ -54,7 +56,7 @@ function ems() {
 
 # close existing Emacs session
 function emq() {
-  if pgrep -f -u $USER "emacs --daemon" >/dev/null 2>&1; then
+  if pgrep -f -u "$USER" "emacs --daemon" >/dev/null 2>&1; then
     emacsclient -e "(kill-emacs)" "$@"
   fi
 }

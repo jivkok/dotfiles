@@ -1,3 +1,6 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC1087,SC2016  # ZSH_THEME_*, PROMPT, RPROMPT are zsh special vars; $fg[x] and single-quoted prompt strings are zsh syntax
+
 if command -v starship >/dev/null 2>&1; then
 
   export STARSHIP_CONFIG="$dotdir/zsh/starship.toml"
@@ -5,12 +8,14 @@ if command -v starship >/dev/null 2>&1; then
 
 elif [ -d "$ZSH" ] && [ -n "$ZSH_CACHE_DIR" ] && [ -n "$ZSH_CUSTOM" ] && [ -n "$SHORT_HOST" ]; then # checks for .oh-my-zsh presense
 
+  # shellcheck disable=SC1087  # $fg[color] and $reset_color are zsh associative array syntax
   ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[blue]%}:"
   ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
   ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[yellow]%}±%{$reset_color%}"
   ZSH_THEME_GIT_PROMPT_CLEAN=""
 
   function prompt_char {
+    # shellcheck disable=SC1087  # $fg[color] and $reset_color are zsh associative array syntax
     if [ $UID -eq 0 ]; then echo "%{$fg[red]%}#%{$reset_color%}"; else echo $; fi
   }
   PROMPT='%(?, ,%{$fg[red]%}errcode: $?%{$reset_color%}

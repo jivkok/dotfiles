@@ -1,7 +1,4 @@
-# Returns whether the given command is executable/aliased
-_has() {
-  return $(command -v "$1" >/dev/null 2>&1)
-}
+# shellcheck shell=bash
 
 # Compares files or directories
 # Usage: jdiff file_or_dir_1 file_or_dir_2

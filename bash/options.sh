@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 #set -o vi               # vi keys
 set -o noclobber # prevent overwriting files with cat
 
@@ -23,7 +25,7 @@ if [ "$OS" = "Linux" ]; then
   #    $ id -u   #gives user ID
   # So: if the group name is the same as the username OR the user id is not greater than 99
   # (i.e. not root or a privileged user), then we are on a local machine, so we set umask 002.
-  if [ "$(id -gn)" == "$(id -un)" -a $(id -u) -gt 99 ]; then
+  if [ "$(id -gn)" == "$(id -un)" ] && [ "$(id -u)" -gt 99 ]; then
     umask 002
   else
     umask 022

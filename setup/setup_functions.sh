@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Dotfiles helper functions
 
 #######################################
@@ -39,6 +40,7 @@ function dot_error() {
 #   None
 function pull_latest_dotfiles() {
   if [ -z "$1" ]; then
+    # shellcheck disable=SC2016  # literal $1 in error message is intentional
     dot_error 'Expected parameter $1 (dotfiles directory) not found.'
     return
   fi
@@ -148,6 +150,7 @@ function make_dotfiles_symlinks() {
   local target_directory="$2"
 
   dot_trace "Symlinking all dotfiles from $source_directory into $target_directory ..."
+  # shellcheck disable=SC2044  # dotfile names are controlled dotfiles without spaces
   for dotfile in $(find "$source_directory" -mindepth 1 -maxdepth 1 -type f -iname ".*"); do
     dot_trace "dotfile: $dotfile"
     make_symlink "$dotfile" "$target_directory"
@@ -210,7 +213,8 @@ function cask_install_package() {
 }
 
 function ver {
-  printf "%04d%04d%04d%04d" "$(echo "$1" | tr '.' ' ')"
+  # shellcheck disable=SC2046,SC2183  # word splitting intentional: tr splits "a.b.c.d" into 4 tokens for printf
+  printf "%04d%04d%04d%04d" $(echo "$1" | tr '.' ' ')
 }
 
 #######################################

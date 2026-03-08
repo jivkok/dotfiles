@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 os=$(uname -s)
 
 # ls aliases

@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 # Get OS X Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
 alias update_osx='sudo softwareupdate --install --all --verbose; command -v update_os >/dev/null 2>&1 && update_os'
 
@@ -14,9 +16,10 @@ command -v md5sum >/dev/null || alias md5sum='md5'
 command -v sha1sum >/dev/null || alias sha1sum='shasum'
 
 # JavaScriptCore REPL
-jscbin='/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
-[ -e "${jscbin}" ] && alias jsc="${jscbin}"
-unset jscbin
+_jscbin='/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc'
+# shellcheck disable=SC2139  # ${_jscbin} intentionally expands at definition time (then unset)
+[ -e "${_jscbin}" ] && alias jsc="${_jscbin}"
+unset _jscbin
 
 # Recursively delete `.DS_Store` files
 alias cleanDS="find . -type f -name '*.DS_Store' -ls -delete"
@@ -63,11 +66,11 @@ alias of='open -a Finder ./'
 alias ql='qlmanage -p &>/dev/null'
 
 if [ -f '/Applications/p4merge.app/Contents/Resources/launchp4merge' ]; then
-  alias p4diff='/Applications/p4merge.app/Contents/Resources/launchp4merge $*'
+  p4diff() { '/Applications/p4merge.app/Contents/Resources/launchp4merge' "$@"; }
 fi
 
 if [ -f "$HOME/.m-cli/m" ]; then
-  alias m="$HOME/.m-cli/m $*"
+  m() { "$HOME/.m-cli/m" "$@"; }
 fi
 
 # `o` with no arguments opens the current directory, otherwise opens the given location

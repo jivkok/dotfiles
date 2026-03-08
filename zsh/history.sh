@@ -1,7 +1,8 @@
+# shellcheck shell=bash
+
 [ -z "$HISTFILE" ] && HISTFILE="$HOME/.zsh_history"
 [ "$HISTSIZE" -lt 50000 ] && HISTSIZE=50000
 [ "$SAVEHIST" -lt 20000 ] && SAVEHIST=20000
-
 
 setopt APPEND_HISTORY         # multiple zsh sessions will append their history list to the history file, rather than replace it.
 setopt EXTENDED_HISTORY       # record timestamp and duration of command in HISTFILE

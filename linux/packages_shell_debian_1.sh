@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Starship: shell-agnostic prompt
 if command -v starship >/dev/null 2>&1; then
   current_version=$(starship --version | head -n 1 | awk '{print $2}')

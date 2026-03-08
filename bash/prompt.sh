@@ -1,3 +1,6 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034  # color vars and GIT_PS1_* are used by __git_ps1 / PS1 string; full palette is intentional
+
 if command -v starship >/dev/null 2>&1; then
 
   export STARSHIP_CONFIG="$dotdir/bash/starship.toml"
@@ -16,7 +19,7 @@ else
     }
   fi
 
-  if [ -n $(which tput) ] && [ "Msys" != $(uname -o) ]; then
+  if [ -n "$(which tput)" ] && [ "Msys" != "$(uname -o)" ]; then
     # Solarized colors, taken from http://git.io/solarized-colors.
     tput sgr0 # reset colors
     BOLD=$(tput bold)
@@ -76,11 +79,14 @@ else
       sshflag=' ⇄'
     fi
 
-    local location="$(dirs -0)"
+    local location
+    location="$(dirs -0)"
 
-    local prefix="\n${YELLOW_BOLD}${user}${COLOR_RESET} @ ${YELLOW_BOLD}${HOSTNAME}${COLOR_RESET}${separator}${GREEN_BOLD}${location}${COLOR_RESET}${BLUE_BOLD}$(__git_ps1 " (%s)")${COLOR_RESET}${sshflag}${COLOR_RESET}"
+    local prefix
+    prefix="\n${YELLOW_BOLD}${user}${COLOR_RESET} @ ${YELLOW_BOLD}${HOSTNAME}${COLOR_RESET}${separator}${GREEN_BOLD}${location}${COLOR_RESET}${BLUE_BOLD}$(__git_ps1 " (%s)")${COLOR_RESET}${sshflag}${COLOR_RESET}"
 
-    local title="${user}${separator}${location}$(__git_ps1 " (%s)")"
+    local title
+    title="${user}${separator}${location}$(__git_ps1 " (%s)")"
     echo -ne "\033]0;${title}\007"
     export PS1="${prefix}\n\$ "
   }

@@ -1,3 +1,6 @@
+# shellcheck shell=bash
+
+source "$dotdir/sh/helpers.sh"
 source "$dotdir/sh/path.sh"
 source "$dotdir/sh/system.sh"
 source "$dotdir/sh/ls.sh"

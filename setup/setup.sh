@@ -16,7 +16,6 @@
 # DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
-# shellcheck source=setup/setup_functions.sh disable=SC1091
 source "${dotdir}/setup/setup_functions.sh"
 
 DOT_PULL_DOTFILES="${DOT_PULL_DOTFILES:-1}"
