@@ -52,16 +52,23 @@ This script:
 ### Step 2 — Run tests
 
 ```bash
-bash tests/run-tests.sh
+bash tests/run-tests.sh [--all | --filter <cmd>]
 ```
+
+| Flag | Behaviour |
+|------|-----------|
+| _(none)_ | **Default.** Runs core tests and any optional tests whose required tools are installed. Tests with unmet requirements are skipped with a `SKIPPED:` notice. |
+| `--all` | Runs every test unconditionally. Fails immediately if a required tool is missing. Use this for a full audit. |
+| `--filter <cmd>` | Runs only tests that declare `<cmd>` in their `REQUIRES` header. Useful for verifying a specific optional tool after installing it. |
 
 This script:
 
 1. Discovers all test files matching `tests/test-cases/test-*.sh` (sorted).
-2. Runs every test locally first.
-3. Reads `tests/.testenv` for `*_DOCKER_IMAGE` variables. Each non-empty value is a Docker image to test in.
-4. For each Docker image, runs every test inside the container with `bash -li` (login + interactive, so PATH and shell environment are fully initialised). The `tests/` directory is bind-mounted read-only into the container at `/home/test/dotfiles/tests`, so test file changes take effect without rebuilding the image.
-5. Fails immediately on any test error.
+2. Filters tests according to the flag and the `REQUIRES` header of each file (see [Test categories](#test-categories) below).
+3. Runs selected tests locally first.
+4. Reads `tests/.testenv` for `*_DOCKER_IMAGE` variables. Each non-empty value is a Docker image to test in.
+5. For each Docker image, runs the same selected tests inside the container with `bash -li` (login + interactive, so PATH and shell environment are fully initialised). The `tests/` directory is bind-mounted read-only into the container at `/home/test/dotfiles/tests`, so test file changes take effect without rebuilding the image.
+6. Fails immediately on any test error.
 
 ---
 
@@ -100,16 +107,33 @@ Image names encode the setup hash: `dotfiles-test-<os>-<hash>`. This makes image
 
 ---
 
-## Test cases
+## Test categories
 
-Test files live in `tests/test-cases/` and are named `test-*.sh`. Shared helpers used by multiple tests live in `tests/test-cases/helpers/` and are not discovered or run directly by the test runner.
+Test files live in `tests/test-cases/` and are named `test-*.sh`. The runner auto-discovers them. Shared helpers live in `tests/test-cases/helpers/` and are not run directly.
+
+### Core tests (always run)
+
+Tests with **no** `REQUIRES` header. They verify the baseline setup produced by `setup/setup.sh` and must pass on every machine.
 
 | File | What it tests |
 |------|---------------|
 | `test-startup-bash.sh` | Starts a login Bash shell and runs the smoke check suite. |
 | `test-startup-zsh.sh` | Starts a login ZSH shell and runs the smoke check suite. |
+| `test-vscode-configure.sh` | Unit-tests the VSCode configuration helper functions in isolation (no editor needed). |
 
 **Helper:** `helpers/startup-checks.sh` — smoke check assertions (commands, files, symlinks, shell config) sourced by the startup tests above.
+
+### Optional tests (run when tool is installed)
+
+Tests that require a tool **not** installed by `setup.sh` declare a `REQUIRES` header at the top of the file:
+
+```bash
+# REQUIRES: code
+```
+
+The runner checks `command -v` for each listed command. In **default mode** the test is skipped when any required tool is absent. In **`--all` mode** it runs and fails if the tool is missing.
+
+To add tests for a new optional tool, create `tests/test-cases/test-<tool>.sh` with the appropriate `REQUIRES` line. Multiple commands can be listed space-separated: `# REQUIRES: docker compose`.
 
 ---
 
@@ -120,3 +144,4 @@ Test files live in `tests/test-cases/` and are named `test-*.sh`. Shared helpers
 | `tests/create-test-envs.sh` | Build/update test environments (local + Docker). Run this when setup files change. |
 | `tests/run-tests.sh` | Run all test cases across all environments. |
 | `tests/docker/build-image.sh` | Low-level script to build a single Docker image. Accepts `IMAGE_NAME` and `DOCKERFILE_PATH` (absolute) as env vars. |
+

@@ -99,6 +99,32 @@ Low risk:
 5) Run tests (see Testing section below).
 6) Document the change (brief note in commit message or docs).
 
+## Commit messages
+
+**Lead with intent, not enumeration.**
+
+Structure:
+- **First line:** `scope: short statement of purpose` (under 72 chars)
+- **Body (optional):** one or two sentences on *why*, not *what files changed*
+
+Do NOT list which files or docs were updated — git diff already shows that.
+
+Bad (enumerates files):
+```
+Add --all and --filter flags to test runner
+
+Updates run-tests.sh with argument parsing. Updates docs/testing.md
+with a flag reference table. Updates .claude/commands/run-tests.md.
+```
+
+Good (states intent):
+```
+test runner: support selective test execution
+
+Add --all and --filter flags so tests requiring optional tools can be
+skipped, targeted, or enforced depending on context.
+```
+
 ### Testing
 After any code change, run `/run-tests` to verify nothing is broken.
 
