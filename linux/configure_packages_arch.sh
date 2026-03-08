@@ -29,6 +29,7 @@ sudo pacman -S --noconfirm --needed tmux # terminal multiplexer
 sudo pacman -S --noconfirm --needed tree # displays an indented directory tree, in color
 sudo pacman -S --noconfirm --needed universal-ctags # builds text indexes for source code files
 sudo pacman -S --noconfirm --needed neovim # Vim-fork focused on extensibility and usability
+sudo pacman -S --noconfirm --needed uv # An extremely fast Python package installer and resolver written in Rust
 sudo pacman -S --noconfirm --needed vim # Vi IMproved - enhanced vi editor
 sudo pacman -S --noconfirm --needed wget # retrieves files from the web
 sudo pacman -S --noconfirm --needed xsel # command line tool to access X clipboard and selection buffers

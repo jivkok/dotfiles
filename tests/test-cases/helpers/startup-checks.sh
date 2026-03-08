@@ -26,6 +26,7 @@ check_cmd  curl
 check_cmd  wget
 check_cmd  shellcheck
 check_cmd  tig
+check_cmd  uv
 
 echo "--- Shell profiles ---"
 check_file    ~/.bash_profile

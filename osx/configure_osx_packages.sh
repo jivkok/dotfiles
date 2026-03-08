@@ -161,6 +161,7 @@ install_brew_package tree # Display directories as trees (with optional color/HT
 install_brew_package ucspi-tcp # Tools for building TCP client-server applications
 install_brew_package universal-ctags --HEAD # ctags
 install_brew_package unix2dos # Convert text between DOS, UNIX, and Mac formats
+install_brew_package uv # Extremely fast Python package installer and resolver, written in Rust
 install_brew_package webkit2png # Create screenshots of webpages from the terminal
 install_brew_package zoxide # Shell extension to easily jump to frequently accessed directories
 

@@ -29,6 +29,7 @@ sudo apt-get install -y -qq tmux # terminal multiplexer
 sudo apt-get install -y -qq tree # displays an indented directory tree, in color
 sudo apt-get install -y -qq universal-ctags # builds text indexes for source code files
 sudo apt-get install -y -qq neovim # Vim-fork focused on extensibility and usability
+sudo apt-get install -y -qq uv # An extremely fast Python package installer and resolver written in Rust
 sudo apt-get install -y -qq vim # Vi IMproved - enhanced vi editor
 sudo apt-get install -y -qq wget # retrieves files from the web
 sudo apt-get install -y -qq xsel # command line tool to access X clipboard and selection buffers
