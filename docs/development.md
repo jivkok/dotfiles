@@ -24,14 +24,13 @@ The source files are:
 | `packages_pm_common_1.txt` | Packages available on all distros via their package manager |
 | `packages_pm_debian_1.txt` | Debian/Ubuntu-specific apt packages |
 | `packages_pm_arch_1.txt` | Arch-specific pacman packages |
-| `packages_pm_aur_1.txt` | Arch AUR packages |
+| `packages_pm_aur_1.txt` | Arch-specific AUR packages |
 | `packages_go_debian_1.txt` | Go tools installed on Debian |
 | `packages_shell_debian_1.sh` | Non-packaged software installed via shell scripts on Debian |
 
 To add or remove a package: edit the appropriate source file above, then regenerate:
-```
-bash linux/generate_distro_package_setup_code.sh debian
-bash linux/generate_distro_package_setup_code.sh arch
+```sh
+linux/generate_distro_package_setup_code.sh
 ```
 
 If a package is not available in a distro's package manager (e.g. `uv` on Debian), do **not** add it to a common `.txt` file — add it to a distro-specific source file or handle it in the relevant `configure_*.sh` component script instead.
