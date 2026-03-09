@@ -107,6 +107,20 @@ Image names encode the setup hash: `dotfiles-test-<os>-<hash>`. This makes image
 
 ---
 
+## Test library
+
+`tests/testlib.sh` is sourced by every test script and by the runner. It provides:
+
+- **Colors** (`FAIL_COLOR`, `SUCCESS_COLOR`, `RESET`) — ANSI codes, suppressed when stdout is not a TTY or `NO_COLOR` is set.
+- **Log-level constants** (`LOG_LEVEL_ERROR=0`, `LOG_LEVEL_INFO=1`, `LOG_LEVEL_TRACE=2`) and `_ACTIVE_LOG_LEVEL`. The full log-level model (ordered enumeration, what appears at each level) is documented in `testlib.sh` itself.
+- **`log_error <msg>`**, **`log_info <msg>`**, **`log_trace <msg>`** — emit a message at the named level.
+- **`_should_log <N>`** — predicate; returns true when the active level ≥ N (for conditional blocks).
+- **`ok <msg>`** — records a passing assertion; prints at trace level only.
+- **`fail <msg>`** — records a failing assertion; always prints to stderr.
+- **`_TEST_PASS` / `_TEST_FAIL`** — counters incremented by `ok` / `fail`.
+
+---
+
 ## Test categories
 
 Test files live in `tests/test-cases/` and are named `test-*.sh`. The runner auto-discovers them. Shared helpers live in `tests/test-cases/helpers/` and are not run directly.
@@ -141,6 +155,7 @@ To add tests for a new optional tool, create `tests/test-cases/test-<tool>.sh` w
 
 | Script | Purpose |
 |--------|---------|
+| `tests/testlib.sh` | Shared test library (colors, log levels, `ok`/`fail`, counters). Sourced by all test scripts and the runner. |
 | `tests/create-test-envs.sh` | Build/update test environments (local + Docker). Run this when setup files change. |
 | `tests/run-tests.sh` | Run all test cases across all environments. |
 | `tests/docker/build-image.sh` | Low-level script to build a single Docker image. Accepts `IMAGE_NAME` and `DOCKERFILE_PATH` (absolute) as env vars. |

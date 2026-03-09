@@ -5,6 +5,9 @@ IFS=$'\n\t'
 DOTDIR="$(cd "$(dirname "$0")/../.." && pwd)"
 STARTUP_TESTS="$(cd "$(dirname "$0")" && pwd)/helpers/startup-checks.sh"
 
-echo "Test: Bash startup. Dotfiles dir: ${DOTDIR}"
+# shellcheck source=../testlib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../testlib.sh"
+
+log_trace "Test: Bash startup. Dotfiles dir: ${DOTDIR}"
 bash -l "${STARTUP_TESTS}"
-echo "PASSED: Bash startup."
+log_trace "PASSED: Bash startup."

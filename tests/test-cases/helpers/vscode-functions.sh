@@ -4,9 +4,6 @@
 # sourcing configure_vscode.sh directly (the main script is not bind-mounted in
 # Docker test environments).
 
-dot_trace() { :; }
-dot_error() { echo "  [dot_error] $*" >&2; }
-
 prepare_and_copy_vscode_config_files () {
   local settingsdir="${1}"
   local config_filename="${2}.json"
@@ -28,19 +25,19 @@ prepare_and_copy_vscode_config_files () {
   if [ -f "${vscode_user_dir}/${config_filename}" ]; then
     local backup_file="${vscode_user_dir}/${config_filename}.$(date +"%Y%m%d%H%M%S")"
     if ! mv "${vscode_user_dir}/${config_filename}" "${backup_file}" 2>/dev/null; then
-      dot_error "Failed to backup existing config file: ${vscode_user_dir}/${config_filename}"
+      log_error "Failed to backup existing config file: ${vscode_user_dir}/${config_filename}"
       return 1
     fi
   fi
 
   if [ -f "${settingsdir}/${osspecific_config_filename}" ]; then
     if ! jq -s '.[0] * .[1]' "${settingsdir}/${config_filename}" "${settingsdir}/${osspecific_config_filename}" > "${vscode_user_dir}/${config_filename}" 2>/dev/null; then
-      dot_error "Failed to merge JSON config files. Check for JSON syntax errors or comments."
+      log_error "Failed to merge JSON config files. Check for JSON syntax errors or comments."
       return 1
     fi
   else
     if ! cp "${settingsdir}/${config_filename}" "${vscode_user_dir}/${config_filename}" 2>/dev/null; then
-      dot_error "Failed to copy config file: ${settingsdir}/${config_filename}"
+      log_error "Failed to copy config file: ${settingsdir}/${config_filename}"
       return 1
     fi
   fi

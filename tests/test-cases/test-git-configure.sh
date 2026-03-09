@@ -4,12 +4,10 @@ set -euo pipefail
 
 DOTDIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
-# ── Test helpers ───────────────────────────────────────────────────────────────
-_pass=0
-_fail=0
+# shellcheck source=../testlib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../testlib.sh"
 
-ok()   { echo "  OK  : $*"; _pass=$(( _pass + 1 )); }
-fail() { echo "  FAIL: $*" >&2; _fail=$(( _fail + 1 )); }
+# ── Test helpers ───────────────────────────────────────────────────────────────
 
 assert_git_cfg() {
   local key="$1" expected="$2"
@@ -55,7 +53,7 @@ export TERM="${TERM:-dumb}"
 bash "$DOTDIR/git/configure_git.sh" >/dev/null 2>&1
 
 # ── Core settings ──────────────────────────────────────────────────────────────
-echo "--- configure_git.sh: core settings ---"
+log_trace "---configure_git.sh: core settings ---"
 
 assert_git_cfg "core.autocrlf"    "input"
 assert_git_cfg "core.fscache"     "true"
@@ -66,7 +64,7 @@ assert_git_cfg "push.default"     "current"
 assert_git_cfg "rebase.autosquash" "true"
 
 # ── Global gitignore ───────────────────────────────────────────────────────────
-echo "--- configure_git.sh: global gitignore ---"
+log_trace "---configure_git.sh: global gitignore ---"
 
 assert_file_exists "$tmpdir/.gitignore.global"
 assert_file_content "$tmpdir/.gitignore.global" ".DS_Store"
@@ -74,7 +72,7 @@ assert_file_content "$tmpdir/.gitignore.global" "*.swp"
 assert_git_cfg "core.excludesfile" "$tmpdir/.gitignore.global"
 
 # ── Colors ────────────────────────────────────────────────────────────────────
-echo "--- configure_git.sh: color settings ---"
+log_trace "---configure_git.sh: color settings ---"
 
 assert_git_cfg "color.ui"          "true"
 assert_git_cfg "color.status.new"  "red bold"
@@ -83,7 +81,7 @@ assert_git_cfg "color.diff.old"    "red bold"
 assert_git_cfg "color.diff.new"    "green bold"
 
 # ── Aliases ───────────────────────────────────────────────────────────────────
-echo "--- configure_git.sh: aliases ---"
+log_trace "---configure_git.sh: aliases ---"
 
 assert_git_cfg "alias.st"       "status -sb"
 assert_git_cfg "alias.co"       "checkout"
@@ -99,10 +97,10 @@ assert_git_cfg_set "alias.hist"
 assert_git_cfg_set "alias.lg"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
-echo
-echo "Passed: ${_pass}, Failed: ${_fail}"
-if [[ "${_fail}" -gt 0 ]]; then
-  echo "==> FAILED."
+log_trace ""
+log_trace "Passed: ${_TEST_PASS}, Failed: ${_TEST_FAIL}"
+if [[ "${_TEST_FAIL}" -gt 0 ]]; then
+  log_error "==> FAILED."
   exit 1
 fi
-echo "==> PASSED."
+log_trace "==> PASSED."

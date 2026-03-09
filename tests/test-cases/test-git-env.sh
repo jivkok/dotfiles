@@ -4,12 +4,10 @@ set -euo pipefail
 
 DOTDIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
-# ── Test helpers ───────────────────────────────────────────────────────────────
-_pass=0
-_fail=0
+# shellcheck source=../testlib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../testlib.sh"
 
-ok()   { echo "  OK  : $*"; _pass=$(( _pass + 1 )); }
-fail() { echo "  FAIL: $*" >&2; _fail=$(( _fail + 1 )); }
+# ── Test helpers ───────────────────────────────────────────────────────────────
 
 assert_alias() {
   local name="$1" expected="$2"
@@ -41,13 +39,13 @@ shopt -s expand_aliases
 source "$DOTDIR/git/git.sh"
 
 # ── Aliases ───────────────────────────────────────────────────────────────────
-echo "--- git.sh: aliases ---"
+log_trace "---git.sh: aliases ---"
 
 assert_alias "g"  "git"
 assert_alias "lg" "lazygit"
 
 # ── Functions ─────────────────────────────────────────────────────────────────
-echo "--- git.sh: functions ---"
+log_trace "---git.sh: functions ---"
 
 assert_function "git_pull_all"
 assert_function "git_pull_submodules"
@@ -63,7 +61,7 @@ assert_function "git-fzf-tags"
 assert_function "gitf"
 
 # ── git_pull_all: no-op on dir without .git ────────────────────────────────────
-echo "--- git.sh: git_pull_all behaviour ---"
+log_trace "---git.sh: git_pull_all behaviour ---"
 
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
@@ -73,7 +71,7 @@ git_pull_all "$tmpdir"
 ok "git_pull_all runs cleanly on empty directory"
 
 # ── git_pull_submodules: exits cleanly when no .gitmodules ────────────────────
-echo "--- git.sh: git_pull_submodules behaviour ---"
+log_trace "---git.sh: git_pull_submodules behaviour ---"
 
 output=$(git_pull_submodules "$tmpdir" 2>&1)
 if [[ "$output" == *"No submodules found"* ]]; then
@@ -83,7 +81,7 @@ else
 fi
 
 # ── gitf: usage message on unknown subcommand ─────────────────────────────────
-echo "--- git.sh: gitf dispatch ---"
+log_trace "---git.sh: gitf dispatch ---"
 
 gitf_out=$(gitf "unknown-subcommand" 2>&1 || true)
 if [[ "$gitf_out" == *"Usage:"* ]]; then
@@ -100,10 +98,10 @@ else
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
-echo
-echo "Passed: ${_pass}, Failed: ${_fail}"
-if [[ "${_fail}" -gt 0 ]]; then
-  echo "==> FAILED."
+log_trace ""
+log_trace "Passed: ${_TEST_PASS}, Failed: ${_TEST_FAIL}"
+if [[ "${_TEST_FAIL}" -gt 0 ]]; then
+  log_error "==> FAILED."
   exit 1
 fi
-echo "==> PASSED."
+log_trace "==> PASSED."
