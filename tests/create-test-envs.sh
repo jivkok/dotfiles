@@ -60,8 +60,17 @@ case "$(uname -s)" in
   *) echo "ERROR: unsupported OS: $(uname -s)" >&2; exit 1 ;;
 esac
 
-# Setup files shared across all OSes
+# Setup files shared across all OSes: everything in setup/ plus the per-tool
+# configure scripts that setup/setup.sh invokes outside that directory.
 mapfile -t COMMON_SETUP_FILES < <(find "${repo_root}/setup" -name '*.sh' | sort)
+COMMON_SETUP_FILES+=(
+  "${repo_root}/git/configure_git.sh"
+  "${repo_root}/python/configure_python.sh"
+  "${repo_root}/vim/configure_vim.sh"
+  "${repo_root}/zsh/configure_zsh.sh"
+  "${repo_root}/tmux/configure_tmux.sh"
+  "${repo_root}/fzf/configure_fzf.sh"
+)
 
 # Compute current setup hashes for each OS
 for os in "${TARGET_OSES[@]}"; do

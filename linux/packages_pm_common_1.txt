@@ -22,7 +22,6 @@ tmux # terminal multiplexer
 tree # displays an indented directory tree, in color
 universal-ctags # builds text indexes for source code files
 neovim # Vim-fork focused on extensibility and usability
-uv # An extremely fast Python package installer and resolver written in Rust
 vim # Vi IMproved - enhanced vi editor
 wget # retrieves files from the web
 xsel # command line tool to access X clipboard and selection buffers
@@ -30,7 +29,6 @@ zoxide # Shell extension to easily jump to frequently accessed directories
 
 # Diagnostics
 atop # Monitor for system resources and process activity
-dstat # versatile resource statistics tool
 htop # interactive processes viewer
 iftop # displays bandwidth usage information on an network interface
 iotop # simple top-like I/O monitor
