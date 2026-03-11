@@ -98,10 +98,4 @@ else
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
-log_trace ""
-log_trace "Passed: ${_TEST_PASS}, Failed: ${_TEST_FAIL}"
-if [[ "${_TEST_FAIL}" -gt 0 ]]; then
-  log_error "==> FAILED."
-  exit 1
-fi
-log_trace "==> PASSED."
+finish_test

@@ -66,6 +66,7 @@ mapfile -t COMMON_SETUP_FILES < <(find "${repo_root}/setup" -name '*.sh' | sort)
 COMMON_SETUP_FILES+=(
   "${repo_root}/git/configure_git.sh"
   "${repo_root}/python/configure_python.sh"
+  "${repo_root}/nodejs/configure_nodejs.sh"
   "${repo_root}/vim/configure_vim.sh"
   "${repo_root}/zsh/configure_zsh.sh"
   "${repo_root}/tmux/configure_tmux.sh"

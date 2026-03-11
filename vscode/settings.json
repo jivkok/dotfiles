@@ -66,5 +66,11 @@
     "editor.formatOnType": true
   },
 
-  "docker.extension.enableComposeLanguageServer": false
+  "docker.extension.enableComposeLanguageServer": false,
+
+  "linter.linters": {
+    "shellcheck": {
+      "command": ["shellcheck", "--format", "json", "-"]
+    }
+  }
 }

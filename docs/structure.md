@@ -2,11 +2,12 @@
 
 ## Top-level layout
 - `setup/` — orchestration and shared helpers (authoritative)
+- `sh/` — shell environment library, sourced at shell startup via `sh/setenv.sh`. Includes paths, env exports, common aliases and functions
 - `osx/` — macOS-specific dotfiles and macOS setup script(s)
 - `linux/` — distro-specific package install scripts (Debian/Arch)
 - `windows/` — PowerShell environment + Windows-specific config
 - `misc/` — dotfiles symlinked into `$HOME` (files starting with `.`)
-- `{git, python, vim, zsh, tmux, fzf}/` — component-specific configuration and installers
+- `{docker, dotnet, fzf, git, go, nodejs, python, vim, tmux, zsh}/` — component-specific configuration and installers
 
 ## How it works (high level)
 

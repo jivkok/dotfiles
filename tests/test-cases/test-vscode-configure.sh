@@ -6,26 +6,6 @@ HELPERS="$(cd "$(dirname "$0")/helpers" && pwd)"
 # shellcheck source=../testlib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../testlib.sh"
 
-# ── Test helpers ──────────────────────────────────────────────────────────────
-
-assert_eq() {
-  local label="$1" expected="$2" actual="$3"
-  if [[ "$expected" == "$actual" ]]; then
-    ok "$label"
-  else
-    fail "$label (expected: '$expected', got: '$actual')"
-  fi
-}
-
-assert_file_exists() { [[ -f "$1" ]] && ok "file exists: ${1##*/}" || fail "file missing: $1"; }
-assert_file_absent()  { [[ ! -f "$1" ]] && ok "file absent: ${1##*/}"  || fail "file should not exist: $1"; }
-
-assert_content() {
-  grep -qF "$2" "$1" 2>/dev/null \
-    && ok "content present: $2" \
-    || fail "content missing '$2' in $1"
-}
-
 # ── Source testable functions (self-contained helper, works in all envs) ──────
 # shellcheck source=helpers/vscode-functions.sh
 source "${HELPERS}/vscode-functions.sh"
@@ -61,7 +41,7 @@ log_trace "---prepare_and_copy_vscode_config_files: direct copy ---"
 dest_copy="${dst}/copy"
 prepare_and_copy_vscode_config_files "${src}" "settings" "linux" "${dest_copy}"
 assert_file_exists "${dest_copy}/settings.json"
-assert_content     "${dest_copy}/settings.json" '"editor.fontSize"'
+assert_file_content     "${dest_copy}/settings.json" '"editor.fontSize"'
 
 # ── prepare_and_copy_vscode_config_files: merge with OS override ──────────────
 log_trace "---prepare_and_copy_vscode_config_files: merge with OS override ---"
@@ -70,8 +50,8 @@ printf '{"editor.fontFamily": "Fira Code"}' > "${src}/settings.linux.json"
 dest_merge="${dst}/merge"
 prepare_and_copy_vscode_config_files "${src}" "settings" "linux" "${dest_merge}"
 assert_file_exists "${dest_merge}/settings.json"
-assert_content     "${dest_merge}/settings.json" '"editor.fontSize"'
-assert_content     "${dest_merge}/settings.json" '"editor.fontFamily"'
+assert_file_content     "${dest_merge}/settings.json" '"editor.fontSize"'
+assert_file_content     "${dest_merge}/settings.json" '"editor.fontFamily"'
 
 # ── prepare_and_copy_vscode_config_files: backup of existing file ─────────────
 log_trace "---prepare_and_copy_vscode_config_files: backup existing file ---"
@@ -118,10 +98,4 @@ assert_eq "first extension"  "publisher.ext-one"   "${_captured_exts[0]}"
 assert_eq "second extension" "publisher.ext-two"   "${_captured_exts[1]}"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
-log_trace ""
-log_trace "Passed: ${_TEST_PASS}, Failed: ${_TEST_FAIL}"
-if [[ "${_TEST_FAIL}" -gt 0 ]]; then
-  log_error "==> FAILED."
-  exit 1
-fi
-log_trace "==> PASSED."
+finish_test

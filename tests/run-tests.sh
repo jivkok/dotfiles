@@ -214,16 +214,29 @@ run_local() {
 
 run_in_docker() {
   local image="$1"
+  shift
+  local -a files=("$@")
   local container_tests="/home/test/dotfiles/tests"
   local container_test_cases="${container_tests}/test-cases"
 
   log_info ""
   log_info "==> Environment: Docker image ${image}"
 
-  for test_file in "${test_files[@]}"; do
+  for test_file in "${files[@]}"; do
     local test_name="${test_file##*/}"
     log_info ""
     log_info "Test file: ${test_name}"
+
+    # Check REQUIRES inside the container; skip if any command is missing.
+    local requires
+    requires=$(get_requires "$test_file")
+    if [[ -n "$requires" ]]; then
+      local check_cmd="command -v ${requires// / && command -v }"
+      if ! docker run --rm "${image}" bash -li -c "$check_cmd" >/dev/null 2>&1; then
+        log_info "  SKIPPED (requires: ${requires})"
+        continue
+      fi
+    fi
 
     local test_exit=0
 
@@ -255,10 +268,17 @@ run_in_docker() {
 run_local
 
 if [[ -f "${testenv_file}" ]]; then
+  # In default mode, Docker evaluates its own REQUIRES per container, so pass
+  # all discovered tests. In filter/all modes the selection is already correct.
+  _docker_files=("${all_test_files[@]}")
+  if [[ "$mode" != "default" ]]; then
+    _docker_files=("${test_files[@]}")
+  fi
+
   while IFS='=' read -r key value; do
     [[ "$key" =~ _DOCKER_IMAGE$ ]] || continue
     [[ -n "$value" ]] || continue
-    run_in_docker "$value"
+    run_in_docker "$value" "${_docker_files[@]}"
   done < "${testenv_file}"
 fi
 

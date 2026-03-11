@@ -29,14 +29,6 @@ assert_git_cfg_set() {
   fi
 }
 
-assert_file_exists() { [[ -f "$1" ]] && ok "file exists: ${1##*/}" || fail "file missing: $1"; }
-
-assert_file_content() {
-  grep -qF "$2" "$1" 2>/dev/null \
-    && ok "content present in ${1##*/}: $2" \
-    || fail "content missing '$2' in $1"
-}
-
 # ── Isolated environment ───────────────────────────────────────────────────────
 # Run configure_git.sh with a temp HOME and GIT_CONFIG_GLOBAL so the real
 # git config and ~/.gitignore.global are not touched.
@@ -97,10 +89,4 @@ assert_git_cfg_set "alias.hist"
 assert_git_cfg_set "alias.lg"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
-log_trace ""
-log_trace "Passed: ${_TEST_PASS}, Failed: ${_TEST_FAIL}"
-if [[ "${_TEST_FAIL}" -gt 0 ]]; then
-  log_error "==> FAILED."
-  exit 1
-fi
-log_trace "==> PASSED."
+finish_test

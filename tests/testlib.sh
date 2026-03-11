@@ -91,3 +91,61 @@ fail() {
   _TEST_FAIL=$((_TEST_FAIL + 1))
   echo "  ${FAIL_COLOR}FAIL${RESET}: $*" >&2
 }
+
+# ── Common test assertions ──────────────────────────────────────────────────────
+#
+# These are available to all test files without redefinition.
+
+# assert_cmd <cmd>  — pass if cmd is on PATH.
+assert_cmd() {
+  local cmd="$1"
+  if command -v "$cmd" >/dev/null 2>&1; then
+    ok "command available: $cmd"
+  else
+    fail "command not found: $cmd"
+  fi
+}
+
+# assert_dir <dir>  — pass if dir exists.
+assert_dir() {
+  local dir="$1"
+  if [ -d "$dir" ]; then
+    ok "directory exists: $dir"
+  else
+    fail "directory not found: $dir"
+  fi
+}
+
+# assert_file_exists <file>  — pass if file exists.
+assert_file_exists() { [ -f "$1" ] && ok "file exists: ${1##*/}" || fail "file missing: $1"; }
+
+# assert_file_absent <file>  — pass if file does not exist.
+assert_file_absent()  { [ ! -f "$1" ] && ok "file absent: ${1##*/}" || fail "file should not exist: $1"; }
+
+# assert_file_content <file> <string>  — pass if file contains string (fixed).
+assert_file_content() {
+  grep -qF "$2" "$1" 2>/dev/null \
+    && ok "content present in ${1##*/}: $2" \
+    || fail "content missing '$2' in $1"
+}
+
+# assert_eq <label> <expected> <actual>  — pass if expected == actual.
+assert_eq() {
+  local label="$1" expected="$2" actual="$3"
+  if [ "$expected" = "$actual" ]; then
+    ok "$label"
+  else
+    fail "$label (expected: '$expected', got: '$actual')"
+  fi
+}
+
+# finish_test  — print summary and exit 1 if any assertions failed.
+finish_test() {
+  log_trace ""
+  log_trace "Passed: ${_TEST_PASS}, Failed: ${_TEST_FAIL}"
+  if [ "${_TEST_FAIL}" -gt 0 ]; then
+    log_error "==> FAILED."
+    exit 1
+  fi
+  log_trace "==> PASSED."
+}

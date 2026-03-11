@@ -25,6 +25,7 @@ if [ "$os" = "Linux" ] && command -V apt-get >/dev/null 2>&1; then
   # sudo add-apt-repository universe
   sudo apt-get update -qq
   sudo apt-get install -y -qq python3 python3-pip pipx
+  install_pipx_package uv # An extremely fast Python package installer and resolver
 elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
   sudo pacman -S --noconfirm --needed python3 python-pip python-pipx
 elif [ "$os" = "Darwin" ]; then

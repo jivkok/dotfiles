@@ -1,181 +1,164 @@
-# OSX, Linux, and Windows machine configuration scripts
+# Dotfiles
+
+Machine configuration scripts for macOS, Linux (Debian/Ubuntu, Arch), and Windows.
 
 ## Table of Contents
 
-* [OS Details](#os-details)
-* [macOS / Linux (Debian-based, Arch)](#macos-linux-debian-based-arch)
-    + [What is included](#what-is-included)
-    + [Installation](#installation)
-    + [Customizations](#customizations)
-    + [Upgrade](#upgrade)
-* [Windows (Command shell and Powershell)](#windows-command-shell-and-powershell)
-    + [What is included](#what-is-included_1)
-    + [Installation](#installation_1)
-    + [Customizations](#customizations_1)
-    + [Upgrade](#upgrade_1)
-* [Credits](#credits)
+- [Dotfiles](#dotfiles)
+  - [Table of Contents](#table-of-contents)
+  - [What is included](#what-is-included)
+    - [macOS / Linux](#macos--linux)
+    - [Windows](#windows)
+  - [macOS / Linux](#macos--linux-1)
+    - [Installation](#installation)
+    - [Optional tools](#optional-tools)
+    - [Customization](#customization)
+    - [Upgrade](#upgrade)
+  - [Windows](#windows-1)
+    - [Installation](#installation-1)
+    - [Customization](#customization-1)
+    - [Upgrade](#upgrade-1)
+  - [Testing](#testing)
+  - [Docs](#docs)
+  - [Credits](#credits)
 
+---
 
+## What is included
 
-## OS Details
+### macOS / Linux
 
-* [macOS](www.apple.com/macos/) - OSX [Snow Leopard](www.apple.com/support/snowleopard/) (10.5) onwards.
-* [Linux](www.linux.com/) - [Debian](www.debian.org/)/[Ubuntu](www.ubuntu.com/), [Arch](https://archlinux.org/).
-* [Windows](www.microsoft.com/en-us/windows/) - [Command shell](https://technet.microsoft.com/en-us/library/cc754340.aspx) and [Powershell](https://technet.microsoft.com/library/hh857337.aspx)
+| Area | Details |
+|------|---------|
+| Shell | Bash and Zsh — options, prompt (Starship), aliases, functions (`sh/`) |
+| Git | Config, aliases, global gitignore (`git/`) |
+| Python | python3, pip, pipx + packages (`python/`) |
+| Node.js | Node, npm, global packages (`nodejs/`) |
+| Vim | Config and plugins (`vim/`) |
+| Zsh | oh-my-zsh, plugins, theme (`zsh/`) |
+| Tmux | Config and plugins (`tmux/`) |
+| fzf | Fuzzy finder + shell integrations (`fzf/`) |
+| VSCode | Settings, keybindings, extensions (`vscode/`) |
 
+**Optional** (run separately — not part of the default setup):
 
+| Tool | Script |
+|------|--------|
+| Docker | `docker/configure_docker.sh` |
+| Go | `go/configure_go.sh` |
+| .NET | `dotnet/configure_dotnet.sh` |
 
-## macOS / Linux (Debian-based, Arch)
+### Windows
 
-### What is included
+* Chocolatey packages
+* Command shell and PowerShell configuration
+* Console setup
 
-* Aliases
-* Functions
-* Shell options: Bash / Zsh
-* Shell theme: Bash / Zsh
-* Shell packages: macOS (Homebrew), Debian (apt), Arch (pacman)
-* ZSH configuration
-* Git configuration
-* Tmux configuration
-* Vim configuration
+---
+
+## macOS / Linux
 
 ### Installation
 
-The setup script will configure shell options, theme, aliases, functions, and packages.
-The setup script will ask whether to run each of the optional steps.
-There is option to change the default shell to [Zsh](www.zsh.org/).
-
-**Note**: Dotfiles default location is `$HOME/dotfiles`. If you want to change it, specify a different directory prior to running the setup scripts by setting the `dotdir` variable: `export dotdir=$HOME/path/to/my/dotfiles`
-
 ```sh
-# OSX
+# macOS
 cd $HOME
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install git
 git clone https://github.com/jivkok/dotfiles.git dotfiles
-./dotfiles/setup.sh
+bash dotfiles/setup/setup.sh
 
-# Linux (Debian-based)
+# Linux (Debian/Ubuntu)
 cd $HOME
 sudo apt-get install -y git
 git clone https://github.com/jivkok/dotfiles.git dotfiles
-./dotfiles/setup.sh
+bash dotfiles/setup/setup.sh
 
 # Linux (Arch)
 cd $HOME
 sudo pacman -S --noconfirm git
 git clone https://github.com/jivkok/dotfiles.git dotfiles
-./dotfiles/setup.sh
+bash dotfiles/setup/setup.sh
 ```
 
+`setup.sh` auto-detects OS, installs packages, configures shell profiles, and sets up all included components. The shell is reloaded at the end.
 
-### Customizations
+### Optional tools
 
-#### Specify custom `$PATH`
+Tools not included in the default setup can be configured individually:
+- Docker: `docker/configure_docker.sh`
+- Go: `go/configure_go.sh`
+- DotNet: `dotnet/configure_dotnet.sh`
+- VSCode: `vscode/configure_vscode.sh`
 
-If `$HOME/.path` exists, it will be sourced along with the other files.
+### Customization
 
-#### Custom commands without creating a new fork
-
-If `$HOME/.profile.local` exists, it will be sourced along with the other files. You can use this to add custom commands without the need to fork this entire repository, or to add commands you don’t want to commit to a public repository.
-Since `$HOME/.profile.local` is sourced at the end, it allows for overriding of existing settings, functions, and aliases.
+`setup/configure_shell_profiles.sh` **merges** bootstrap snippets into your existing `~/.bash_profile`, `~/.bashrc`, and `~/.zshrc` rather than replacing them. Any personal settings already in those files are preserved. Add machine-local overrides directly to those files after running setup.
 
 ### Upgrade
 
 ```sh
 cd ~/dotfiles
 git pull
+bash setup/setup.sh
 ```
 
+---
 
-
-## Windows (Command shell and Powershell)
-
-### What is included
-
-* Packages with [Chocolatey](https://chocolatey.org/)
-* Command shell / Powershell setup
-* Console configuration
-* Command shell configuration
-* Powershell configuration
+## Windows
 
 ### Installation
 
-The setup script will install packages with Chocolatey, configure a multi-tabbed console and its desktop shortcut, and configure system options / theme / aliases / functions.
-
-**Note**: run the shell commands from an elevated shell.
-
-#### Option #1 (concise, with Boxstarter & Chocolatey)
-
-Open [http://j.mp/jivkokshell](http://j.mp/jivkokshell) in a browser. It is same as:
-
 ```bat
-START http://boxstarter.org/package/nr/url?https://raw.githubusercontent.com/jivkok/Chocolatey-Packages/master/jivkok.Shell/shell.boxstarter.ps1
-```
-
-#### Option #2 (concise)
-
-```bat
-rem With Command shell:
-@powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/jivkok/dotfiles/master/setup/setup.ps1'))"
-```
-
-```posh
-# With Powershell:
-Set-ExecutionPolicy Bypass
-iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/jivkok/dotfiles/master/setup/setup.ps1'))
-```
-
-#### Option #3 (with Chocolatey)
-
-```bat
-rem With Command shell:
-@powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))" && SET PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin
-cinst jivkok.shell -y -source http://www.myget.org/F/jivkok-chocolatey
-```
-
-```posh
-# With Powershell:
-iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
-cinst jivkok.shell -y -source http://www.myget.org/F/jivkok-chocolatey
-```
-
-#### Option #4 (manual repo cloning)
-
-```bat
-rem With Command shell:
+rem Command shell:
 git clone https://github.com/jivkok/dotfiles.git %USERPROFILE%\dotfiles
 @powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\dotfiles\setup\setup.ps1
 ```
 
 ```posh
-# With Powershell:
+# PowerShell:
 git clone https://github.com/jivkok/dotfiles.git $HOME\dotfiles
 . $HOME\dotfiles\setup\setup.ps1
 ```
 
-### Customizations
+### Customization
 
-#### Custom commands without creating a new fork
-
-If custom profile script ( `%USERPROFILE%\profile.cmd` for Command shell, `$Home\profile.ps1` for Powershell ) exists, it will be included along with the other files. You can use this to add custom commands without the need to fork this entire repository, or to add commands you don’t want to commit to a public repository.
-Since this local profile is included at the end, it allows for overriding of existing settings, functions, and aliases.
+Create `%USERPROFILE%\profile.cmd` (Command shell) or `$Home\profile.ps1` (PowerShell) for local overrides. These are sourced at the end of the respective shell startup and can override any settings, functions, or aliases.
 
 ### Upgrade
 
 ```bat
-rem With Command shell:
+rem Command shell:
 cd /d %USERPROFILE%\dotfiles
 git pull
 ```
 
 ```posh
-# With Powershell:
+# PowerShell:
 cd $HOME\dotfiles
 git pull
 ```
 
+---
 
+## Testing
+
+The repo includes a test suite (`tests/run-tests.sh`) that runs locally and in Docker containers (Debian, Arch).
+
+See [`docs/testing.md`](./docs/testing.md) for details.
+
+---
+
+## Docs
+
+| File | Contents |
+|------|----------|
+| [`docs/structure.md`](./docs/structure.md) | Repo layout, setup flow, orchestration invariants, where to add things |
+| [`docs/development.md`](./docs/development.md) | Development workflow and agent pipeline |
+| [`docs/testing.md`](./docs/testing.md) | Test architecture, environments, Docker images, test categories, scripts reference |
+| [`docs/coding-conventions.md`](./docs/coding-conventions.md) | Shell scripting conventions |
+
+---
 
 ## Credits
 

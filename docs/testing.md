@@ -67,7 +67,7 @@ This script:
 2. Filters tests according to the flag and the `REQUIRES` header of each file (see [Test categories](#test-categories) below).
 3. Runs selected tests locally first.
 4. Reads `tests/.testenv` for `*_DOCKER_IMAGE` variables. Each non-empty value is a Docker image to test in.
-5. For each Docker image, runs the same selected tests inside the container with `bash -li` (login + interactive, so PATH and shell environment are fully initialised). The `tests/` directory is bind-mounted read-only into the container at `/home/test/dotfiles/tests`, so test file changes take effect without rebuilding the image.
+5. For each Docker image, evaluates `REQUIRES` headers **inside the container** (using `bash -li` so the full PATH is available) and skips tests whose required tools are absent — independently of the local machine. In **default mode** all discovered tests are considered per container; in **filter/all mode** the already-filtered list is used. Tests run with `bash -li` so PATH and shell environment are fully initialised. The `tests/` directory is bind-mounted read-only into the container at `/home/test/dotfiles/tests`, so test file changes take effect without rebuilding the image.
 6. Fails immediately on any test error.
 
 ---
@@ -105,19 +105,26 @@ Both images:
 
 Image names encode the setup hash: `dotfiles-test-<os>-<hash>`. This makes images content-addressable — an unchanged setup always reuses the same image.
 
+### Augmenting images with optional tools
+
+Base images only contain what `setup/setup.sh` installs. To test an optional tool (Go, .NET, Docker) inside a container, augment the image with `augment-image.sh`:
+
+```bash
+# By OS shorthand + tool name
+bash tests/docker/augment-image.sh debian go
+bash tests/docker/augment-image.sh arch dotnet
+
+# By full image name + explicit script path
+bash tests/docker/augment-image.sh dotfiles-test-debian-5f0235439e97 go/configure_go.sh
+```
+
+This builds a new image `FROM` the existing one, re-copies the current dotfiles, runs the configure script, and retags the result with the **same image name**. `run-tests.sh` picks it up automatically — no changes to `.testenv` needed. `--no-cache` is always used to ensure the configure script actually runs.
+
 ---
 
 ## Test library
 
-`tests/testlib.sh` is sourced by every test script and by the runner. It provides:
-
-- **Colors** (`FAIL_COLOR`, `SUCCESS_COLOR`, `RESET`) — ANSI codes, suppressed when stdout is not a TTY or `NO_COLOR` is set.
-- **Log-level constants** (`LOG_LEVEL_ERROR=0`, `LOG_LEVEL_INFO=1`, `LOG_LEVEL_TRACE=2`) and `_ACTIVE_LOG_LEVEL`. The full log-level model (ordered enumeration, what appears at each level) is documented in `testlib.sh` itself.
-- **`log_error <msg>`**, **`log_info <msg>`**, **`log_trace <msg>`** — emit a message at the named level.
-- **`_should_log <N>`** — predicate; returns true when the active level ≥ N (for conditional blocks).
-- **`ok <msg>`** — records a passing assertion; prints at trace level only.
-- **`fail <msg>`** — records a failing assertion; always prints to stderr.
-- **`_TEST_PASS` / `_TEST_FAIL`** — counters incremented by `ok` / `fail`.
+`tests/testlib.sh` is sourced by every test script and by the runner. It provides shared functions (log-level constants, log error/info/trace functions, ANSI colors, assertions, etc.).
 
 ---
 
@@ -128,14 +135,6 @@ Test files live in `tests/test-cases/` and are named `test-*.sh`. The runner aut
 ### Core tests (always run)
 
 Tests with **no** `REQUIRES` header. They verify the baseline setup produced by `setup/setup.sh` and must pass on every machine.
-
-| File | What it tests |
-|------|---------------|
-| `test-startup-bash.sh` | Starts a login Bash shell and runs the smoke check suite. |
-| `test-startup-zsh.sh` | Starts a login ZSH shell and runs the smoke check suite. |
-| `test-vscode-configure.sh` | Unit-tests the VSCode configuration helper functions in isolation (no editor needed). |
-
-**Helper:** `helpers/startup-checks.sh` — smoke check assertions (commands, files, symlinks, shell config) sourced by the startup tests above.
 
 ### Optional tests (run when tool is installed)
 
@@ -159,4 +158,5 @@ To add tests for a new optional tool, create `tests/test-cases/test-<tool>.sh` w
 | `tests/create-test-envs.sh` | Build/update test environments (local + Docker). Run this when setup files change. |
 | `tests/run-tests.sh` | Run all test cases across all environments. |
 | `tests/docker/build-image.sh` | Low-level script to build a single Docker image. Accepts `IMAGE_NAME` and `DOCKERFILE_PATH` (absolute) as env vars. |
+| `tests/docker/augment-image.sh` | Augments an existing test image by running a `configure_*.sh` script on top of it and retagging the result with the same name. Used to install optional tools (Go, .NET, Docker) into a test image so their optional tests can run. |
 

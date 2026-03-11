@@ -1,38 +1,39 @@
 #!/usr/bin/env bash
 # Install .Net
 
-dotnet_install() {
-  script_path="${TMPDIR:-/tmp}/dotnet-install.sh"
+dotdir="$(cd "$(dirname "$0")/.." && pwd)"
+source "$dotdir/setup/setup_functions.sh"
 
-  wget https://dot.net/v1/dotnet-install.sh -O "$script_path"
+dotnet_install() {
+  local script_path="${TMPDIR:-/tmp}/dotnet-install.sh"
+
+  dot_trace "Downloading dotnet-install.sh ..."
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL https://dot.net/v1/dotnet-install.sh -o "$script_path"
+  elif command -v wget >/dev/null 2>&1; then
+    wget https://dot.net/v1/dotnet-install.sh -O "$script_path"
+  else
+    dot_error "Neither curl nor wget found. Cannot download dotnet-install.sh."
+    return 1
+  fi
   chmod +x "$script_path"
 
+  dot_trace "Running dotnet-install.sh (LTS) ..."
   "$script_path" --channel LTS --version latest
   # "$script_path" --channel STS --version latest
 }
 
-echo 'Configuring DotNet ...'
+dot_trace "Configuring DotNet ..."
 
 os=$(uname -s)
 
-# https://learn.microsoft.com/en-us/dotnet/core/install/remove-runtime-sdk-versions
+# https://learn.microsoft.com/en-us/dotnet/core/install/macos#install-net-with-a-script
 # https://learn.microsoft.com/en-us/dotnet/core/install/linux-scripted-manual#scripted-install
-# This script  installs artifacts for current user. Read docs for system-wide install:
-# https://learn.microsoft.com/en-us/dotnet/core/install/linux
-if [ "$os" = "Linux" ]; then
-  sudo rm -rf /usr/share/dotnet/
-  sudo rm -rf /usr/lib/dotnet/
-  rm -rf "$HOME/.dotnet"
-
+if [ "$os" = "Linux" ] || [ "$os" = "Darwin" ]; then
   dotnet_install
-
-elif [ "$os" = "Darwin" ]; then
-  dotnet_install
-  brew install --cask visual-studio-code
-
 else
-  echo "Unsupported OS: $os"
-  return
+  dot_error "Unsupported OS: $os"
+  exit 1
 fi
 
-echo 'Configuring DotNet done.'
+dot_trace "Configuring DotNet done."
