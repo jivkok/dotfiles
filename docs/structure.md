@@ -13,7 +13,7 @@
 
 ### Setup
 
-#### Unix (macOS/Linux)
+#### Unix (macOS/Linux) — "full" profile
 Primary orchestrator:
 - `setup/setup.sh`
 
@@ -26,6 +26,13 @@ Flow:
    - shell profiles (Bash, ZSH)
    - symlinks to misc config files (in `misc/`, `osx/`) into `$HOME`
    - configure components: `git/`, `python/`, `vim/`, `zsh/`, `tmux/`, `fzf/`, etc.
+
+#### Linux remote VMs — "minimal" profile
+Two scripts handle the minimal workflow:
+- `setup/setup-remote-vm.sh` — on-VM entrypoint. Runs directly on the target Linux system (Linux-only; exits with error on macOS). Installs the minimal package set, sets up bash profiles (no zsh), home symlinks, locale, and tmux config.
+- `setup/deploy-remote-vm.sh <user@host>` — local orchestrator. Rsyncs the minimal-relevant dotfiles subset to the remote host, then invokes `setup-remote-vm.sh` via SSH. Supports `-p <port>` for non-default SSH ports.
+
+Minimal package scripts: `linux/configure_packages_minimal_debian.sh` and `linux/configure_packages_minimal_arch.sh` (auto-generated — see `docs/development.md`).
 
 #### Windows
 Primary orchestrator: `setup/setup.ps1`
@@ -46,10 +53,10 @@ DOS: `windows/SetEnv.cmd`
 
 ## Orchestration invariants
 
-1. `setup/setup.sh` is the entry point (Unix)
-- OS selection is done here.
-- Component scripts are invoked in a fixed order.
-- This script should stay readable and “glue-only”.
+1. There are two Unix entry points:
+- `setup/setup.sh` — full profile (full developer workstation). OS selection and component invocation happen here.
+- `setup/setup-remote-vm.sh` — minimal profile (minimal Linux VM). Invoked remotely by `setup/deploy-remote-vm.sh`.
+- Both scripts should stay readable and “glue-only”.
 
 2. Shared helpers live in `setup/setup_functions.sh` - All scripts should source it (directly or indirectly) if they want:
 - logging (`dot_trace`, `dot_error`)

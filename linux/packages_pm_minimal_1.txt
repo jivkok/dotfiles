@@ -1,0 +1,16 @@
+# Common
+bat
+curl
+eza
+git
+jq
+mosh
+ranger
+ripgrep
+tmux
+vim
+
+# Diagnostics
+htop
+lsof
+strace

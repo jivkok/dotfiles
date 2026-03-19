@@ -24,6 +24,16 @@
 - Notes:
   - Similar baseline to Debian but with Arch names and AUR usage
 
+## Linux — Minimal profile (remote VMs)
+- Setup: `linux/configure_packages_minimal_debian.sh` (Debian) / `linux/configure_packages_minimal_arch.sh` (Arch) — auto-generated
+- Entry point: `setup/setup-remote-vm.sh` (on-VM); `setup/deploy-remote-vm.sh` (local orchestrator)
+- Shell: bash only (no zsh, no oh-my-zsh, no Starship)
+- Notes:
+  - Minimal package set — see `linux/packages_pm_minimal_*.txt` for the authoritative list
+  - No git identity, no vim plugins, no language toolchains (Python, Node, Go)
+  - Deployed via rsync + SSH; no git repo on the remote VM — `DOT_PULL_DOTFILES` is not used
+  - Debian: `bat` installed as `batcat`, `fd-find` as `fdfind`; symlinks created in `~/bin` by `setup-remote-vm.sh`
+
 ## Windows
 - Setup: `setup/setup.ps1`
 - `windows/SetEnv.ps1` (shell environment)

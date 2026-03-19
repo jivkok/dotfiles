@@ -12,7 +12,7 @@ function dot_trace() {
   local timestamp
 
   timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
-  echo -e "$(tput setaf 2)$timestamp: $msg$(tput sgr0)"
+  echo -e "$(tput setaf 2 2>/dev/null)$timestamp: $msg$(tput sgr0 2>/dev/null)"
   touch ~/.dotfiles_history
   echo "$timestamp: [INFO] $msg" >>~/.dotfiles_history
 }
@@ -28,7 +28,7 @@ function dot_error() {
   local timestamp
 
   timestamp=$(date "+%Y-%m-%d %H:%M:%S")
-  echo -e "\n$(tput setaf 1)$timestamp: $msg$(tput sgr0)\n"
+  echo -e "\n$(tput setaf 1 2>/dev/null)$timestamp: $msg$(tput sgr0 2>/dev/null)\n"
   echo "$timestamp: [ERROR] $msg" >>~/.dotfiles_history
 }
 

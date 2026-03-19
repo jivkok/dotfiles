@@ -1,0 +1,45 @@
+FROM --platform=linux/amd64 archlinux:latest
+
+ENV TERM=xterm-256color
+
+# Build arg: host public key to authorize for passwordless SSH
+ARG HOST_PUBLIC_KEY
+
+# Add expected system users & groups
+RUN useradd -r -s /usr/bin/nologin systemd-network 2>/dev/null || true
+RUN groupadd -r systemd-journal 2>/dev/null || true
+
+RUN sed -i '/^\[options\]/a DisableSandbox' /etc/pacman.conf
+
+RUN pacman -Syu --noconfirm \
+  && pacman -S --noconfirm --needed \
+    bash \
+    ca-certificates \
+    curl \
+    git \
+    openssh \
+    rsync \
+    sudo \
+  && pacman -Scc --noconfirm
+
+# Create a non-root user to behave like a real machine
+RUN useradd -m -s /bin/bash test \
+  && echo "test ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/test \
+  && chmod 0440 /etc/sudoers.d/test
+
+# Configure SSH server
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config \
+  && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config \
+  && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config \
+  && ssh-keygen -A
+
+# Install host's public key for passwordless SSH access as user 'test'
+RUN mkdir -p /home/test/.ssh \
+  && echo "${HOST_PUBLIC_KEY}" > /home/test/.ssh/authorized_keys \
+  && chmod 700 /home/test/.ssh \
+  && chmod 600 /home/test/.ssh/authorized_keys \
+  && chown -R test:test /home/test/.ssh
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
