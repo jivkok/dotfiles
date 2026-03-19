@@ -12,8 +12,7 @@ shopt -s nocaseglob   # Case-insensitive globbing (used in pathname expansion)
 shopt -s autocd 2>/dev/null   # * `autocd`, e.g. `**/qux` will enter `./foo/bar/baz/qux`
 shopt -s globstar 2>/dev/null # * Recursive globbing, e.g. `echo **/*.txt`
 
-OS="$(uname -s)"
-if [ "$OS" = "Linux" ]; then
+if $_is_linux; then
 
   # Set up umask permissions (http://en.wikipedia.org/wiki/Umask)
   # umask 002 allows only you to write (but the group to read) any new files that you create.

@@ -7,6 +7,17 @@ function ex() {
     *.tar.bz2) tar xjfv "$1" ;;
     *.tar.gz) tar xzfv "$1" ;;
     *.tar.xz) tar xJfv "$1" ;;
+    *.tar.zst | *.zst)
+      if ! _has zstd; then
+        echo "zstd is required to extract '$1'"
+        return 1
+      fi
+      if [[ "$1" == *.tar.* ]]; then
+        tar -I zstd -xvf "$1"
+      else
+        zstd --decompress "$1"
+      fi
+      ;;
     *.bz2) bunzip2 "$1" ;;
     *.rar) rar x "$1" ;;
     *.gz) gunzip "$1" ;;
@@ -32,7 +43,10 @@ lsz() {
   if [ -f "$1" ]; then
     case $1 in
     *.tar.bz2 | *.tar.gz | *.tar | *.tbz2 | *.tgz) tar tvf "$1" ;;
+    *.tar.xz) tar tvf "$1" ;;
     *.zip) unzip -l "$1" ;;
+    *.7z) 7z l "$1" ;;
+    *.rar) rar l "$1" ;;
     *) echo "'$1' unrecognized." ;;
     esac
   else
@@ -40,56 +54,39 @@ lsz() {
   fi
 }
 
-# Simple calculator
-function calc() {
-  local result=""
-  result="$(echo "scale=10;$*" | bc --mathlib | tr -d '\\\n')"
-  #                       └─ default (when `--mathlib` is used) is 20
-  #
-  if [[ "$result" == *.* ]]; then
-    # improve the output for decimal numbers
-    echo "$result" |
-      sed \
-        -e 's/^\./0./' \
-        -e 's/^-\./-0./' \
-        -e 's/0*$//;s/\.$//'\
-        # add "0" for cases like ".5", "-.5"; remove trailing zeros
-  else
-    echo "$result"
-  fi
-  printf "\n"
-}
-
-# Copy user's default ssh key to a remote machine
+# Copy user's SSH public key to a remote machine; delegates to ssh-copy-id if available
 function ssh_copy_id() {
-  cat ~/.ssh/id_rsa.pub | ssh "$1" -p "${2:-22}" "mkdir -p ~/.ssh && chmod 0700 ~/.ssh && touch ~/.ssh/authorized_keys && chmod 0644 ~/.ssh/authorized_keys && cat >> ~/.ssh/authorized_keys"
+  local host="${1}"
+  local port="${2:-22}"
+
+  if _has ssh-copy-id; then
+    ssh-copy-id -p "${port}" "${host}"
+    return
+  fi
+
+  local key=""
+  local candidate
+  for candidate in ~/.ssh/id_ed25519.pub ~/.ssh/id_ecdsa.pub ~/.ssh/id_rsa.pub; do
+    if [ -f "$candidate" ]; then
+      key="$candidate"
+      break
+    fi
+  done
+
+  if [ -z "$key" ]; then
+    echo "No SSH public key found in ~/.ssh/ (tried id_ed25519.pub, id_ecdsa.pub, id_rsa.pub)"
+    return 1
+  fi
+
+  ssh "${host}" -p "${port}" "mkdir -p ~/.ssh && chmod 0700 ~/.ssh && touch ~/.ssh/authorized_keys && chmod 0644 ~/.ssh/authorized_keys && cat >> ~/.ssh/authorized_keys" < "$key"
 }
 
-# Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
+# Create a .tar.gz archive using gzip
 function targz() {
   local tmpFile="${*%/}.tar"
   tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1
-
-  size=$(
-    stat -f"%z" "${tmpFile}" 2>/dev/null # OS X `stat`
-    stat -c"%s" "${tmpFile}" 2>/dev/null # GNU `stat`
-  )
-
-  local cmd=""
-  if ((size < 52428800)) && hash zopfli 2>/dev/null; then
-    # the .tar file is smaller than 50 MB and Zopfli is available; use it
-    cmd="zopfli"
-  else
-    if hash pigz 2>/dev/null; then
-      cmd="pigz"
-    else
-      cmd="gzip"
-    fi
-  fi
-
-  echo "Compressing .tar using \`${cmd}\`…"
-  "${cmd}" -v "${tmpFile}" || return 1
-  [ -f "${tmpFile}" ] && rm "${tmpFile}"
+  echo "Compressing .tar using gzip…"
+  gzip -v "${tmpFile}" || return 1
   echo "${tmpFile}.gz created successfully."
 }
 
@@ -103,13 +100,24 @@ function dataurl() {
   echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')"
 }
 
+# Format and syntax-highlight JSON from stdin using the best available tool
+_json_format() {
+  if _has jq; then
+    jq '.'
+  elif _has bat; then
+    python3 -m json.tool | bat -l json
+  else
+    python3 -m json.tool
+  fi
+}
+
 # Syntax-highlight JSON strings or files
 # Usage: `json '{"foo":42}'` or `echo '{"foo":42}' | json`
 function json() {
   if [ -t 0 ]; then # argument
-    python -mjson.tool <<<"$*" | pygmentize -l javascript
+    _json_format <<<"$*"
   else # pipe
-    python -mjson.tool | pygmentize -l javascript
+    _json_format
   fi
 }
 
@@ -128,8 +136,7 @@ function encode() {
   if [ "$encoding" = "url" ]; then
     echo -n "$string" | perl -pe 's/([^-_.~A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg'
   elif [ "$encoding" = "html" ]; then
-    # shellcheck disable=SC2016  # PHP code in single quotes; $ is PHP syntax, not shell
-    echo -n "$string" | php -R 'echo htmlentities($argn);'
+    python3 -c "import html, sys; print(html.escape(sys.argv[1]))" "$string"
   elif [ "$encoding" = "base64" ]; then
     echo -n "$string" | base64
   elif [ "$encoding" = "utf8" ]; then
@@ -141,13 +148,13 @@ function encode() {
   fi
 }
 
-# Support multiple encodings (URL, base64, Unicode, etc.)
+# Decode strings in various encodings (URL, base64, Unicode, etc.)
 function decode() {
   local encoding="$1"
   local string="$2"
 
   if [ -z "$encoding" ] || [ -z "$string" ]; then
-    echo "Encode string"
+    echo "Decode string"
     echo "Usage: decode <encoding> <string>"
     echo " - encoding: url, html, base64, utf8"
     return
@@ -156,41 +163,47 @@ function decode() {
   if [ "$encoding" = "url" ]; then
     echo -n "$string" | perl -pe 's/\+/ /g; s/%([0-9a-f]{2})/chr(hex($1))/eig'
   elif [ "$encoding" = "html" ]; then
-    # shellcheck disable=SC2016  # PHP code in single quotes; $ is PHP syntax, not shell
-    echo -n "$string" | php -R 'echo html_entity_decode($argn);'
+    python3 -c "import html, sys; print(html.unescape(sys.argv[1]))" "$string"
   elif [ "$encoding" = "base64" ]; then
-    echo -n "$string" | base64 -D
+    echo -n "$string" | base64 --decode
   elif [ "$encoding" = "utf8" ]; then
-    perl -e "binmode(STDOUT, ':utf8'); print \"$string\""
+    perl -e 'binmode(STDOUT, ":utf8"); my $s = $ARGV[0]; $s =~ s/\\x([0-9a-fA-F]{2})/chr(hex($1))/ge; print $s, "\n"' "$string"
   else
     echo "Unsupported encoding: $encoding"
     return
   fi
 }
 
-# encode a given image file as base64 and output css background property to clipboard
+# Encode a given image file as base64 and output a CSS background property to clipboard
 function img2base64() {
+  if ! _has pbcopy; then
+    echo "Error: pbcopy is not available on this system"
+    return 1
+  fi
   openssl base64 -in "$1" | awk -v ext="${1#*.}" '{ str1=str1 $0 }END{ print "background:url(data:image/"ext";base64,"str1");" }' | pbcopy
   echo "$1 encoded as base64 and copied as css background property to clipboard"
 }
 
-# encode a given font file as base64 and output css src property to clipboard
+# Encode a given font file as base64 and output a CSS src property to clipboard
 function font_base64() {
+  if ! _has pbcopy; then
+    echo "Error: pbcopy is not available on this system"
+    return 1
+  fi
   openssl base64 -in "$1" | awk -v ext="${1#*.}" '{ str1=str1 $0 }END{ print "src:url(\"data:font/"ext";base64,"str1"\")  format(\"woff\");" }' | pbcopy
   echo "$1 encoded as font and copied as css src property to clipboard"
 }
 
-# Get a character’s Unicode code point
+# Get a character's Unicode code point
 function codepoint() {
   perl -e "use utf8; print sprintf('U+%04X', ord(\"$*\"))"
-  # print a newline unless we’re piping the output to another program
+  # print a newline unless we're piping the output to another program
   if [ -t 1 ]; then
     echo "" # newline
   fi
 }
 
-# Show all the names (CNs and SANs) listed in the SSL certificate
-# for a given domain
+# Show all the names (CNs and SANs) listed in the SSL certificate for a given domain
 function getcertnames() {
   if [ -z "${1}" ]; then
     echo "ERROR: No domain specified."
@@ -198,26 +211,23 @@ function getcertnames() {
   fi
 
   local domain="${1}"
-  echo "Testing ${domain}…"
+  local port="${2:-443}"
+  echo "Testing ${domain}:${port}…"
   echo "" # newline
 
   local tmp
-  tmp=$(echo -e "GET / HTTP/1.0\nEOT" |
-    openssl s_client -connect "${domain}:443" -servername "${domain}" 2>&1)
+  tmp=$(echo | openssl s_client -connect "${domain}:${port}" -servername "${domain}" -connect_timeout 5 2>/dev/null)
 
   if [[ "${tmp}" = *"-----BEGIN CERTIFICATE-----"* ]]; then
-    local certText
-    certText=$(echo "${tmp}" |
-      openssl x509 -text -certopt "no_aux, no_header, no_issuer, no_pubkey, \
-            no_serial, no_sigdump, no_signame, no_validity, no_version")
+    local cert_info
+    cert_info=$(echo "${tmp}" | openssl x509 -noout -subject -ext subjectAltName 2>/dev/null)
     echo "Common Name:"
     echo "" # newline
-    echo "${certText}" | grep "Subject:" | sed -e "s/^.*CN=//" | sed -e "s/\/emailAddress=.*//"
+    echo "${cert_info}" | grep "^subject" | sed -E 's/.*CN *= *//'
     echo "" # newline
     echo "Subject Alternative Name(s):"
     echo "" # newline
-    echo "${certText}" | grep -A 1 "Subject Alternative Name:" |
-      sed -e "2s/DNS://g" -e "s/ //g" | tr "," "\n" | tail -n +2
+    echo "${cert_info}" | grep -oE 'DNS:[^,]+' | sed 's/DNS: *//'
     return 0
   else
     echo "ERROR: Certificate not found."
@@ -225,17 +235,72 @@ function getcertnames() {
   fi
 }
 
-# MAC lookup
+# MAC vendor lookup
 function mac_lookup() {
   local mac="$1"
   if [ -z "$mac" ]; then
     echo "MAC vendor lookup"
-    echo "Usage: mac-lookup MAC_address_or_prefix"
+    echo "Usage: mac_lookup MAC_address_or_prefix"
     return
   fi
 
   mac=${mac//:/}
   mac=${mac:0:6}
 
+  if ! [[ "$mac" =~ ^[0-9a-fA-F]{6}$ ]]; then
+    echo "Error: invalid MAC address (expected 6 hex characters after stripping colons)"
+    return 1
+  fi
+
   curl "https://api.macvendors.com/$mac"
+  echo
+}
+
+# Compares files or directories with the best available diff tool
+# Usage: jdiff file_or_dir_1 file_or_dir_2
+jdiff() {
+  if [ -z "$2" ]; then
+    echo "Compares files or directories"
+    echo "Usage: jdiff file_or_dir_1 file_or_dir_2"
+    return 1
+  fi
+  if [ ! -e "$1" ]; then
+    echo "$1: does not exist"
+    return 1
+  fi
+  if [ ! -e "$2" ]; then
+    echo "$2: does not exist"
+    return 1
+  fi
+
+  local -a _comp
+  if [ -d "$1" ]; then
+    if [ -d "$2" ]; then
+      _comp=('-Nur')
+    else
+      echo "Cannot compare directory ( $1 ) with a file ( $2 )"
+      return 1
+    fi
+  else
+    if [ ! -d "$2" ]; then
+      _comp=('-u')
+    else
+      echo "Cannot compare file ( $1 ) with a directory ( $2 )"
+      return 1
+    fi
+  fi
+
+  if _has difft; then
+    diff "${_comp[@]}" "$1" "$2" | difft
+  elif _has delta; then
+    diff "${_comp[@]}" "$1" "$2" | delta
+  elif _has diff-so-fancy; then
+    diff "${_comp[@]}" "$1" "$2" | diff-so-fancy
+  elif _has ydiff; then
+    diff "${_comp[@]}" "$1" "$2" | ydiff
+  elif _has git; then
+    git diff --no-index "$1" "$2"
+  else
+    diff --color=auto "${_comp[@]}" "$1" "$2"
+  fi
 }

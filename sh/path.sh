@@ -20,7 +20,7 @@ if [[ "$OSTYPE" = darwin* ]]; then
   eval "$(/usr/libexec/path_helper -s)"
   eval "$(/opt/homebrew/bin/brew shellenv)"
 
-  if [[ "$SHELL" == *zsh* ]]; then
+  if [[ -n "$ZSH_VERSION" ]]; then
     setopt null_glob
   else
     shopt -s nullglob

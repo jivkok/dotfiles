@@ -22,10 +22,10 @@ optional "$HOME/.fzf.bash"
 # bind "^[[1;5D" backward-word # ctrl-left
 # bind "^[[1;5C" forward-word # ctrl-right
 
-if command -V zoxide >/dev/null 2>&1; then
+if _has zoxide; then
   eval "$(zoxide init bash)"
 
-  zp() {
+  zz() {
     pushd . > /dev/null || return
     z "$@"
   }

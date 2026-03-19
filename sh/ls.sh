@@ -1,7 +1,5 @@
 # shellcheck shell=bash
 
-os=$(uname -s)
-
 # ls aliases
 
 if command -v eza >/dev/null 2>&1; then
@@ -9,12 +7,12 @@ if command -v eza >/dev/null 2>&1; then
     alias l='eza -aF --color=auto --group-directories-first'
     alias ll='eza -alF --color=auto --group-directories-first'
 
-elif [ "$os" = "Linux" ]; then
+elif $_is_linux; then
 
   alias l='ls -AF --color=auto --group-directories-first'
   alias ll='ls -AlFh --color=auto --group-directories-first'
 
-elif [ "$os" = "Darwin" ]; then
+elif $_is_osx; then
 
   if command -v gls >/dev/null 2>&1; then
     alias l='gls -AF --color=auto --group-directories-first'

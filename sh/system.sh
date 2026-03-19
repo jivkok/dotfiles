@@ -21,64 +21,76 @@ if [ -d "$HOME/go" ]; then
   export GOBIN="$GOPATH/bin"
 fi
 
-# Easier navigation
+# Navigation
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
+# Reload the shell as a login shell
+reload() { exec "$SHELL" -l; }
 
-# Directories
-alias md='mkdir'
+# Filesystem
+alias md='mkdir -p'
 alias rd='rm -rf'
-alias paths='echo -e ${PATH//:/\\n}'
+# Create a new directory and enter it
+function mkd() {
+  mkdir -p "$@" && cd "$_" || exit
+}
+# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
+# the `.git` directory, listing directories first. The output gets piped into
+# `less` with options to preserve color and line numbers, unless the output is
+# small enough for one screen.
+function tre() {
+  tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX
+}
 
-# Misc
-alias envs='env | sort'
+# Shell session
 alias h='history'
 alias j='jobs'
-alias mk='make'
-alias nh='unset HISTFILE'
-alias rr='ranger'
-alias vars='set | sort'
 alias x='exit'
+alias nh='unset HISTFILE'
 
-# System info
-## top processes by CPU
-alias pscpu10='ps aux | head -1; ps aux | tail -n +2 | sort -nr -k 3 | head -10'
-# alias pscpu10='ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10'
-## top processes by memory
-alias psmem10='ps aux | head -1; ps aux | tail -n +2 | sort -nr -k 4 | head -10'
-
-# memory
-alias meminfo='free -m -l -t'
-
-# Networking
-alias ports='netstat -tulan'
-
-# Get week number
-alias week='date +%V'
-
-# IP addresses
-alias ip='dig +short myip.opendns.com @resolver1.opendns.com'
-alias localip="ifconfig | grep -Eo 'inet (addr:)?([0-9]+\.){3}[0-9]+' | grep -Eo '([0-9]+\.){3}[0-9]+' | grep -v '127.0.0.1'"
-
-# Reload the shell (i.e. invoke as a login shell)
-alias reload='exec $SHELL -l'
-
+# Tools
+alias mk='make'
+alias rr='ranger'
 # Tmux auto-attach
 command -v tmux >/dev/null && alias t='(tmux has-session 2>/dev/null && tmux attach) || (tmux new-session)'
 
-# Helpers
+# Environment inspection
+alias envs='env | sort'
+alias vars='set | sort'
+# Print each PATH entry on its own line
+paths() { tr ':' '\n' <<< "$PATH"; }
 
+# Misc
+alias week='date +%V'
+
+# Override man to display colorized output
+function man() {
+  env \
+    LESS_TERMCAP_md=$'\e[1;36m' \
+    LESS_TERMCAP_me=$'\e[0m' \
+    LESS_TERMCAP_se=$'\e[0m' \
+    LESS_TERMCAP_so=$'\e[1;40;92m' \
+    LESS_TERMCAP_ue=$'\e[0m' \
+    LESS_TERMCAP_us=$'\e[1;32m' \
+    man "$@"
+}
+
+# Log a timestamped message to the console and ~/.dotfiles_history
 function dot_trace() {
   local msg="$1"
   local timestamp
   timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
-  echo -e "\n$(tput setaf 2)$timestamp: $msg$(tput sgr0)\n"
+  if [ -t 1 ]; then
+    echo -e "\n$(tput setaf 2)$timestamp: $msg$(tput sgr0)\n"
+  else
+    echo -e "\n$timestamp: $msg\n"
+  fi
   touch ~/.dotfiles_history
   echo "$timestamp: [INFO] $msg" >>~/.dotfiles_history
 }
 
-# system update
+# Update the OS, package managers, shell plugins, and editors
 function update_os() {
   echo -e "\nUpdating system ...\n"
 
@@ -93,18 +105,16 @@ function update_os() {
   fi
 
   # Package manager updates
-  os=$(uname -s)
-
-  if [ "$os" = "Darwin" ] && command -V brew >/dev/null 2>&1; then
+  if $_is_osx && command -v brew >/dev/null 2>&1; then
     echo -e "\nUpdating Homebrew packages ...\n"
-    brew update-reset
+    brew update
     brew upgrade
     brew cleanup
     brew doctor --verbose
     echo -e "\nUpdating Homebrew packages done.\n"
   fi
 
-  if [ "$os" = "Linux" ] && command -V apt-get >/dev/null 2>&1; then
+  if $_is_linux && command -v apt-get >/dev/null 2>&1; then
     echo -e "\nUpdating apt-get packages ...\n"
     sudo apt-get update -y -qq --fix-missing
     sudo apt-get dist-upgrade
@@ -113,12 +123,12 @@ function update_os() {
     echo -e "\nUpdating apt-get packages done.\n"
   fi
 
-  if [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
+  if $_is_linux && command -v pacman >/dev/null 2>&1; then
     echo -e "\nUpdating pacman packages ...\n"
     sudo pacman -Syu --needed --noconfirm archlinux-keyring
     sudo pacman -Syyu --overwrite "*"
     echo -e "\nUpdating pacman packages done.\n"
-    if command -V yay >/dev/null 2>&1; then
+    if command -v yay >/dev/null 2>&1; then
       echo -e "\nUpdating yay packages ...\n"
       yay -Syu --answerupgrade None --answerclean None --answerdiff None
       echo -e "\nUpdating yay packages done.\n"
@@ -132,8 +142,8 @@ function update_os() {
     "$fzfrepo/install" --key-bindings --completion --no-update-rc
 
     # fzf-git
-    filename="fzf-git.sh"
-    url="https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh"
+    local filename="fzf-git.sh"
+    local url="https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh"
     echo "Downloading $url"
     curl -s -o "$HOME/bin/$filename" "$url"
     chmod 755 "$HOME/bin/$filename"
@@ -155,20 +165,21 @@ function update_os() {
     echo -e "\nUpdating Tmux plugins done.\n"
   fi
 
-  if command -V vim >/dev/null 2>&1; then
+  if command -v vim >/dev/null 2>&1; then
     echo -e "\nUpdating Vim plugins ...\n"
     vim +PlugUpdate +qall
     echo -e "\nUpdating Vim plugins done.\n"
   fi
-  if command -V nvim >/dev/null 2>&1; then
+  if command -v nvim >/dev/null 2>&1; then
     echo -e "\nUpdating NeoVim plugins ...\n"
     nvim +PlugUpdate +qall
     echo -e "\nUpdating NeoVim plugins done.\n"
   fi
 
-  if command -V python3 >/dev/null 2>&1; then
+  local pipcmd=""
+  if command -v python3 >/dev/null 2>&1; then
     pipcmd="pip3"
-  elif command -V python >/dev/null 2>&1; then
+  elif command -v python >/dev/null 2>&1; then
     pipcmd="pip"
   fi
   if [ -n "$pipcmd" ]; then
@@ -180,7 +191,7 @@ function update_os() {
     echo -e "\nUpdating Python packages done.\n"
   fi
 
-  if command -V npm >/dev/null 2>&1; then
+  if command -v npm >/dev/null 2>&1; then
     echo -e "\nUpdating Node packages ...\n"
     npm install npm@latest -g
     npm update -g
@@ -197,147 +208,4 @@ function update_os() {
   # fi
 
   echo -e "\nUpdating system done.\n"
-}
-
-# Helps identifying the source/content of a command
-function help() {
-  local cmd="$1"
-  if [ -z "$cmd" ]; then
-    echo "Helps identifying the source/content of a command"
-    echo "Usage: help command"
-    return
-  fi
-
-  local DEFAULT="\033[0;39m" RED="\033[0;31m" GREEN="\033[0;32m"
-  local hasBat=0
-  command -V bat >/dev/null 2>&1 && hasBat=1
-
-  local cmdtest
-  cmdtest="$(type "$cmd")" # command -V, which
-
-  # alias
-  if [[ $cmdtest == *"is an alias for"* ]]; then
-    echo -e "${GREEN}Alias${DEFAULT}"
-    alias "$cmd"
-    return
-  fi
-
-  # function
-  if [[ $cmdtest == *"is a shell function"* ]]; then
-    echo -e "${GREEN}${cmdtest}${DEFAULT}"
-    if [[ $hasBat == 1 ]]; then
-      which "$cmd" | bat -l sh
-    else
-      which "$cmd"
-    fi
-    return
-  fi
-
-  # file
-  local f
-  f="$(echo "$cmdtest" | sed -E 's/.+\ is\ (.*)/\1/')"
-  if [ -f "$f" ]; then
-    echo -e "${GREEN}${cmdtest}${DEFAULT}"
-    file "$f"
-    return
-  fi
-
-  # man
-
-  if man "$cmd" >/dev/null 2>&1; then
-    echo -e "${GREEN}Found man entry for: ${cmd}${DEFAULT}"
-    man "$cmd"
-    return
-  fi
-
-  # whatis
-  local mantest
-  mantest="$(man -f "$cmd")"
-  if [[ $mantest != *"nothing appropriate"* ]]; then
-    echo -e "${GREEN}Found whatis entries for: ${cmd}${DEFAULT}"
-    man -f "$cmd"
-    return
-  fi
-
-  # apropos
-  mantest="$(man -k "$cmd")"
-  if [[ $mantest != *"nothing appropriate"* ]]; then
-    echo -e "${GREEN}Found whatis strings for: ${cmd}${DEFAULT}"
-    man -k "$cmd"
-    return
-  fi
-
-  echo -e "${RED}Could not find anything for: ${cmd}${DEFAULT}"
-  return 1
-}
-
-# Create a new directory and enter it
-function mkd() {
-  mkdir -p "$@" && cd "$_" || exit
-}
-
-# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
-# the `.git` directory, listing directories first. The output gets piped into
-# `less` with options to preserve color and line numbers, unless the output is
-# small enough for one screen.
-function tre() {
-  tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX
-}
-
-# colorized man
-function man() {
-  env \
-    LESS_TERMCAP_md=$'\e[1;36m' \
-    LESS_TERMCAP_me=$'\e[0m' \
-    LESS_TERMCAP_se=$'\e[0m' \
-    LESS_TERMCAP_so=$'\e[1;40;92m' \
-    LESS_TERMCAP_ue=$'\e[0m' \
-    LESS_TERMCAP_us=$'\e[1;32m' \
-    man "$@"
-}
-
-function history_top_commands() {
-  history | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl | head -n20
-}
-
-# Tails the system log
-function sys_log() {
-  local os
-  os="$(uname -s)"
-  if [ "$os" = "Linux" ]; then
-    syslog=/var/log/syslog
-  elif [ "$os" = "Darwin" ]; then
-    syslog=/var/log/system.log
-  else
-    echo "Unsupported OS: $os"
-    return
-  fi
-
-  if [[ $# -gt 0 ]]; then
-    query=$(echo "$*" | tr -s ' ' '|')
-    tail -f $syslog | grep -i --color=auto -E "$query"
-  else
-    tail -f $syslog
-  fi
-}
-
-#######################################
-# Disk usage
-# Arguments:
-#   $1 - directory (default: current)
-#   $2 - count (default: 20)
-#   $3 - depth (default: 1)
-# Returns:
-#   List of directories and their cummulative size
-diskusage() {
-  local _dushow _dusort
-  if echo zzz | sort -h >/dev/null 2>&1; then
-    _dushow="-h"
-    _dusort="-h"
-  else
-    _dushow=""
-    _dusort="-n"
-  fi
-
-  du $_dushow -d "${3:-1}" -t 1K "${1:-.}" | sort $_dusort -r | head -n "${2:-20}"
 }

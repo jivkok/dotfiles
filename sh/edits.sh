@@ -30,12 +30,12 @@ else
 fi
 alias vimupd='v +PlugUpdate +qall'
 
-if [ "$(uname -s)" = "Linux" ] && command -v xsel >/dev/null 2>&1; then
+if $_is_linux && command -v xsel >/dev/null 2>&1; then
   alias pbcopy='xsel --clipboard --input'
   alias pbpaste='xsel --clipboard --output'
 fi
 
-# open file/s in Emacs (in current session, if any) in new frame
+# Open file/s in Emacs (in current session, if any) in a new frame
 function em() {
   if ! pgrep -f -u "$USER" "emacs --daemon" >/dev/null 2>&1; then
     emacs --daemon
@@ -44,17 +44,17 @@ function em() {
   emacsclient -c "$@"
 }
 
-# open file/s in Emacs in existing frame/session
+# Open file/s in Emacs in an existing frame/session
 function ems() {
   if ! pgrep -f -u "$USER" "emacs --daemon" >/dev/null 2>&1; then
-    emacs --daemon "$@"
+    emacs --daemon
     emacsclient "$@"
   else
     emacsclient -n "$@"
   fi
 }
 
-# close existing Emacs session
+# Close the existing Emacs daemon session
 function emq() {
   if pgrep -f -u "$USER" "emacs --daemon" >/dev/null 2>&1; then
     emacsclient -e "(kill-emacs)" "$@"

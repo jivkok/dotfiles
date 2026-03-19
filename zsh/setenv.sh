@@ -22,10 +22,10 @@ source "$dotdir/zsh/prompt.sh"
 optional "$HOME/.fzf.zsh"
 # optional "$HOME/bin/fzf-git.sh"
 
-if command -V zoxide >/dev/null 2>&1; then
+if _has zoxide; then
   eval "$(zoxide init zsh)"
 
-  zp() {
+  zz() {
     pushd . > /dev/null || return
     z "$@"
   }
