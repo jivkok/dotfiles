@@ -11,15 +11,15 @@ Each "agent" is the same Claude Code instance running under a different role —
 ```
 .claude/
   commands/
-    new-task.md          # slash command: submit a task and immediately triage it
+    create-task.md          # slash command: submit a task and immediately triage it
     triage.md            # orchestrator: routes inbox tasks to clarifying/ or ready/
-    clarify.md           # requirements agent entry point
+    clarify.md           # analyst entry point
     implement.md         # dev/test agent entry point
     run-pipeline.md      # full-auto: triage → clarify → implement in sequence
   agents/
-    requirements.md      # system prompt for the requirements agent role
-    development.md       # system prompt for the dev/test agent role
-    orchestrator.md      # system prompt for the triage/orchestrator role
+    analyst.md           # system prompt for the analyst role
+    engineer.md          # system prompt for the engineer role
+    orchestrator.md      # system prompt for the orchestrator role
 tasks/
   inbox/                 # new tasks land here
   clarifying/            # needs requirements work
@@ -66,10 +66,10 @@ Each task is a markdown file. Required fields are enforced by the triage agent �
 Triage moves tasks lacking this to clarifying/.
 
 ## Out of Scope
-(optional — requirements agent fills this in if missing)
+(optional — analyst fills this in if missing)
 
 ## Edge Cases / Test Scenarios
-(optional — requirements agent fills this in if missing)
+(optional — analyst fills this in if missing)
 ```
 
 **Priority values**: `urgent` / `high` / `medium` / `low`.
@@ -79,7 +79,7 @@ Triage moves tasks lacking this to clarifying/.
 
 #### Mode 1: Step-by-step (review between phases)
 
-**1. Task submission** — run `/new-task <description>`. The command generates a structured task file in `tasks/inbox/` from the one-liner, immediately runs triage on it, and reports whether it went to `ready/` or `clarifying/`. Tasks can also be dropped manually into `tasks/inbox/` using the template in `tasks/templates/task.md`.
+**1. Task submission** — run `/create-task <description>`. The command generates a structured task file in `tasks/inbox/` from the one-liner, immediately runs triage on it, and reports whether it went to `ready/` or `clarifying/`. Tasks can also be dropped manually into `tasks/inbox/` using the template in `tasks/templates/task.md`.
 
 **2. Triage** (`/triage`) — the orchestrator reads all inbox tasks and routes each one:
 - Has description + acceptance criteria with unambiguous scope → `tasks/ready/`
@@ -91,14 +91,14 @@ Triage moves tasks lacking this to clarifying/.
 
 #### Mode 2: Full-auto
 
-1. Task submission: run `/new-task <description>`.
+1. Task submission: run `/create-task <description>`.
 2. Start orchestrator: `/run-pipeline`
 
 ---
 
 ### Concrete Implementation
 
-**`.claude/commands/new-task.md`** — user entry point:
+**`.claude/commands/create-task.md`** — user entry point:
 ```md
 Arguments: a one-line task description provided by the user.
 
@@ -126,9 +126,9 @@ Read all files in tasks/inbox/. For each task:
 Print a summary of what moved where and why.
 ```
 
-**`.claude/commands/clarify.md`** — requirements agent:
+**`.claude/commands/clarify.md`** — analyst:
 ```md
-Agent role: requirements analyst (see .claude/agents/requirements.md).
+Agent role: analyst (see .claude/agents/analyst.md).
 
 Read all files in tasks/clarifying/. Pick the highest-priority one
 (priority field, then oldest Created date as tiebreaker).
@@ -141,9 +141,9 @@ Read all files in tasks/clarifying/. Pick the highest-priority one
 - Move the file to tasks/ready/, set Status: ready.
 ```
 
-**`.claude/commands/implement.md`** — development agent:
+**`.claude/commands/implement.md`** — engineer:
 ```md
-Agent role: dev/test engineer (see .claude/agents/development.md).
+Agent role: engineer (see .claude/agents/engineer.md).
 
 Read all files in tasks/ready/. Pick the highest-priority one
 (priority field, then oldest Created date as tiebreaker).

@@ -8,7 +8,7 @@ Parse the arguments as follows:
 - If the first word is a priority tag — `[urgent]`, `[high]`, `[medium]`, or `[low]` — extract it as the priority (without brackets). The remainder is the description.
 - Otherwise, priority is `medium` and the entire argument string is the description.
 
-If no arguments are provided, tell the user: "Usage: /new-task [priority?] <description>" and stop.
+If no arguments are provided, tell the user: "Usage: /create-task [priority?] <description>" and stop.
 
 ## Step 1: Generate the task file
 

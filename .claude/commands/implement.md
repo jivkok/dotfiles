@@ -1,4 +1,4 @@
-Load the development agent role from `.claude/agents/development.md` and implement one task from `tasks/ready/`.
+Load the engineer role from `.claude/agents/engineer.md` and implement one task from `tasks/ready/`.
 
 ## Scope
 

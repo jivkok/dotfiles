@@ -23,7 +23,7 @@ Follow the process in `docs/development.md` — including the mandatory testing 
 ## Task Pipeline
 
 This repo uses a file-based multi-agent task pipeline for managing work autonomously.
-Submit tasks with `/new-task <description>`. Tasks flow through:
+Submit tasks with `/create-task <description>`. Tasks flow through:
 
 ```
 tasks/inbox/ → tasks/clarifying/ → tasks/ready/ → tasks/done/

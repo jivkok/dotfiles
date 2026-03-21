@@ -1,4 +1,4 @@
-Load the requirements agent role from `.claude/agents/requirements.md` and apply it to all files in `tasks/clarifying/`.
+Load the analyst role from `.claude/agents/analyst.md` and apply it to all files in `tasks/clarifying/`.
 
 ## Scope
 
