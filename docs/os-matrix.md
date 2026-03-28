@@ -1,5 +1,39 @@
 # OS Matrix (macOS vs Linux vs Windows)
 
+## Component support matrix
+
+| Component | macOS | Debian/Ubuntu | Arch | Linux minimal (remote VM) | Windows |
+|-----------|:-----:|:-------------:|:----:|:-------------------------:|:-------:|
+| Bash profile | ✓ | ✓ | ✓ | ✓ | — |
+| ZSH + plugins | ✓ | ✓ | ✓ | ✗ | — |
+| Git config/identity | ✓ | ✓ | ✓ | ✗ | ✓ |
+| Vim + plugins | ✓ | ✓ | ✓ | ✗ | — |
+| Tmux + plugins | ✓ | ✓ | ✓ | config only (no plugins) | — |
+| FZF | ✓ | ✓ | ✓ | ✗ | — |
+| Python tools | ✓ | ✓ | ✓ | ✗ | — |
+| Node.js | ✓ | ✓ | ✓ | ✗ | ✓ |
+| Go tools | ✓ | ✓ | ✓ | ✗ | — |
+| .NET tools | ✓ | ✓ | ✓ | ✗ | ✓ |
+| Home symlinks (`misc/`) | ✓ | ✓ | ✓ | ✓ | — |
+| Locale setup | ✓ | ✓ | ✓ | ✓ | — |
+| Home bin | ✓ | ✓ | ✓ | bat/fd symlinks only | — |
+| PowerShell profile | — | — | — | — | ✓ |
+| Chocolatey packages | — | — | — | — | ✓ |
+
+**✓** = installed  **✗** = explicitly excluded  **—** = not applicable on this platform
+
+### Package managers by OS
+
+| OS | Package manager | Notes |
+|----|----------------|-------|
+| macOS | Homebrew (`brew`) | GNU coreutils installed via Homebrew cellar and prepended to PATH |
+| Debian/Ubuntu | `apt-get` | Some tools installed from source (fzf, Starship via shell script) |
+| Arch | `pacman` + `yay` (AUR) | AUR used for tools not in official repos |
+| Linux minimal | `apt-get` or `pacman` | Minimal package list only — see `linux/packages_pm_minimal_*.txt` |
+| Windows | Chocolatey | Requires elevated (admin) prompt |
+
+---
+
 ## macOS (OSX, Darwin)
 - Setup: `osx/configure_osx.sh`
 - Package manager: Homebrew (brew)

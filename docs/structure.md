@@ -34,6 +34,25 @@ Two scripts handle the minimal workflow:
 
 Minimal package scripts: `linux/configure_packages_minimal_debian.sh` and `linux/configure_packages_minimal_arch.sh` (auto-generated — see `docs/development.md`).
 
+**Full vs minimal profile comparison:**
+
+| Component | Full profile | Minimal profile |
+|-----------|:------------:|:---------------:|
+| Bash profile | ✓ | ✓ |
+| ZSH + oh-my-zsh + Starship | ✓ | ✗ |
+| Git config/identity | ✓ | ✗ |
+| Vim + plugins | ✓ | ✗ |
+| Tmux | ✓ (config + plugins) | ✓ (config only) |
+| FZF | ✓ | ✗ |
+| Python toolchain | ✓ | ✗ |
+| Node.js | ✓ | ✗ |
+| Go tools | ✓ | ✗ |
+| Home symlinks (`misc/`) | ✓ | ✓ |
+| Locale setup | ✓ | ✓ |
+| Home bin (full) | ✓ | bat/fd symlinks only |
+| `git pull` on run | ✓ (`DOT_PULL_DOTFILES=1`) | ✗ (rsync, no repo on VM) |
+| Supported OS | macOS, Linux | Linux only |
+
 #### Windows
 Primary orchestrator: `setup/setup.ps1`
 

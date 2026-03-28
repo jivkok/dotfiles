@@ -184,6 +184,44 @@ To add tests for a new optional tool, create `tests/test-cases/test-<tool>.sh` w
 
 ---
 
+## Troubleshooting
+
+### Stale or inconsistent `.testenv`
+
+`.testenv` can get out of sync with reality if a Docker image is deleted outside of the normal workflow (e.g. `docker rmi` run manually, disk cleanup, Docker Desktop reset).
+
+**Symptoms:**
+- `run-tests.sh` references an image that no longer exists
+- `create-test-envs.sh` reports no changes but the image is missing
+
+**Fix — force a full rebuild:**
+```bash
+rm tests/.testenv
+bash tests/create-test-envs.sh
+```
+
+This discards all cached hashes and rebuilds every environment from scratch.
+
+**Fix — rebuild a single OS only** (e.g. Debian):
+Edit `tests/.testenv` and blank out (or delete) the relevant hash line:
+```
+DEBIAN_SETUP_HASH=
+```
+Then re-run `bash tests/create-test-envs.sh`. Only the OS with a changed or missing hash is rebuilt.
+
+### Missing SSH public key (minimal/remote images)
+
+If `create-test-envs.sh` prints `WARN: no SSH public key found — skipping remote image build`, the minimal Docker images won't be built and remote tests will be skipped.
+
+**Fix:** ensure at least one of these files exists before running the script:
+```
+~/.ssh/id_ed25519.pub
+~/.ssh/id_rsa.pub
+~/.ssh/id_ecdsa.pub
+```
+
+---
+
 ## Scripts reference
 
 | Script | Purpose |
