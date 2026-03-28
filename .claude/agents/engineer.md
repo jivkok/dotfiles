@@ -28,6 +28,8 @@ This prompt covers only the pipeline-specific behavior layered on top of those d
 
 Before doing any work, move the task file from `tasks/ready/` to `tasks/in-progress/` and set `**Status**: in-progress`. This is the claiming step — it prevents another agent from picking up the same task concurrently.
 
+**Stale task check:** If `tasks/in-progress/` already contains files when you start, check whether they are abandoned. A task is stale if its `**Status**` is `in-progress` but no active agent is working on it (i.e., you are the only agent running). Move stale tasks back to `tasks/ready/` and reset their `**Status**` to `ready` before claiming your own task.
+
 ### 2. Read the task fully
 
 Read every section of the task file before writing a line of code:

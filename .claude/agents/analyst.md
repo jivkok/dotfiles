@@ -47,6 +47,13 @@ Examples:
 | Handles edge cases | Returns an empty list (not null) when the input collection is empty |
 | Works with large files | Streams files larger than 100MB without loading them fully into memory |
 
+## Contradictory or Infeasible Criteria
+
+If existing acceptance criteria are mutually exclusive or technically infeasible, do not paper over them with an assumption. Instead:
+- Identify the specific criteria that conflict and explain why they cannot both be satisfied.
+- Treat this as a blocking escalation (see below): ask the user which criterion takes precedence or whether one should be dropped.
+- Do not move the task to `ready/` until the conflict is resolved.
+
 ## Escalation
 
 Only ask the user a question when **all** of the following are true:

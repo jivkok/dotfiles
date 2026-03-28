@@ -5,8 +5,10 @@ Create a new task and immediately triage it.
 Arguments: $ARGUMENTS
 
 Parse the arguments as follows:
-- If the first word is a priority tag — `[urgent]`, `[high]`, `[medium]`, or `[low]` — extract it as the priority (without brackets). The remainder is the description.
+- Normalize the first word to lowercase before matching.
+- If the normalized first word is a priority tag — `[urgent]`, `[high]`, `[medium]`, or `[low]` — extract it as the priority (without brackets). The remainder is the description.
 - Otherwise, priority is `medium` and the entire argument string is the description.
+- If the first word looks like a tag (wrapped in `[` and `]`) but is not one of the four valid values, stop and tell the user: "Unknown priority '<value>'. Valid values: urgent, high, medium, low."
 
 If no arguments are provided, tell the user: "Usage: /create-task [priority?] <description>" and stop.
 
