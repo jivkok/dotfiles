@@ -82,12 +82,16 @@ fi
 
 export LOG_LEVEL
 
+# ── Test environments ─────────────────────────────────────────────────────────────
+# Ensure test environments are up to date before running tests.
+bash "${tests_root}/create-test-envs.sh"
+
 # ── Test discovery ─────────────────────────────────────────────────────────────
 
 mapfile -t all_test_files < <(find "${test_cases_dir}" -name 'test-*.sh' | sort)
 
 if [[ ${#all_test_files[@]} -eq 0 ]]; then
-  echo "No test files found in ${test_cases_dir}."
+  log_info "No test files found in ${test_cases_dir}."
   exit 0
 fi
 
@@ -121,8 +125,8 @@ select_tests() {
       default)
         if requires_met "$f"; then
           selected+=("$f")
-        elif _should_log $LOG_LEVEL_INFO; then
-          echo "  SKIPPED: ${name} (requires: ${requires})" >&2
+        else
+          log_info "  SKIPPED: ${name} (requires: ${requires})" >&2
         fi
         ;;
       all)
@@ -158,7 +162,7 @@ _record_result() {
     log_info "  ${SUCCESS_COLOR}PASSED${RESET}"
   else
     _total_fail=$((_total_fail + 1))
-    log_info "  ${FAIL_COLOR}FAILED${RESET}"
+    log_error "  ${FAIL_COLOR}FAILED${RESET}"
   fi
 }
 
@@ -173,7 +177,7 @@ run_test() {
       command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
     done
     if [[ ${#missing[@]} -gt 0 ]]; then
-      echo "  ERROR: ${name} requires missing commands: ${missing[*]}" >&2
+      log_error "  ERROR: ${name} requires missing commands: ${missing[*]}" >&2
       return 1
     fi
   fi

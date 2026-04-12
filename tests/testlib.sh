@@ -71,9 +71,9 @@ _should_log() {
 
 # ── Logging functions ──────────────────────────────────────────────────────────
 
-log_error() { if _should_log $LOG_LEVEL_ERROR; then echo "$*"; fi }
-log_info()  { if _should_log $LOG_LEVEL_INFO;  then echo "$*"; fi }
-log_trace() { if _should_log $LOG_LEVEL_TRACE; then echo "$*"; fi }
+log_error() { if _should_log $LOG_LEVEL_ERROR; then echo "[$(date '+%H:%M:%S')] $*"; fi }
+log_info()  { if _should_log $LOG_LEVEL_INFO;  then echo "[$(date '+%H:%M:%S')] $*"; fi }
+log_trace() { if _should_log $LOG_LEVEL_TRACE; then echo "[$(date '+%H:%M:%S')] $*"; fi }
 
 # ── Assertion helpers ──────────────────────────────────────────────────────────
 
@@ -89,7 +89,7 @@ ok() {
 # Record a failing assertion.  Always prints to stderr.
 fail() {
   _TEST_FAIL=$((_TEST_FAIL + 1))
-  echo "  ${FAIL_COLOR}FAIL${RESET}: $*" >&2
+  echo "[$(date '+%H:%M:%S')]   ${FAIL_COLOR}FAIL${RESET}: $*" >&2
 }
 
 # ── Common test assertions ──────────────────────────────────────────────────────

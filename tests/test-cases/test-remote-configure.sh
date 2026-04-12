@@ -107,6 +107,17 @@ assert_minimal_setup() {
   local label="$1"
   local port="$2"
 
+  # Multiplex all SSH calls in this function over one master connection.
+  # bash dynamic scoping: local _SSH_TEST_OPTS is visible to every ssh_check_*
+  # helper called from here, so no helper changes are needed.
+  local ctl_socket
+  ctl_socket=$(mktemp -u "/tmp/ssh-test-ctl-XXXXX")
+  # shellcheck disable=SC2178  # intentional local array shadow
+  local _SSH_TEST_OPTS=("${_SSH_TEST_OPTS[@]}" \
+    -o "ControlMaster=auto" \
+    -o "ControlPath=${ctl_socket}" \
+    -o "ControlPersist=60")
+
   log_trace "--- ${label}: bash login shell startup ---"
 
   startup_errors=$(ssh "${_SSH_TEST_OPTS[@]}" -p "${port}" test@127.0.0.1 \
@@ -196,6 +207,9 @@ assert_minimal_setup() {
   else
     fail "${label}: ~/.tmux.conf is not a symlink"
   fi
+
+  # Tear down the SSH master; ignore errors (already gone or never opened).
+  ssh -o "ControlPath=${ctl_socket}" -O exit test@127.0.0.1 2>/dev/null || true
 }
 
 # ── Read remote image names from .testenv ──────────────────────────────────────

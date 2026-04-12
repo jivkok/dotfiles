@@ -43,7 +43,13 @@ The setup hash for each OS is computed from the combined content of its relevant
 
 ## Workflow
 
-### Step 1 — Create / update test environments
+```bash
+bash tests/run-tests.sh [--all | --filter <cmd>]
+```
+
+### Environment setup (create-test-envs.sh)
+
+`create-test-envs.sh` is invoked automatically by `run-tests.sh`, but can also be run standalone to pre-build images before running tests:
 
 ```bash
 bash tests/create-test-envs.sh
@@ -62,11 +68,7 @@ This script:
 6. Resolves the current Docker image name for each OS by checking which image exists for the current hash.
 7. Writes updated state to `tests/.testenv`.
 
-### Step 2 — Run tests
-
-```bash
-bash tests/run-tests.sh [--all | --filter <cmd>]
-```
+### Running tests (run-tests.sh)
 
 | Flag | Behaviour |
 |------|-----------|
@@ -227,7 +229,7 @@ If `create-test-envs.sh` prints `WARN: no SSH public key found — skipping remo
 | Script | Purpose |
 |--------|---------|
 | `tests/testlib.sh` | Shared test library (colors, log levels, `ok`/`fail`, counters). Sourced by all test scripts and the runner. |
-| `tests/create-test-envs.sh` | Build/update test environments (local + Docker). Run this when setup files change. |
+| `tests/create-test-envs.sh` | Build/update test environments (local + Docker). Called automatically by `run-tests.sh`; can also be run standalone to pre-build images. |
 | `tests/run-tests.sh` | Run all test cases across all environments. |
 | `tests/docker/build-image.sh` | Builds a single full Docker image. Accepts `IMAGE_NAME` and `DOCKERFILE_PATH` as env vars. |
 | `tests/docker/build-image-remote.sh` | Builds a single minimal (SSH-enabled) Docker image. Same interface as `build-image.sh` plus `DOCKER_RUN_ARGS` for `--build-arg HOST_PUBLIC_KEY=<key>`. |

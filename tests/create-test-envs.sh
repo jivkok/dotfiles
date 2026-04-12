@@ -3,6 +3,8 @@ set -euo pipefail
 
 tests_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=testlib.sh
+source "${tests_root}/testlib.sh"
 
 # Compute a sha256 hash of a list of files (combined content).
 hash_files() {
@@ -80,10 +82,10 @@ case "$(uname -s)" in
     elif grep -qiE '^ID(_LIKE)?=.*debian' /etc/os-release 2>/dev/null; then
       HOST_OS="DEBIAN"
     else
-      echo "ERROR: unsupported Linux distro" >&2; exit 1
+      log_error "ERROR: unsupported Linux distro" >&2; exit 1
     fi
     ;;
-  *) echo "ERROR: unsupported OS: $(uname -s)" >&2; exit 1 ;;
+  *) log_error "ERROR: unsupported OS: $(uname -s)" >&2; exit 1 ;;
 esac
 
 # Setup files shared across all full OSes: setup/*.sh excluding minimal-only scripts,
@@ -129,21 +131,21 @@ done
 # Read last known setup hashes from tests/.testenv if it exists
 testenv_path="${tests_root}/.testenv"
 if [[ -f "${testenv_path}" ]]; then
-  echo "Reading ${testenv_path}"
+  log_trace "Reading ${testenv_path}"
   while IFS='=' read -r key value; do
     # Expect lines like: OSX_SETUP_HASH=abc123 or DEBIAN_REMOTE_SETUP_HASH=abc123
     if [[ "$key" =~ ^([A-Z]+)_SETUP_HASH$ ]]; then
       os="${BASH_REMATCH[1]}"
       LAST_OS_SETUP_HASHES[$os]="$value"
-      echo "Last setup hash for ${os}: ${value}"
+      log_trace "Last setup hash for ${os}: ${value}"
     elif [[ "$key" =~ ^([A-Z]+_REMOTE)_SETUP_HASH$ ]]; then
       remote_os="${BASH_REMATCH[1]}"
       LAST_REMOTE_SETUP_HASHES[$remote_os]="$value"
-      echo "Last setup hash for ${remote_os}: ${value}"
+      log_trace "Last setup hash for ${remote_os}: ${value}"
     fi
   done < "${testenv_path}"
 else
-  echo "No existing ${testenv_path} found. Assuming all setups are new."
+  log_info "No existing ${testenv_path} found. Assuming all setups are new."
 fi
 
 # Identify OSes whose setup files have changed. Update their env.
@@ -159,32 +161,32 @@ fi
 
 for os in "${TARGET_OSES[@]}"; do
   if [[ "${OS_SETUP_HASHES[$os]}" == "${LAST_OS_SETUP_HASHES[$os]}" ]]; then
-    echo "${os} setup is up-to-date."
+    log_trace "${os} setup is up-to-date."
     continue
   fi
 
-  echo "Setup has changed for: ${os} (${LAST_OS_SETUP_HASHES[$os]:-none} -> ${OS_SETUP_HASHES[$os]})"
+  log_info "Setup has changed for: ${os} (${LAST_OS_SETUP_HASHES[$os]:-none} -> ${OS_SETUP_HASHES[$os]})"
 
   if [[ "${os}" == "${HOST_OS}" ]]; then
-    echo "  Running setup locally for ${os}..."
+    log_info "  Running setup locally for ${os}..."
     DOT_PULL_DOTFILES=0 DOT_RELOAD_SHELL=0 bash "${repo_root}/setup/setup.sh" \
-      || { echo "ERROR: local setup failed (exit code $?)" >&2; exit 1; }
+      || { log_error "ERROR: local setup failed (exit code $?)" >&2; exit 1; }
   elif [[ "${os}" == "OSX" ]]; then
-    echo "  Skipping ${os}: Docker target not supported."
+    log_info "  Skipping ${os}: Docker target not supported."
   else
     image_prefix="dotfiles-test-${os,,}-"
     image_name="${image_prefix}${OS_SETUP_HASHES[$os]}"
     if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
-      echo "  Docker image already exists: ${image_name}"
+      log_info "  Docker image already exists: ${image_name}"
     else
       # Match only full images (hex hash suffix); exclude minimal images (which contain "-remote-")
       old_images=$(docker image ls --format '{{.ID}} {{.Repository}}' \
         | awk -v p="${image_prefix}" '$2 ~ "^" p "[0-9a-f]+$" {print $1}')
       if [[ -n "${old_images}" ]]; then
-        echo "  Removing stale images for ${os}..."
-        echo "${old_images}" | xargs docker rmi --force 2>/dev/null || true
+        log_info "  Removing stale images for ${os}..."
+        log_info "${old_images}" | xargs docker rmi --force 2>/dev/null || true
       fi
-      echo "  Building Docker image: ${image_name}..."
+      log_info "  Building Docker image: ${image_name}..."
       IMAGE_NAME="${image_name}" DOCKERFILE_PATH="${tests_root}/${OS_DOCKERFILE[$os]}" \
         bash "${tests_root}/docker/build-image.sh"
     fi
@@ -203,11 +205,11 @@ done
 
 for remote_os in "${REMOTE_OSES[@]}"; do
   if [[ "${REMOTE_SETUP_HASHES[$remote_os]}" == "${LAST_REMOTE_SETUP_HASHES[$remote_os]}" ]]; then
-    echo "${remote_os} setup is up-to-date."
+    log_trace "${remote_os} setup is up-to-date."
     continue
   fi
 
-  echo "Setup has changed for: ${remote_os} (${LAST_REMOTE_SETUP_HASHES[$remote_os]:-none} -> ${REMOTE_SETUP_HASHES[$remote_os]})"
+  log_info "Setup has changed for: ${remote_os} (${LAST_REMOTE_SETUP_HASHES[$remote_os]:-none} -> ${REMOTE_SETUP_HASHES[$remote_os]})"
 
   # Normalise: DEBIAN_REMOTE -> debian-remote, ARCH_REMOTE -> arch-remote
   image_prefix="dotfiles-test-${remote_os//_REMOTE/-remote}"
@@ -215,16 +217,16 @@ for remote_os in "${REMOTE_OSES[@]}"; do
   image_name="${image_prefix}${REMOTE_SETUP_HASHES[$remote_os]}"
 
   if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
-    echo "  Docker image already exists: ${image_name}"
+    log_info "  Docker image already exists: ${image_name}"
   elif [[ -z "${_host_pubkey}" ]]; then
-    echo "  WARNING: no SSH public key found; skipping remote image build for ${remote_os}."
+    log_info "  WARNING: no SSH public key found; skipping remote image build for ${remote_os}."
   else
     old_images=$(docker image ls --quiet --filter reference="${image_prefix}*")
     if [[ -n "${old_images}" ]]; then
-      echo "  Removing stale images for ${remote_os}..."
-      echo "${old_images}" | xargs docker rmi --force 2>/dev/null || true
+      log_info "  Removing stale images for ${remote_os}..."
+      log_info "${old_images}" | xargs docker rmi --force 2>/dev/null || true
     fi
-    echo "  Building Docker image: ${image_name}..."
+    log_info "  Building Docker image: ${image_name}..."
     IMAGE_NAME="${image_name}" \
     DOCKERFILE_PATH="${tests_root}/${REMOTE_DOCKERFILE[$remote_os]}" \
     DOCKER_RUN_ARGS="--build-arg HOST_PUBLIC_KEY=${_host_pubkey}" \
@@ -238,7 +240,7 @@ for os in "${TARGET_OSES[@]}"; do
   image_name="dotfiles-test-${os,,}-${OS_SETUP_HASHES[$os]}"
   if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
     LATEST_DOCKER_IMAGES[$os]="${image_name}"
-    echo "${os}_DOCKER_IMAGE=${LATEST_DOCKER_IMAGES[$os]}"
+    log_trace "${os}_DOCKER_IMAGE=${LATEST_DOCKER_IMAGES[$os]}"
   fi
 done
 
@@ -248,7 +250,7 @@ for remote_os in "${REMOTE_OSES[@]}"; do
   image_name="${image_name,,}-${REMOTE_SETUP_HASHES[$remote_os]}"
   if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
     LATEST_REMOTE_DOCKER_IMAGES[$remote_os]="${image_name}"
-    echo "${remote_os}_MINIMAL_IMAGE=${LATEST_REMOTE_DOCKER_IMAGES[$remote_os]}"
+    log_trace "${remote_os}_MINIMAL_IMAGE=${LATEST_REMOTE_DOCKER_IMAGES[$remote_os]}"
   fi
 done
 
