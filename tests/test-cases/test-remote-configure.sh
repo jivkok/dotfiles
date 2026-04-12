@@ -17,6 +17,9 @@ _HAVE_DEPS=1
 if ! command -v docker >/dev/null 2>&1 || ! command -v ssh >/dev/null 2>&1; then
   log_info "SKIPPED: docker or ssh not available in this environment"
   _HAVE_DEPS=0
+elif ! docker info >/dev/null 2>&1; then
+  log_info "SKIPPED: Docker daemon is not running"
+  _HAVE_DEPS=0
 elif [[ -f /.dockerenv ]]; then
   log_info "SKIPPED: running inside a Docker container — minimal SSH ports are mapped to host loopback, not container loopback"
   _HAVE_DEPS=0
@@ -45,6 +48,11 @@ start_remote_container() {
 
   # Get the mapped SSH port (container exposes 22)
   port=$(docker inspect --format '{{(index (index .NetworkSettings.Ports "22/tcp") 0).HostPort}}' "${cid}")
+
+  # Remove any stale known_hosts entry for this port so deploy-remote-vm.sh
+  # (which uses the real known_hosts) does not hit a host key conflict.
+  ssh-keygen -R "[127.0.0.1]:${port}" >/dev/null 2>&1 || true
+
   echo "${cid}:${port}"
 }
 
@@ -56,11 +64,17 @@ deploy_to_container() {
       -p "${port}" "test@127.0.0.1"
 }
 
+# Common SSH options for test helpers: ephemeral containers get fresh host keys
+# each run, so skip known_hosts entirely to avoid stale-key failures.
+# LogLevel=ERROR suppresses SSH's own informational messages (e.g. "Permanently
+# added ...") so they are not mistaken for remote bash startup errors.
+_SSH_TEST_OPTS=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 -o LogLevel=ERROR)
+
 # SSH into container and check a command exists.
 ssh_check_cmd() {
   local port="$1"
   local cmd="$2"
-  ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p "${port}" test@127.0.0.1 \
+  ssh "${_SSH_TEST_OPTS[@]}" -p "${port}" test@127.0.0.1 \
     "bash -li -c 'command -v ${cmd} >/dev/null 2>&1'"
 }
 
@@ -68,7 +82,7 @@ ssh_check_cmd() {
 ssh_check_cmd_absent() {
   local port="$1"
   local cmd="$2"
-  ! ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p "${port}" test@127.0.0.1 \
+  ! ssh "${_SSH_TEST_OPTS[@]}" -p "${port}" test@127.0.0.1 \
     "bash -li -c 'command -v ${cmd} >/dev/null 2>&1'"
 }
 
@@ -76,7 +90,7 @@ ssh_check_cmd_absent() {
 ssh_check_file() {
   local port="$1"
   local path="$2"
-  ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p "${port}" test@127.0.0.1 \
+  ssh "${_SSH_TEST_OPTS[@]}" -p "${port}" test@127.0.0.1 \
     "bash -li -c 'test -f ${path}'"
 }
 
@@ -84,7 +98,7 @@ ssh_check_file() {
 ssh_check_symlink() {
   local port="$1"
   local link="$2"
-  ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p "${port}" test@127.0.0.1 \
+  ssh "${_SSH_TEST_OPTS[@]}" -p "${port}" test@127.0.0.1 \
     "bash -li -c 'test -L ${link}'"
 }
 
@@ -95,7 +109,7 @@ assert_minimal_setup() {
 
   log_trace "--- ${label}: bash login shell startup ---"
 
-  startup_errors=$(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p "${port}" test@127.0.0.1 \
+  startup_errors=$(ssh "${_SSH_TEST_OPTS[@]}" -p "${port}" test@127.0.0.1 \
     "bash -l -c true" 2>&1 >/dev/null)
   if [[ -z "${startup_errors}" ]]; then
     ok "${label}: bash login shell starts with no errors"
@@ -142,7 +156,7 @@ assert_minimal_setup() {
   done
 
   # oh-my-zsh must NOT be present
-  if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p "${port}" test@127.0.0.1 \
+  if ssh "${_SSH_TEST_OPTS[@]}" -p "${port}" test@127.0.0.1 \
       "bash -li -c 'test ! -d ~/.oh-my-zsh'" 2>/dev/null; then
     ok "${label}: oh-my-zsh directory absent"
   else
@@ -167,7 +181,7 @@ assert_minimal_setup() {
   fi
 
   # zshrc must NOT be written by minimal setup
-  if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p "${port}" test@127.0.0.1 \
+  if ssh "${_SSH_TEST_OPTS[@]}" -p "${port}" test@127.0.0.1 \
       "bash -li -c 'test ! -f ~/.zshrc'" 2>/dev/null; then
     ok "${label}: ~/.zshrc absent (minimal profile)"
   else
