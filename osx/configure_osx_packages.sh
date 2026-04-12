@@ -190,15 +190,6 @@ install_brew_package zoxide # Shell extension to easily jump to frequently acces
 
 dot_trace "Installing cask packages."
 
-# browsers
-install_cask_package brave-browser
-install_cask_package google-chrome # brew reinstall google-chrome --no-quarantine
-install_cask_package chromium
-install_cask_package firefox
-install_cask_package librewolf # brew reinstall librewolf --no-quarantine
-install_cask_package duckduckgo
-install_cask_package opera
-
 # FUSE, requires reboot
 # brew cask install osxfuse
 
