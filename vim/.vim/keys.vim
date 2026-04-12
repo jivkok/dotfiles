@@ -9,7 +9,7 @@ nmap <F1> :help<space>jkvim<cr>
 vnoremap <silent> * :call VisualSelection('f')<cr>
 vnoremap <silent> # :call VisualSelection('b')<cr>
 " Disable highlight when <leader><cr> is pressed
-map <silent> <leader><cr> :noh<cr>
+nmap <silent> <leader><cr> :noh<cr>
 
 " Buffers
 nmap <leader>w :w!<cr> " Force-save file
@@ -17,13 +17,13 @@ nmap <leader>W :w !sudo tee % > /dev/null<cr> " Save file as root
 nmap <F3> :bp<cr> " Previous buffer
 nmap <F4> :bn<cr> " Next buffer
 nmap <leader>bd :bd<cr> " Close buffer
-map <leader>cd :cd %:p:h<cr>:pwd<cr> " Switch CWD to the directory of the open buffer
+nmap <leader>cd :cd %:p:h<cr>:pwd<cr> " Switch CWD to the directory of the open buffer
 
 " Tabs
 nmap <Leader>tn :tabnew<cr>
 nmap <Leader>tc :tabclose<cr>
 " Opens new tab with the current buffer's tab
-map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
+nmap <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
 nmap <F11> :tabp<cr>
 nmap <F12> :tabn<cr>
 
@@ -56,18 +56,12 @@ function! StripWhitespace()
     call setpos('.', save_cursor)
     call setreg('/', old_query)
 endfunction
-noremap <leader>ss :call StripWhitespace()<cr>
+nnoremap <leader>ss :call StripWhitespace()<cr>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Helper functions
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-function! CmdLine(str)
-    exe "menu Foo.Bar :" . a:str
-    emenu Foo.Bar
-    unmenu Foo
-endfunction
 
 function! VisualSelection(direction) range
     let l:saved_reg = @"
@@ -77,13 +71,9 @@ function! VisualSelection(direction) range
     let l:pattern = substitute(l:pattern, "\n$", "", "")
 
     if a:direction == 'b'
-        execute "normal ?" . l:pattern . "^M"
-    elseif a:direction == 'gv'
-        call CmdLine("vimgrep " . '/'. l:pattern . '/' . ' **/*.')
-    elseif a:direction == 'replace'
-        call CmdLine("%s" . '/'. l:pattern . '/')
+        execute "normal ?" . l:pattern . "\<CR>"
     elseif a:direction == 'f'
-        execute "normal /" . l:pattern . "^M"
+        execute "normal /" . l:pattern . "\<CR>"
     endif
 
     let @/ = l:pattern

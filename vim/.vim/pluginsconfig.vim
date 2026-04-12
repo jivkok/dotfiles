@@ -1,18 +1,6 @@
 " pluginsconfig.vim
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ack.vim
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:ackhighlight=1
-" use :Ack! which does not open the first entry it finds automatically
-map <leader>a :Ack!<space>
-if executable("rg")
-  let g:ackprg="rg --vimgrep --smart-case --no-ignore --hidden --follow --glob '!.git'"
-elseif executable("ag")
-  let g:ackprg="ag --vimgrep --smart-case"
-endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Airline & DevIcons
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if filereadable(expand("~/.vim/plugins/oceanic-next/colors/OceanicNext.vim"))
@@ -46,57 +34,85 @@ let g:ale_sign_error = '⤫'
 let g:ale_sign_warning = '⚠'
 " Airline integration
 let g:airline#extensions#ale#enabled = 1
+" Fixers (run manually via <leader>f, not on save)
+let g:ale_fix_on_save = 0
+let g:ale_fixers = {
+    \ 'c':          ['clang-format'],
+    \ 'cpp':        ['clang-format'],
+    \ 'cs':         ['dotnet_format'],
+    \ 'javascript': ['prettier'],
+    \ 'python':     ['black', 'isort'],
+    \ }
+nnoremap <leader>f :ALEFix<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fugitive
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-map <leader>gs :Gstatus<cr>
-map <leader>gc :Gcommit<cr>
-map <leader>ga :Git add --all<cr>:Gcommit<cr>
-map <leader>gb :Gblame<cr>
+nmap <leader>gs :Git<cr>
+nmap <leader>gc :Git commit<cr>
+nmap <leader>ga :Git add --all<cr>:Git commit<cr>
+nmap <leader>gb :Git blame<cr>
 " Start in insert mode for commit
 function! BufEnterCommit()
   normal gg0
   if getline('.') == ''
-    start
-  end
+    startinsert
+  endif
 endfunction
-autocmd BufEnter    *.git/COMMIT_EDITMSG  exe BufEnterCommit()
-" Automatically remove fugitive buffers
-autocmd BufReadPost fugitive://* set bufhidden=delete
+augroup fugitive_autocmds
+  autocmd!
+  autocmd BufEnter    COMMIT_EDITMSG  exe BufEnterCommit()
+  autocmd BufReadPost fugitive://*    set bufhidden=delete
+augroup END
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " FZF
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap <leader>a :Rg<CR>
 nmap <leader>b :Buffers<CR>
 nmap <leader>o :Files<CR>
-nmap <leader>t :Tags<CR>
+nmap <leader>tt :Tags<CR>
 nmap <leader>tb :BTags<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Multiple cursors
+" vim-visual-multi
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Disable deoplete when in multi cursor mode
-function! Multiple_cursors_before()
-    let b:deoplete_disable_auto_complete = 1
-endfunction
-function! Multiple_cursors_after()
-    let b:deoplete_disable_auto_complete = 0
+" Disable completion engine when entering multi cursor mode
+augroup visual_multi_autocmds
+  autocmd!
+  autocmd User visual_multi_start call s:VMCompletionToggle(0)
+  autocmd User visual_multi_exit  call s:VMCompletionToggle(1)
+augroup END
+
+function! s:VMCompletionToggle(enable)
+  if has('nvim')
+    if a:enable
+      lua local ok, cmp = pcall(require, 'cmp'); if ok then cmp.setup.buffer { enabled = true } end
+    else
+      lua local ok, cmp = pcall(require, 'cmp'); if ok then cmp.setup.buffer { enabled = false } end
+    endif
+  else
+    let b:asyncomplete_enable = a:enable
+  endif
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NerdTree
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Open NERDTree if no files specified
-"autocmd vimenter * if !argc() | NERDTree | endif
 nmap <F2> :NERDTreeToggle<cr>
-map <leader>nt :NERDTreeToggle<cr>
-map <leader>ntf :NERDTreeFind<cr>
+nmap <leader>nt :NERDTreeToggle<cr>
+nmap <leader>ntf :NERDTreeFind<cr>
 let g:NERDTreeShowBookmarks=1
 let g:NERDTreeMinimalUI=1
 let g:NERDTreeShowHidden=1
 let g:NERDTreeQuitOnOpen=1
 let g:NERDTreeIgnore=['\.git$', '\.so$', '\.class$', '\.swp']
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" indentLine
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Exclude filetypes where conceallevel interferes
+let g:indentLine_fileTypeExclude = ['markdown', 'json', 'help']
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " OmniSharp-vim
@@ -173,24 +189,6 @@ augroup omnisharp_commands
   autocmd FileType cs nmap <silent> <buffer> <Leader><F12> <Plug>(omnisharp_find_usages)
 augroup END
 
-" Enable snippet completion, using the ultisnips plugin
-" let g:OmniSharp_want_snippet=1
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Tagbar
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap <F3> :TagbarToggle<cr>
-let g:tagbar_usearrows = 1
-" Sort tags by name
-let g:tagbar_sort = 1
-" Do not show short help on top
-let g:tagbar_compact = 1
-" Show the visibility symbols (public/protected/private)
-let g:tagbar_show_visibility = 1
-" Expand tag folds until the current tag is visible
-let g:tagbar_autoshowtag = 1
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-airline
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -198,72 +196,64 @@ let g:tagbar_autoshowtag = 1
 let g:airline#extensions#tabline#enabled = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vim-autoformat
+" vista.vim (LSP-aware tag/symbol outline)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-noremap <leader>f :Autoformat<CR> " may require formatters: read the docs
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vim-expand-region
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-vmap v <Plug>(expand_region_expand)
-vmap <C-v> <Plug>(expand_region_shrink)
+nmap <F8> :Vista!!<cr>
+" Use ALE as LSP executive when available, fall back to ctags
+let g:vista_default_executive = 'ale'
+let g:vista_executive_for = { 'cs': 'ale' }
+" Echo the cursor symbol to the status line
+let g:vista_echo_cursor = 1
+" Close the vista window when jumping to a tag
+let g:vista_close_on_jump = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-gitgutter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <Leader>ht :GitGutterLineHighlightsToggle<cr>
-let g:gitgutter_escape_grep = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vim-session
+" undotree
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:session_autosave = 'no'
-
+nnoremap <F5> :UndotreeToggle<CR>
+" Show diff in the bottom panel
+let g:undotree_ShortIndicators = 1
+let g:undotree_SetFocusWhenToggle = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vim-mundo
+" Completion
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <F5> :MundoToggle<CR>
-
-
 if has('nvim')
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Deoplete
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:deoplete#enable_at_startup = 1
-
+  " nvim-cmp
+  lua << EOF
+  local ok, cmp = pcall(require, 'cmp')
+  if not ok then return end
+  cmp.setup({
+    mapping = cmp.mapping.preset.insert({
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<CR>']      = cmp.mapping.confirm({ select = false }),
+      ['<Tab>']     = cmp.mapping.select_next_item(),
+      ['<S-Tab>']   = cmp.mapping.select_prev_item(),
+      ['<C-e>']     = cmp.mapping.abort(),
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'buffer' },
+    }),
+  })
+EOF
+else
+  " asyncomplete.vim
+  inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+  inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+  inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+  augroup asyncomplete_setup
+    autocmd!
+    autocmd User asyncomplete_setup call asyncomplete#register_source(
+        \ asyncomplete#sources#buffer#get_source_options({
+        \ 'name': 'buffer',
+        \ 'allowlist': ['*'],
+        \ 'completor': function('asyncomplete#sources#buffer#completor'),
+        \ }))
+  augroup END
 endif
-
-" Removed plugins settings
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ctrlp
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"let g:ctrlp_show_hidden = 1
-"let g:ctrlp_custom_ignore = '\v[\/](node_modules|target|dist)|(\.(swp|ico|git|svn|DS_Store))$'
-" Don't manage working directory
-"let g:ctrlp_working_path_mode = 0
-"let g:ctrlp_follow_symlinks = 2
-"nmap <leader>t :CtrlPTag<CR>
-"if executable('ag')
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-"  let g:ctrlp_user_command = 'cd %s && ag --files-with-matches -g "" --ignore "\.git$\|\.hg$\|\.svn$"'
-  " ag is fast enough that CtrlP doesn't need to cache
-  " no it isn't
-  " let g:ctrlp_use_caching = 0
-"endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Neomake
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" autocmd! BufEnter,BufWritePost * Neomake " too slow
-" nmap <leader>mk :Neomake<CR>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" unite
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"let g:unite_prompt='❯ '
-"let g:unite_source_rec_async_command=['ag', '--follow', '--nocolor', '--nogroup','--hidden', '-g', '', '--ignore', '.git', '--ignore', '*.png', '--ignore', 'lib']
-"nnoremap <C-l> :Unite -auto-resize -start-insert -direction=botright file_rec buffer<CR>
-

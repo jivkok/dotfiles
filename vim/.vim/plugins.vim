@@ -20,17 +20,17 @@ call plug#begin('~/.vim/plugins')
 
 " Editor
 Plug 'ryanoasis/vim-devicons' " icons for various plugins
-Plug 'benmills/vimux' " tmux integration, runs shell commands
+Plug 'preservim/vimux' " tmux integration, runs shell commands
 Plug 'vim-airline/vim-airline' " status line
 Plug 'vim-airline/vim-airline-themes' " status line
 Plug 'airblade/vim-gitgutter' " git diff in the gutter and stages/reverts hunks
 Plug 'tpope/vim-fugitive' " Git wrapper
 Plug 'sheerun/vim-polyglot' " collection of language packs - syntax, indent, ftdetect
-Plug 'nathanaelkane/vim-indent-guides' "displays indent levels
+Plug 'Yggdroot/indentLine' " displays indent levels
 
 " Editor - buffers/files
-Plug 'scrooloose/nerdtree' " File tree explorer
-Plug 'Xuyuanp/nerdtree-git-plugin' " show git status in NerdTree
+Plug 'preservim/nerdtree' " File tree explorer
+
 
 " Editor - languages
 Plug 'OmniSharp/omnisharp-vim' " Omnicompletion (intellisense) and more for C#
@@ -41,37 +41,37 @@ Plug 'tomasiser/vim-code-dark' " color scheme
 " Plug 'gruvbox-community/gruvbox' " color scheme
 
 " Editing
-Plug 'terryma/vim-multiple-cursors' " multiple selections
+Plug 'mg979/vim-visual-multi' " multiple selections/cursors
 Plug 'easymotion/vim-easymotion' " motions - mark all words on a screen and then allow one-key-press to jump to any of them
 Plug 'tpope/vim-surround' " surroundings: parentheses, brackets, quotes, XML tags, and more
 Plug 'tpope/vim-repeat' " enable repeating supported plugin maps with '.'
 Plug 'tpope/vim-unimpaired' " provides several pairs of bracket mappings
 Plug 'mattn/emmet-vim' " HTML/CSS high-speed coding
-Plug 'sgur/vim-editorconfig' " standardized editing styles
-Plug 'simnalamburt/vim-mundo' " Vim undo tree visualizer
+if !has('nvim')
+  Plug 'sgur/vim-editorconfig' " standardized editing styles (built into nvim 0.9+)
+endif
+Plug 'mbbill/undotree' " Vim undo tree visualizer
 
 " Auto-completion
 if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } " code-completion engine
+  Plug 'hrsh7th/nvim-cmp'          " completion engine
+  Plug 'hrsh7th/cmp-buffer'        " buffer words source
+  Plug 'hrsh7th/cmp-nvim-lsp'      " LSP source
 else
-  Plug 'Shougo/neocomplete' " code-completion engine
+  Plug 'prabirshrestha/asyncomplete.vim'         " completion engine
+  Plug 'prabirshrestha/asyncomplete-buffer.vim'  " buffer words source
 endif
-" Plug 'davidhalter/jedi-vim' " Python autocompletion
-
-" Linting engines
-Plug 'dense-analysis/ale' " Asynchronous lint engine
 
 " Linting, syntax-coloring, and auto-formatting
-Plug 'Chiel92/vim-autoformat' " code auto-formatting
+Plug 'dense-analysis/ale' " Asynchronous lint engine
 
 " Search
-Plug 'mileszs/ack.vim' " Run your favorite search tool from Vim
-Plug 'junegunn/fzf', { 'dir': '~/.vim/plugins/.fzf', 'do': './install --bin' }
+Plug 'junegunn/fzf', { 'dir': '~/.vim/plugins/.fzf', 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim' " fuzzy file finder integration
 Plug 'kshenoy/vim-signature' " place, toggle and display marks
 
 " Tags
-Plug 'majutsushi/tagbar' " class outline viewer
+Plug 'liuchengxu/vista.vim' " LSP-aware class/tag outline viewer
 
 call plug#end()
 " No plugins below this line --------------------------------------------------
