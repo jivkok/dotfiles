@@ -78,10 +78,13 @@ DOS: `windows/SetEnv.cmd`
 - Both scripts should stay readable and “glue-only”.
 
 2. Shared helpers live in `setup/setup_functions.sh` - All scripts should source it (directly or indirectly) if they want:
-- logging (`dot_trace`, `dot_error`)
-- symlink helpers (with backup behavior)
+- logging (`log_error`, `log_warning`, `log_info`, `log_trace`) — controlled by `LOG_LEVEL` (default: 2/info)
+- package management (`install_*` for bulk scripts, `install_or_upgrade_*` for tool configure scripts)
+- file operations (`download_file`, `backup_file_if_exists`, `backup_folder_if_exists`)
+- symlink helpers (`make_symlink`, `make_dotfiles_symlinks`)
 - `append_or_merge_file` (no duplication)
-- clone/pull helper for external repos
+- clone/pull helper for external repos (`clone_or_update_repo`)
+- OS/command detection (`_is_osx`, `_is_linux`, `_is_arch`, `_is_debian`, `_has`) — sourced from `sh/helpers.sh`
 
 3. Shell profiles are merged, not replaced
 - `setup/configure_shell_profiles.sh` merges bootstrap snippets into:

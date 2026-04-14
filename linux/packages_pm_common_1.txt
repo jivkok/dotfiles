@@ -16,6 +16,7 @@ ranger # caca-utils highlight atool w3m poppler-utils mediainfo # File manager w
 ripgrep # Fast regex text searching tool for files (recursively), respects .gitignore
 rlwrap # readline feature command line wrapper
 shellcheck # lint tool for shell scripts
+shfmt # shell parser, formatter, and interpreter
 stow # I use it to manage my dotfiles symlinks
 tig # Text interface for Git repositories
 tmux # terminal multiplexer

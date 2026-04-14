@@ -4,8 +4,8 @@
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
 source "$dotdir/setup/setup_functions.sh"
 
-dot_trace "Configuring HOME symlinks ..."
+log_info "Configuring HOME symlinks ..."
 
 make_dotfiles_symlinks "$dotdir/misc" "$HOME"
 
-dot_trace "Configuring HOME symlinks done."
+log_info "Configuring HOME symlinks done."

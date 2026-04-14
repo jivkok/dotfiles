@@ -6,7 +6,7 @@
 # The dotfiles subset is rsynced to ~/dotfiles on the remote, then
 # setup-remote-vm.sh is invoked via SSH.
 
-set -euo pipefail
+set -uo pipefail
 
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
 source "${dotdir}/setup/setup_functions.sh"
@@ -27,7 +27,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ $# -lt 1 ]]; then
-  dot_error "Usage: deploy-remote-vm.sh [-p <port>] <user@host>"
+  log_error "Usage: deploy-remote-vm.sh [-p <port>] <user@host>"
   exit 1
 fi
 
@@ -44,7 +44,7 @@ if [[ -n "${ssh_port}" ]]; then
   rsync_ssh_opts="ssh -p ${ssh_port} -o StrictHostKeyChecking=no"
 fi
 
-dot_trace "Deploying minimal dotfiles to ${remote_target} ..."
+log_trace "Deploying minimal dotfiles to ${remote_target} ..."
 
 # Rsync only the minimal-relevant subset of the dotfiles repo.
 # Trailing slash on source means "contents of", not "directory itself".
@@ -84,9 +84,9 @@ rsync -az --delete \
   --exclude="*" \
   "${dotdir}/" "${remote_target}:${remote_dotfiles_dir}"
 
-dot_trace "Dotfiles rsynced. Running setup-remote-vm.sh on ${remote_target} ..."
+log_trace "Dotfiles rsynced. Running setup-remote-vm.sh on ${remote_target} ..."
 
 # shellcheck disable=SC2029  # Intentional: remote_dotfiles_dir with ~ expands on the remote
 ssh -t "${ssh_opts[@]}" "${remote_target}" "DOT_RELOAD_SHELL=0 bash ${remote_dotfiles_dir}/setup/setup-remote-vm.sh"
 
-dot_trace "Minimal setup complete on ${remote_target}."
+log_trace "Minimal setup complete on ${remote_target}."

@@ -7,9 +7,9 @@ _has() {
 
 # OS detection
 _OS="$(uname -s)"
-_is_osx=false;  [[ "$_OS" == "Darwin" ]] && _is_osx=true
-_is_linux=false;  [[ "$_OS" == "Linux"  ]] && _is_linux=true
+[[ "$_OS" == "Darwin" ]] && _is_osx=true   || _is_osx=false
+[[ "$_OS" == "Linux"  ]] && _is_linux=true  || _is_linux=false
 
 # Distro detection (Linux only)
-_is_arch=false;   [[ -f /etc/arch-release ]]   && _is_arch=true
-_is_debian=false; [[ -f /etc/debian_version ]] && _is_debian=true
+[[ -f /etc/arch-release ]]   && _is_arch=true   || _is_arch=false
+[[ -f /etc/debian_version ]] && _is_debian=true || _is_debian=false

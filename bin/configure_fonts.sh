@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
+# shellcheck disable=SC1091
 
 # Summary:
 # Pull fonts from a dedicated GitHub repo, update a local (inside dotfiles) folder, and install fonts if the current host is not a Linux VM.
@@ -23,6 +24,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 # Script lives at $DOTFILES_ROOT/bin/; go up one level to reach dotfiles root.
 DEFAULT_DOTFILES_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+source "${DEFAULT_DOTFILES_ROOT}/setup/setup_functions.sh"
 DOTFILES_ROOT="${DOTFILES_ROOT:-$DEFAULT_DOTFILES_ROOT}"
 
 DOTFILES_FONTS_DIR="${DOTFILES_FONTS_DIR:-$DOTFILES_ROOT/fonts}"
@@ -47,17 +49,9 @@ FONT_EXTS=(
   "ttf" "otf" "ttc" "otc" "woff" "woff2"
 )
 
-# Helper funtions
+# Script-local helpers
 
-log()  { printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >&2; }
-die()  { log "ERROR: $*"; exit 1; }
-
-need_cmd() {
-  command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"
-}
-
-is_macos() { [[ "$(uname -s)" == "Darwin" ]]; }
-is_linux() { [[ "$(uname -s)" == "Linux" ]]; }
+die() { log_error "$*"; exit 1; }
 
 # VM detection for Linux:
 # - Prefer systemd-detect-virt (no sudo, reliable on systemd hosts)
@@ -157,7 +151,7 @@ sync_fonts_cache() {
   need_cmd tar
   need_cmd rsync
 
-  log "Reading repo metadata (unauthenticated GitHub API)..."
+  log_trace "Reading repo metadata (unauthenticated GitHub API)..."
   local repo_json default_branch pushed_at
   repo_json="$(github_api_get_repo_json)" || die "Failed to query GitHub repo metadata"
   default_branch="$(json_get_string "$repo_json" "default_branch")"
@@ -170,38 +164,32 @@ sync_fonts_cache() {
   printf '%s\n' "$repo_json" >"$REPO_META_FILE"
 
   if [[ "$default_branch" != "$FONTS_REPO_REF" ]]; then
-    log "WARN: repo default_branch='$default_branch' differs from configured ref='$FONTS_REPO_REF' (continuing with '$FONTS_REPO_REF')"
+    log_trace "WARN: repo default_branch='$default_branch' differs from configured ref='$FONTS_REPO_REF' (continuing with '$FONTS_REPO_REF')"
   fi
 
   if [[ -f "$REPO_PUSHED_AT_FILE" ]]; then
     local last_pushed
     last_pushed="$(cat "$REPO_PUSHED_AT_FILE" 2>/dev/null || true)"
     if [[ "$last_pushed" == "$pushed_at" ]]; then
-      log "Repo pushed_at unchanged ($pushed_at). Skipping archive download/extract; cache sync assumed up-to-date."
+      log_trace "Repo pushed_at unchanged ($pushed_at). Skipping archive download/extract; cache sync assumed up-to-date."
       return 0
     fi
   fi
 
-  log "Repo changed (pushed_at=$pushed_at). Downloading tarball for ref '$FONTS_REPO_REF'..."
+  log_trace "Repo changed (pushed_at=$pushed_at). Downloading tarball for ref '$FONTS_REPO_REF'..."
   local tar_url="https://api.github.com/repos/${FONTS_REPO_OWNER}/${FONTS_REPO_NAME}/tarball/${FONTS_REPO_REF}"
 
-  # Download to a temp file then atomically replace archive cache
-  local tmp_archive
-  tmp_archive="$(mktemp "${TMPDIR_BASE%/}/fonts_repo.XXXXXX.tar.gz")"
-  curl -fSL \
+  download_file "$tar_url" "$ARCHIVE_CACHE_FILE" \
     -H "Accept: application/vnd.github+json" \
     -H "User-Agent: dotfiles-fonts-sync" \
-    -o "$tmp_archive" \
-    "$tar_url" || die "Failed to download tarball"
-
-  mv -f "$tmp_archive" "$ARCHIVE_CACHE_FILE"
+    || die "Failed to download tarball"
 
   # Extract
   local tmp_extract
   tmp_extract="$(mktemp -d "${TMPDIR_BASE%/}/fonts_extract.XXXXXX")"
   trap 'rm -rf "$tmp_extract" 2>/dev/null || true' RETURN
 
-  log "Extracting tarball..."
+  log_trace "Extracting tarball..."
   tar -xzf "$ARCHIVE_CACHE_FILE" -C "$tmp_extract" || die "Failed to extract tarball"
 
   # GitHub tarballs contain a single top-level directory like: owner-repo-sha/
@@ -209,7 +197,7 @@ sync_fonts_cache() {
   extracted_root="$(find "$tmp_extract" -mindepth 1 -maxdepth 1 -type d | head -n1)"
   [[ -n "$extracted_root" ]] || die "Could not find extracted root directory"
 
-  log "Syncing fonts into cache dir: $DOTFILES_FONTS_DIR (add/update only; no deletions)"
+  log_trace "Syncing fonts into cache dir: $DOTFILES_FONTS_DIR (add/update only; no deletions)"
   # rsync without "--delete" does not remove local files
   # shellcheck disable=SC2046
   rsync -a \
@@ -218,7 +206,7 @@ sync_fonts_cache() {
     "$DOTFILES_FONTS_DIR"/
 
   printf '%s\n' "$pushed_at" >"$REPO_PUSHED_AT_FILE"
-  log "Cache sync complete."
+  log_trace "Cache sync complete."
 }
 
 install_fonts_macos() {
@@ -226,7 +214,7 @@ install_fonts_macos() {
   local target="$HOME/Library/Fonts"
   mkdir -p "$target"
 
-  log "Installing fonts for current user (macOS) -> $target"
+  log_trace "Installing fonts for current user (macOS) -> $target"
   # shellcheck disable=SC2046
   rsync -a \
     $(build_rsync_font_filters) \
@@ -240,30 +228,30 @@ install_fonts_linux() {
   need_cmd rsync
 
   if [[ "$DOTFILES_FORCE_FONTS_INSTALL" == "1" ]]; then
-    log "Linux: DOTFILES_FORCE_FONTS_INSTALL=1 set; forcing installation."
+    log_trace "Linux: DOTFILES_FORCE_FONTS_INSTALL=1 set; forcing installation."
   else
     if is_vm_linux; then
-      log "Linux: VM detected (or unknown). Skipping font installation (set DOTFILES_FORCE_FONTS_INSTALL=1 to override)."
+      log_trace "Linux: VM detected (or unknown). Skipping font installation (set DOTFILES_FORCE_FONTS_INSTALL=1 to override)."
       return 0
     fi
-    log "Linux: bare metal detected; proceeding with installation."
+    log_trace "Linux: bare metal detected; proceeding with installation."
   fi
 
   local target="$HOME/.local/share/fonts"
   mkdir -p "$target"
 
-  log "Installing fonts for current user (Linux) -> $target"
+  log_trace "Installing fonts for current user (Linux) -> $target"
   # shellcheck disable=SC2046
   rsync -a \
     $(build_rsync_font_filters) \
     "$DOTFILES_FONTS_DIR"/ \
     "$target"/
 
-  if command -v fc-cache >/dev/null 2>&1; then
-    log "Refreshing fontconfig cache (fc-cache -f)..."
-    fc-cache -f >/dev/null 2>&1 || log "WARN: fc-cache failed (continuing)"
+  if _has fc-cache; then
+    log_trace "Refreshing fontconfig cache (fc-cache -f)..."
+    fc-cache -f >/dev/null 2>&1 || log_trace "WARN: fc-cache failed (continuing)"
   else
-    log "WARN: fc-cache not found; skipping font cache refresh."
+    log_trace "WARN: fc-cache not found; skipping font cache refresh."
   fi
 }
 
@@ -272,21 +260,23 @@ main() {
   DOTFILES_ROOT="$(cd -- "$DOTFILES_ROOT" && pwd)"
   DOTFILES_FONTS_DIR="${DOTFILES_FONTS_DIR/#\$DOTFILES_ROOT/$DOTFILES_ROOT}"
 
-  log "DOTFILES_ROOT=$DOTFILES_ROOT"
-  log "DOTFILES_FONTS_DIR=$DOTFILES_FONTS_DIR"
-  log "Repo=${FONTS_REPO_OWNER}/${FONTS_REPO_NAME} ref=$FONTS_REPO_REF"
+  log_info "Configuring fonts ..."
+
+  log_trace "DOTFILES_ROOT=$DOTFILES_ROOT"
+  log_trace "DOTFILES_FONTS_DIR=$DOTFILES_FONTS_DIR"
+  log_trace "Repo=${FONTS_REPO_OWNER}/${FONTS_REPO_NAME} ref=$FONTS_REPO_REF"
 
   sync_fonts_cache
 
-  if is_macos; then
+  if $_is_osx; then
     install_fonts_macos
-  elif is_linux; then
+  elif $_is_linux; then
     install_fonts_linux
   else
-    log "Unsupported OS ($(uname -s)); sync completed, skipping installation."
+    log_trace "Unsupported OS (${_OS}); sync completed, skipping installation."
   fi
 
-  log "Done."
+  log_info "Configuring fonts done."
 }
 
 main "$@"

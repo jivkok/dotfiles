@@ -9,22 +9,21 @@ function install_alfred_workflow() {
   workflow_url="$1"
   workflow_name=$(echo "$workflow_url" | perl -lne 'print $& if /([^\/]+)\.alfredworkflow/')
 
-  dot_trace "Downloading $workflow_url"
-  curl -L -o "$alfred_dir/$workflow_name" "$workflow_url"
+  log_trace "Downloading $workflow_url"
+  download_file "$workflow_url" "$alfred_dir/$workflow_name" -L
 
-  dot_trace "Installing $workflow_name ..."
+  log_trace "Installing $workflow_name ..."
   open "$alfred_dir/$workflow_name"
   sleep 20
 }
 
 # dotdir="$( cd "$( dirname "$0" )" && pwd )"
-[ -z "$dotdir" ] && dotdir="$HOME/dotfiles"
+dotdir="$(cd "$(dirname "$0")/.." && pwd)"
+source "$dotdir/setup/setup_functions.sh"
 
-source "$dotdir/setupfunctions.sh"
+log_info "Configuring Alfred workflows ..."
 
-dot_trace "Configuring Alfred workflows ..."
-
-cask_install_package alfred
+install_or_upgrade_cask_package alfred
 
 # Awesome Lists
 install_alfred_workflow 'https://github.com/nikitavoloboev/alfred-awesome-lists/releases/download/v1.0.5/Awesome.lists.alfredworkflow'
@@ -97,4 +96,4 @@ install_alfred_workflow 'https://github.com/cs1707/tldr-alfred/raw/master/tldr.a
 # UUIDGen
 install_alfred_workflow 'https://github.com/eliasmaier/uuidgen.alfred/raw/master/UUIDGen.alfredworkflow'
 
-dot_trace "Configuring Alfred workflows done."
+log_info "Configuring Alfred workflows done."

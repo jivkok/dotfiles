@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 IFS=$'\n\t'
 # Configure browsers (macOS only).
 #
@@ -12,29 +12,17 @@ IFS=$'\n\t'
 #   1. Safari → Settings → Privacy → "Prevent cross-site tracking": enable
 #   2. Safari → Settings → Privacy → "Hide IP Address" → "Trackers and Websites"
 #   3. Firefox → Multi-Account Containers → create: Personal, Work, Shopping, Social
-#   4. Create Automator app wrappers for research profiles (dock shortcuts)
 
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
 source "$dotdir/setup/setup_functions.sh"
 
 # macOS only
-if [[ "$(uname -s)" != "Darwin" ]]; then
-  dot_trace "configure_browsers.sh: skipping (not macOS)."
+if ! $_is_osx; then
+  log_trace "configure_browsers.sh: skipping (not macOS)."
   exit 0
 fi
 
 # ─── Helper functions ────────────────────────────────────────────────────────
-
-# install_cask_if_absent <cask-name>
-install_cask_if_absent() {
-  local pkg="$1"
-  if brew list --cask "$pkg" &>/dev/null; then
-    dot_trace "already installed: $pkg"
-  else
-    dot_trace "installing: $pkg"
-    brew install --cask "$pkg"
-  fi
-}
 
 # ensure_firefox_profiles_ini <app_support_dir> <profile_name> [default=0|1]
 # Ensures the named profile entry exists in profiles.ini.
@@ -78,7 +66,7 @@ create_firefox_profile_if_absent() {
   local profiles_root="${app_support_dir}/Profiles"
   local profile_dir="${profiles_root}/${profile_name}"
 
-  dot_trace "Ensuring profile: $profile_name"
+  log_trace "Ensuring profile: $profile_name"
   mkdir -p "$profile_dir"
 
   ensure_firefox_profiles_ini "$app_support_dir" "$profile_name" "$is_default"
@@ -99,36 +87,26 @@ install_firefox_extension() {
   mkdir -p "$ext_dir"
 
   if [[ -f "$xpi_path" ]]; then
-    dot_trace "extension already present: ${ext_id}"
+    log_trace "extension already present: ${ext_id}"
     return 0
   fi
 
-  dot_trace "downloading extension: ${ext_id} (${amo_slug})"
-  local tmp
-  tmp="$(mktemp)"
-  local http_status
-  http_status="$(curl -sS -L -w "%{http_code}" -o "$tmp" "$url" 2>/dev/null)"
-  local curl_exit=$?
-  # file:// URIs (used in tests) return status "000" — treat as success
-  local expected_status="200"
-  if [[ "$url" == file://* ]]; then expected_status="000"; fi
-  if [[ $curl_exit -ne 0 || "$http_status" != "$expected_status" ]]; then
-    rm -f "$tmp"
-    dot_error "failed to download extension ${ext_id} (HTTP ${http_status})"
+  log_trace "downloading extension: ${ext_id} (${amo_slug})"
+  if ! download_file "$url" "$xpi_path"; then
+    log_error "failed to download extension ${ext_id}"
     return 1
   fi
-  if file "$tmp" 2>/dev/null | grep -qi "HTML"; then
-    rm -f "$tmp"
-    dot_error "extension download returned HTML page for ${ext_id}"
+  if file "$xpi_path" 2>/dev/null | grep -qi "HTML"; then
+    rm -f "$xpi_path"
+    log_error "extension download returned HTML page for ${ext_id}"
     return 1
   fi
-  if [[ ! -s "$tmp" ]]; then
-    rm -f "$tmp"
-    dot_error "extension download returned empty file for ${ext_id}"
+  if [[ ! -s "$xpi_path" ]]; then
+    rm -f "$xpi_path"
+    log_error "extension download returned empty file for ${ext_id}"
     return 1
   fi
-  mv "$tmp" "$xpi_path"
-  dot_trace "installed extension: ${ext_id}"
+  log_trace "installed extension: ${ext_id}"
 }
 
 # write_firefox_prefs_js <profile_dir> <content>
@@ -138,10 +116,10 @@ write_firefox_prefs_js() {
   local profile_dir="$1"
   local content="$2"
   if [[ -d "$profile_dir" ]]; then
-    dot_trace "Writing prefs.js → $profile_dir"
+    log_trace "Writing prefs.js → $profile_dir"
     printf '%s\n' "$content" > "${profile_dir}/prefs.js"
   else
-    dot_trace "Profile dir not found, skipping prefs.js: $profile_dir"
+    log_trace "Profile dir not found, skipping prefs.js: $profile_dir"
   fi
 }
 
@@ -160,23 +138,23 @@ install_extensions_into_profile() {
 
 # ─── Install browsers ────────────────────────────────────────────────────────
 
-dot_trace "Installing browsers ..."
+log_info "Installing browsers ..."
 
-install_cask_if_absent firefox
-install_cask_if_absent firefox@developer-edition
-install_cask_if_absent mullvad-browser
-install_cask_if_absent duckduckgo
-install_cask_if_absent tor-browser
-install_cask_if_absent microsoft-edge
-install_cask_if_absent google-chrome
-install_cask_if_absent opera
+install_or_upgrade_cask_package firefox
+install_or_upgrade_cask_package firefox@developer-edition
+install_or_upgrade_cask_package mullvad-browser
+install_or_upgrade_cask_package duckduckgo
+install_or_upgrade_cask_package tor-browser
+install_or_upgrade_cask_package microsoft-edge
+install_or_upgrade_cask_package google-chrome
+install_or_upgrade_cask_package opera
 
 # ─── Firefox — profiles and prefs.js ─────────────────────────────────────────
 
 FF_APP_SUPPORT="${HOME}/Library/Application Support/Firefox"
 FF_PROFILES="${FF_APP_SUPPORT}/Profiles"
 
-dot_trace "Configuring Firefox profiles ..."
+log_info "Configuring Firefox profiles ..."
 create_firefox_profile_if_absent "$FF_APP_SUPPORT" "jk-default"          1
 create_firefox_profile_if_absent "$FF_APP_SUPPORT" "jk-research-trusted"
 create_firefox_profile_if_absent "$FF_APP_SUPPORT" "jk-research-private"
@@ -274,7 +252,7 @@ ${FF_RESEARCH_PRIVATE_PREFS}"
 #   jk-research-trusted: ublock, new-tab-override, containers, vimium, joplin, stylus, sidebery
 #   jk-research-private: ublock, new-tab-override, vimium, joplin, stylus, noscript, sidebery
 
-dot_trace "Installing Firefox extensions via XPI ..."
+log_info "Installing Firefox extensions via XPI ..."
 
 install_extensions_into_profile "${FF_PROFILES}/jk-default" \
   "uBlock0@raymondhill.net"                    "ublock-origin" \
@@ -306,7 +284,7 @@ install_extensions_into_profile "${FF_PROFILES}/jk-research-private" \
 # Firefox Developer Edition shares the same app support directory and profiles.ini
 # as Firefox stable. Dev Edition profiles are distinguished by name only.
 
-dot_trace "Configuring Firefox Developer Edition profiles ..."
+log_info "Configuring Firefox Developer Edition profiles ..."
 create_firefox_profile_if_absent "$FF_APP_SUPPORT" "jk-dev-local"
 create_firefox_profile_if_absent "$FF_APP_SUPPORT" "jk-home-network"
 
@@ -365,7 +343,7 @@ ${FFDX_HOME_NETWORK_PREFS}"
 # ─── Firefox Developer Edition — extensions via XPI drop-in ──────────────────
 # Both profiles get: vimium-ff, new-tab-override
 
-dot_trace "Installing Firefox Developer Edition extensions via XPI ..."
+log_info "Installing Firefox Developer Edition extensions via XPI ..."
 
 install_extensions_into_profile "${FF_PROFILES}/jk-dev-local" \
   "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"  "vimium-ff" \
@@ -379,21 +357,21 @@ install_extensions_into_profile "${FF_PROFILES}/jk-home-network" \
 # macOS 15+ (Sequoia) gates the Safari container behind Full Disk Access (TCC).
 # Probe the Preferences directory: if ls fails with EPERM, FDA is not granted.
 
-dot_trace "Configuring Safari ..."
+log_info "Configuring Safari ..."
 
 SAFARI_CONTAINER="${HOME}/Library/Containers/com.apple.Safari"
 SAFARI_PREFS_DIR="${SAFARI_CONTAINER}/Data/Library/Preferences"
 SAFARI_PREFS="${SAFARI_PREFS_DIR}/com.apple.Safari"
 
 if ! ls "$SAFARI_PREFS_DIR" &>/dev/null; then
-  dot_trace "Safari: Full Disk Access not granted — apply these settings manually in Safari → Settings:"
-  dot_trace "  General  → \"Open 'safe' files after downloading\": uncheck"
-  dot_trace "  Search   → \"Include Safari Suggestions\": uncheck"
-  dot_trace "  Search   → \"Enable Quick Website Search\": uncheck"
-  dot_trace "  Privacy  → \"Prevent cross-site tracking\": check"
-  dot_trace "  Privacy  → \"Hide IP Address\": Trackers and Websites"
-  dot_trace "  Advanced → \"Warn when visiting a fraudulent website\": check"
-  dot_trace "  Advanced → (Websites tab) \"Block pop-up windows\": check"
+  log_trace "Safari: Full Disk Access not granted — apply these settings manually in Safari → Settings:"
+  log_trace "  General  → \"Open 'safe' files after downloading\": uncheck"
+  log_trace "  Search   → \"Include Safari Suggestions\": uncheck"
+  log_trace "  Search   → \"Enable Quick Website Search\": uncheck"
+  log_trace "  Privacy  → \"Prevent cross-site tracking\": check"
+  log_trace "  Privacy  → \"Hide IP Address\": Trackers and Websites"
+  log_trace "  Advanced → \"Warn when visiting a fraudulent website\": check"
+  log_trace "  Advanced → (Websites tab) \"Block pop-up windows\": check"
 else
   defaults write "$SAFARI_PREFS" AutoOpenSafeDownloads -bool false
   defaults write "$SAFARI_PREFS" SuppressSearchSuggestions -bool true
@@ -406,5 +384,5 @@ else
     -bool false
 fi
 
-dot_trace "configure_browsers.sh done."
-dot_trace "Manual steps required — see script header."
+log_trace "Manual steps required — see script header."
+log_info "Installing browsers done."

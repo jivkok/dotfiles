@@ -4,10 +4,9 @@
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
 source "$dotdir/setup/setup_functions.sh"
 
-dot_trace "Configuring FZF ..."
+log_info "Configuring FZF ..."
 
-os=$(uname -s)
-if [ "$os" = "Linux" ] >/dev/null 2>&1; then
+if $_is_linux; then
   # apt packages are somewhat behind picking up the latest fzf. Install it from source instead. TODO: decide on Arch.
   mkdir -p "$HOME/.repos"
   fzfrepo="$HOME/.repos/fzf"
@@ -25,25 +24,26 @@ if [ "$os" = "Linux" ] >/dev/null 2>&1; then
   fi
 
   if [ "$run_install" = "1" ]; then
-    "$fzfrepo/install" --key-bindings --completion --no-update-rc
+    log_trace "Running fzf install script ..."
+    "$fzfrepo/install" --key-bindings --completion --no-update-rc >/dev/null
   fi
 
-elif [ "$os" = "Darwin" ]; then
-  ! brew ls --versions fzf >/dev/null 2>&1 && brew install fzf
-
-  "$(brew --prefix)/opt/fzf/install" --key-bindings --completion --no-update-rc >/dev/null
+elif $_is_osx; then
+  if install_or_upgrade_brew_package fzf; then
+    log_trace "Running fzf install script ..."
+    "$(brew --prefix)/opt/fzf/install" --key-bindings --completion --no-update-rc >/dev/null
+  fi
 
 else
-  dot_error "Unsupported OS: $os"
-  return 1 >/dev/null 2>&1
+  log_error "Unsupported OS: ${_OS}"
   exit 1
 fi
 
 # fzf-git
 filename="fzf-git.sh"
 url="https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh"
-dot_trace "Downloading $url into $HOME/bin/$filename"
-curl -s -o "$HOME/bin/$filename" "$url"
+log_trace "Downloading $url into $HOME/bin/$filename"
+download_file "$url" "$HOME/bin/$filename"
 chmod 755 "$HOME/bin/$filename"
 
-dot_trace "Configuring FZF done."
+log_info "Configuring FZF done."

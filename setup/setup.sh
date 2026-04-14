@@ -23,30 +23,28 @@ if [[ "${DOT_PULL_DOTFILES}" == "1" ]]; then
   pull_latest_dotfiles "${dotdir}"
 fi
 
-os=$(uname -s)
 os_description=""
 os_setup_path=""
 
-if [[ "${os}" == "Linux" ]] && command -V apt-get >/dev/null 2>&1; then
+if $_is_debian; then
   os_description="Linux (Debian and derivative distros)"
   os_setup_path="${dotdir}/linux/configure_packages_debian.sh"
 
-elif [[ "${os}" == "Linux" ]] && command -V pacman >/dev/null 2>&1; then
+elif $_is_arch; then
   os_description="Linux (Arch and derivative distros)"
   os_setup_path="${dotdir}/linux/configure_packages_arch.sh"
 
-elif [[ "${os}" == "Darwin" ]]; then
+elif $_is_osx; then
   os_description="OSX"
   os_setup_path="${dotdir}/osx/configure_osx.sh"
 
 else
-  dot_error "Unsupported OS: ${os}"
+  log_error "Unsupported OS: ${_OS}"
   exit 1
 fi
 
-dot_trace "Configuring ${os_description} ..."
+log_trace "OS: ${os_description}"
 "${os_setup_path}"
-dot_trace "Configuring ${os_description} done."
 
 "${dotdir}/setup/configure_shell_profiles.sh"
 "${dotdir}/setup/configure_home_symlinks.sh"
@@ -60,10 +58,10 @@ dot_trace "Configuring ${os_description} done."
 "${dotdir}/tmux/configure_tmux.sh"
 "${dotdir}/fzf/configure_fzf.sh"
 
-dot_trace "Configuring ${os_description} done."
+log_info "Configuring system done."
 
 DOT_RELOAD_SHELL="${DOT_RELOAD_SHELL:-1}"
 if [[ "${DOT_RELOAD_SHELL}" == "1" ]]; then
-  dot_trace "Reloading shell ${SHELL}"
+  log_trace "Reloading shell ${SHELL}"
   exec ${SHELL} -l
 fi

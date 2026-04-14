@@ -1,3 +1,0 @@
-git-extras # Extra commands for git
-lazydocker # terminal ui for docker and docker-compose
-shfmt # shell parser, formatter, and interpreter

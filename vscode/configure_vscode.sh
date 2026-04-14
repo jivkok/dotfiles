@@ -66,69 +66,62 @@
 # - No rollback on partial failure.
 
 install_vscode_and_dependencies () {
-  os=$(uname -s)
-  if [ "${os}" = "Linux" ]; then
+  if $_is_linux; then
 
-    if command -v apt-get >/dev/null 2>&1; then
+    if $_is_debian; then
       if ! apt list --installed 2>/dev/null | grep -q "^code/"; then
-        dot_trace 'Installing VSCode'
+        log_trace 'Installing VSCode'
         curl -sSL https://packages.microsoft.com/keys/microsoft.asc \
           | gpg --dearmor \
           | sudo tee /usr/share/keyrings/microsoft-archive-keyring.gpg > /dev/null
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/code stable main" \
           | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
         sudo apt-get update -qq
-        sudo apt-get install -y -qq code
+        install_or_upgrade_apt_package code
       fi
       if ! apt list --installed 2>/dev/null | grep -q "^codium/"; then
-        dot_trace 'Installing VSCodium'
+        log_trace 'Installing VSCodium'
         curl -sSL https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg \
           | gpg --dearmor \
           | sudo tee /usr/share/keyrings/vscodium-archive-keyring.gpg > /dev/null
         echo "deb [signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main" \
           | sudo tee /etc/apt/sources.list.d/vscodium.list > /dev/null
         sudo apt-get update -qq
-        sudo apt-get install -y -qq codium
+        install_or_upgrade_apt_package codium
       fi
       # Dependencies
-      sudo apt-get install -y -qq jq
+      install_or_upgrade_apt_package jq
 
-    elif command -v pacman >/dev/null 2>&1; then
-      if ! command -v yay >/dev/null 2>&1; then
-        dot_error "yay AUR helper not found. Install yay before running this script on Arch."
+    elif $_is_arch; then
+      if ! _has yay; then
+        log_error "yay AUR helper not found. Install yay before running this script on Arch."
         return 1
       fi
       if ! ( pacman -Q code >/dev/null 2>&1 || pacman -Q visual-studio-code-bin >/dev/null 2>&1 ); then
-        dot_trace 'Installing VSCode'
-        yay -S --noconfirm visual-studio-code-bin
+        log_trace 'Installing VSCode'
+        install_or_upgrade_yay_package visual-studio-code-bin
       fi
       if ! ( pacman -Q vscodium-bin >/dev/null 2>&1 || pacman -Q vscodium >/dev/null 2>&1 ); then
-        dot_trace 'Installing VSCodium'
-        yay -S --noconfirm vscodium-bin
+        log_trace 'Installing VSCodium'
+        install_or_upgrade_yay_package vscodium-bin
       fi
       # Dependencies
-      sudo pacman -S --noconfirm --needed jq
+      install_or_upgrade_pacman_package jq
 
     else
-      dot_error "Unsupported Linux distribution (no apt-get or pacman found)."
+      log_error "Unsupported Linux distribution (no apt-get or pacman found)."
       return 1
     fi
 
-  elif [ "$os" = "Darwin" ]; then
+  elif $_is_osx; then
 
-    if ! brew ls --cask --versions visual-studio-code >/dev/null 2>&1; then
-      dot_trace 'Installing VSCode'
-      brew install --cask visual-studio-code
-    fi
-    if ! brew ls --cask --versions vscodium >/dev/null 2>&1; then
-      dot_trace 'Installing VSCodium'
-      brew install --cask vscodium
-    fi
+    install_or_upgrade_cask_package visual-studio-code
+    install_or_upgrade_cask_package vscodium
     # JSON processor
-    ! brew ls --versions jq >/dev/null 2>&1 && brew install jq
+    install_or_upgrade_brew_package jq
 
   else
-    dot_error "Unsupported OS: $os"
+    log_error "Unsupported OS: ${_OS}"
     return 1
   fi
 }
@@ -151,23 +144,17 @@ prepare_and_copy_vscode_config_files () {
   # Create directory if it doesn't exist
   mkdir -p "${vscode_user_dir}"
 
-  if [ -f "${vscode_user_dir}/${config_filename}" ]; then
-    local backup_file="${vscode_user_dir}/${config_filename}.$(date +"%Y%m%d%H%M%S")"
-    if ! mv "${vscode_user_dir}/${config_filename}" "${backup_file}" 2>/dev/null; then
-      dot_error "Failed to backup existing config file: ${vscode_user_dir}/${config_filename}"
-      return 1
-    fi
-  fi
+  backup_file_if_exists "${vscode_user_dir}/${config_filename}"
 
   if [ -f "${settingsdir}/${osspecific_config_filename}" ]; then
     # TODO: account for cases where the json files contain comments - jq doesn't support JSON with comments by default - consider using jsonc parser
     if ! jq -s '.[0] * .[1]' "${settingsdir}/${config_filename}" "${settingsdir}/${osspecific_config_filename}" > "${vscode_user_dir}/${config_filename}" 2>/dev/null; then
-      dot_error "Failed to merge JSON config files. Check for JSON syntax errors or comments."
+      log_error "Failed to merge JSON config files. Check for JSON syntax errors or comments."
       return 1
     fi
   else
     if ! cp "${settingsdir}/${config_filename}" "${vscode_user_dir}/${config_filename}" 2>/dev/null; then
-      dot_error "Failed to copy config file: ${settingsdir}/${config_filename}"
+      log_error "Failed to copy config file: ${settingsdir}/${config_filename}"
       return 1
     fi
   fi
@@ -231,25 +218,25 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   source "${dotdir}/setup/setup_functions.sh"
   settingsdir="$(cd "$(dirname "$0")" && pwd)"
 
-  dot_trace 'Configuring VS Code & VS Codium ...'
+  log_info 'Configuring VS Code & VS Codium ...'
   install_vscode_and_dependencies
 
-  os=$(uname -s)
   os_name_token=
   vscode_user_dir=
   vscodium_user_dir=
-  if [ "${os}" = "Linux" ]; then
+
+  if $_is_linux; then
     os_name_token="linux"
     vscode_user_dir="${HOME}/.config/Code/User"
     vscodium_user_dir="${HOME}/.config/VSCodium/User"
 
-  elif [ "$os" = "Darwin" ]; then
+  elif $_is_osx; then
     os_name_token="osx"
     vscode_user_dir="${HOME}/Library/Application Support/Code/User"
     vscodium_user_dir="${HOME}/Library/Application Support/VSCodium/User"
 
   else
-    dot_error "Unsupported OS: $os"
+    log_error "Unsupported OS: ${_OS}"
     exit 1
   fi
 
@@ -263,5 +250,5 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   install_extensions "code" "${settingsdir}/extensions.code.txt" "${settingsdir}"
   install_extensions "codium" "${settingsdir}/extensions.codium.txt" "${settingsdir}"
 
-  dot_trace 'Configuring VS Code & VS Codium done.'
+  log_info 'Configuring VS Code & VS Codium done.'
 fi

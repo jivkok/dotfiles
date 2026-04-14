@@ -1,63 +1,41 @@
 #!/usr/bin/env bash
 # OSX packages
 
-install_brew_package() {
-  if [ -z "$1" ]; then
-    echo "Package name not set."
-    return
-  fi
-
-  local package="$1"
-  local installed=$(brew list --versions "$package")
-
-  if [ -z "$installed" ]; then
-    brew install "$package"
-  fi
-}
-
-install_cask_package() {
-  local package="$1"
-  local installed=$(brew list --versions --cask "$package")
-
-  if [ -z "$installed" ]; then
-    brew install --cask "$package"
-  fi
-}
+dotdir="$( cd "$( dirname "$0" )/.." && pwd )"
+source "$dotdir/setup/setup_functions.sh"
 
 install_mas_package() {
   if [ -z "$1" ]; then
-    echo "Package name not set."
+    log_error "install_mas_package: package name not set."
     return
   fi
 
   local package="$1"
-  local installed=$(mas list | grep "$package")
+  local installed
+  installed=$(mas list | grep "$package")
 
   if [ -z "$installed" ]; then
     mas install "$package"
   fi
 }
 
-dotdir="$( cd "$( dirname "$0" )/.." && pwd )"
-source "$dotdir/setup/setup_functions.sh"
-
-dot_trace "Configuring OSX packages ..."
+log_info "Configuring OSX packages ..."
 
 # Install/update homebrew
 if [ ! -f /opt/homebrew/bin/brew ]; then
-  dot_trace "Installing Homebrew."
+  log_trace "Installing Homebrew."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   eval "$(/opt/homebrew/bin/brew shellenv)"
   export PATH
 else
-  dot_trace "Updating Homebrew."
-  brew update --quiet
+  log_trace "Updating Homebrew."
+  brew update --quiet >/dev/null
 fi
 
-dot_trace "Updating existing brew/cask packages."
-brew upgrade --quiet
+log_info "Updating existing brew packages."
+brew upgrade --formula --quiet
 
-dot_trace "Installing brew packages."
+log_info "Installing brew packages."
 
 # GNU utilities (those that come with OS X are outdated).
 # Don’t forget their paths to $PATH. Example for coreutils: $(brew --prefix coreutils)/libexec/gnubin
@@ -126,7 +104,6 @@ install_brew_package lynx # Text-based web browser
 install_brew_package m-cli # Swiss Army Knife for macOS
 install_brew_package mas # Mac App Store command-line interface
 install_brew_package miller # Like sed, awk, cut, join & sort for name-indexed data such as CSV
-install_brew_package mitmproxy # Intercept, modify, replay, save HTTP/S traffic
 install_brew_package mtr # traceroute and ping in a single tool
 install_brew_package mosh # Remote terminal application
 install_brew_package ngrep # Network grep
@@ -188,7 +165,10 @@ install_brew_package zoxide # Shell extension to easily jump to frequently acces
 # brew install xz # General-purpose data compression with high compression ratio
 # brew install zopfli # New zlib (gzip, deflate) compatible compressor
 
-dot_trace "Installing cask packages."
+log_info "Updating existing cask packages."
+brew upgrade --cask --greedy-auto-updates --quiet
+
+log_info "Installing cask packages."
 
 # FUSE, requires reboot
 # brew cask install osxfuse
@@ -198,6 +178,7 @@ install_cask_package http-toolkit # capture http(s) traffic / web development pr
 install_cask_package iterm2 # terminal
 install_cask_package kdiff3 # file/directory diff/merge
 install_cask_package key-codes # key codes
+install_cask_package mitmproxy # Intercept, modify, replay, save HTTP/S traffic
 install_cask_package p4v # file diff/merge
 install_cask_package postman # http APIs (REST/SOAP/GraphQL) development
 install_cask_package proxyman # capture http(s) traffic / web development proxy
@@ -224,7 +205,7 @@ install_cask_package suspicious-package # inspecting macOS installer packages
 install_cask_package the-unarchiver # unarchive many archive formats
 install_cask_package tunnelblick # OpenVPN client
 install_cask_package vlc # media player
-install_cask_package wireshark # network capture / monitor, depends on xquartz
+install_cask_package wireshark-app # network capture / monitor, depends on xquartz
 install_cask_package xrg # System Monitor for OSX
 
 # ai
@@ -273,10 +254,13 @@ install_cask_package claude # Anthropic's Claude AI desktop app
 # brew install --cask xquartz # X11
 # https://www.trankynam.com/atext and http://www.phraseexpress.com/ - text expansion. Note: Alfred also does text expansion
 
-dot_trace "brew cleanup."
+log_trace "brew cleanup."
 brew cleanup
 
-dot_trace "Installing AppStore apps."
+log_info "Updating existing AppStore apps."
+mas update
+
+log_info "Installing AppStore apps."
 
 # AppStore apps:
 install_mas_package 1044484672 # ApolloOne - Photo Video Viewer. RAW files viewer & EXIF editor
@@ -290,4 +274,4 @@ install_mas_package 302584613 # Amazon Kindle
 # Install these widget apps from the AppStore:
 # nothing currently
 
-dot_trace "Configuring OSX packages done."
+log_info "Configuring OSX packages done."

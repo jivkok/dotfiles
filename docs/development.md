@@ -52,7 +52,7 @@ If a package is not available in a distro's package manager, do **not** add it t
 
 ### Cross-platform rules (for changes)
 - Don’t assume a tool exists on all OSes.
-- Prefer feature detection (`command -v`, `Test-Path`) over OS-only branching when reasonable.
+- Prefer feature detection over OS-only branching when reasonable. For Bash scripts use `_has <cmd>` (not `command -v`); for PowerShell use `Test-Path`.
 - If you add a new dependency:
   - decide how it installs on brew/apt/pacman/choco
   - update the OS scripts accordingly
@@ -62,7 +62,9 @@ If a package is not available in a distro's package manager, do **not** add it t
 1. Create `component/configure_component.sh`
 2. Script should:
    - source `setup/setup_functions.sh`
-   - install dependencies per OS (brew/apt/pacman)
+   - open with `log_info "Configuring <Tool> ..."` and close with `log_info "Configuring <Tool> done."`
+   - detect OS with `_is_osx` / `_is_linux` / `_is_arch` / `_is_debian`
+   - install dependencies via `install_or_upgrade_*` helpers (no direct `brew install`, `apt-get install`, etc.)
    - link config files into expected locations
    - be safe to re-run
 3. Add a call in `setup/setup.sh` in the appropriate sequence.
@@ -73,16 +75,26 @@ If a package is not available in a distro's package manager, do **not** add it t
 - Use `#!/usr/bin/env bash`
 - Determine repo root consistently: `dotdir="$(cd "$(dirname "$0")/.." && pwd)"`
 - Source helpers early: `source "$dotdir/setup/setup_functions.sh"`
-- OS detection:
-  - `os=$(uname -s)`
-  - Linux distro detection via presence of package manager (`apt-get`, `pacman`)
+- OS detection: use `_is_osx`, `_is_linux`, `_is_arch`, `_is_debian` (from `sh/helpers.sh`, available after sourcing `setup_functions.sh`). No inline `uname -s`.
+- Command detection: use `_has <cmd>`. No inline `command -v`.
 
 ### Logging
-- Use `dot_trace "message"` for normal steps.
-- Use `dot_error "message"` for failures.
-- Logs go to:
-  - terminal (colored)
-  - `~/.dotfiles_history` (persistent)
+Four levels, controlled by `LOG_LEVEL` env var (default: `2`/info):
+
+| Function      | Level | When to use |
+|---------------|-------|-------------|
+| `log_error`   | 0     | Actual error conditions |
+| `log_warning` | 1     | Recoverable/notable skips |
+| `log_info`    | 2     | Script start/end, major phase delimiters |
+| `log_trace`   | 3     | Individual fine-grained steps |
+
+Tool configure scripts open with `log_info "Configuring <Tool> ..."` and close with `log_info "Configuring <Tool> done."`.
+
+Logs go to terminal (colored) and `~/.dotfiles_history` (persistent).
+
+**Generated scripts**: Logging conventions apply to `configure_packages_*.sh` even though
+they carry a `# DO NOT EDIT` header. Fixes go in `generate_distro_package_setup_code.sh`;
+re-run the generator after any change to propagate them to the generated files.
 
 ### Symlinks (Unix)
 - Use the helper symlink function (not raw `ln -s`) so backups are consistent.

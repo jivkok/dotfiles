@@ -4,36 +4,37 @@
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
 source "$dotdir/setup/setup_functions.sh"
 
-dot_trace "Configuring NodeJS ..."
+log_info "Configuring NodeJS ..."
 
-os=$(uname -s)
-if [ "$os" = "Linux" ] && command -V apt-get >/dev/null 2>&1; then
-  sudo apt-get install -y -qq nodejs npm
-elif [ "$os" = "Linux" ] && command -V pacman >/dev/null 2>&1; then
-  sudo pacman -S --noconfirm --needed nodejs npm
-elif [ "$os" = "Darwin" ]; then
-  ! brew ls --versions node >/dev/null 2>&1 && brew install node
+if $_is_debian; then
+  install_or_upgrade_apt_package nodejs
+  install_or_upgrade_apt_package npm
+elif $_is_arch; then
+  install_or_upgrade_pacman_package nodejs
+  install_or_upgrade_pacman_package npm
+elif $_is_osx; then
+  install_or_upgrade_brew_package node
 else
-  dot_error "Unsupported OS: $os"
+  log_error "Unsupported OS: ${_OS}"
   exit 1
 fi
 
-dot_trace "Installing NPM packages ..."
-npm install -g n               # Node version manager
+log_trace "Installing NPM packages ..."
+install_or_upgrade_npm_package n               # Node version manager
 
 # apt packages Node conservatively (often behind LTS); upgrade via n.
 # Arch (pacman) and macOS (Homebrew) are rolling/current — n would install
 # to /usr/local/bin but be shadowed by the system binary, so skip it there.
-if [ "$os" = "Linux" ] && command -v apt-get >/dev/null 2>&1; then
-  sudo n lts
+if $_is_debian; then
+  sudo env "PATH=$PATH" n lts
 fi
 
-npm install -g diff2html-cli  # Fast Diff to colorized HTML
-npm install -g eslint          # JavaScript/TypeScript linter
-npm install -g http-server     # Zero-configuration command-line HTTP server
-npm install -g nodemon         # Auto-restart node apps on file changes
-npm install -g typescript      # TypeScript language
+install_or_upgrade_npm_package diff2html-cli   # Fast Diff to colorized HTML
+install_or_upgrade_npm_package eslint          # JavaScript/TypeScript linter
+install_or_upgrade_npm_package http-server     # Zero-configuration command-line HTTP server
+install_or_upgrade_npm_package nodemon         # Auto-restart node apps on file changes
+install_or_upgrade_npm_package typescript      # TypeScript language
 
-npm cache verify
+npm cache verify >/dev/null
 
-dot_trace "Configuring NodeJS done."
+log_info "Configuring NodeJS done."

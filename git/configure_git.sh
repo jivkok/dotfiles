@@ -7,7 +7,7 @@
 dotdir="$(cd "$(dirname "$0")/.." && pwd)"
 source "$dotdir/setup/setup_functions.sh"
 
-dot_trace "Configuring git ..."
+log_info "Configuring git ..."
 
 # Core
 
@@ -16,14 +16,14 @@ if [ -z "$var" ]; then
   var=JK
   git config --global user.name "$var"
 fi
-dot_trace "Git user name: $var"
+log_trace "Git user name: $var"
 
 var="$(git config --global --get user.email)"
 if [ -z "$var" ]; then
   var="jivkokgit@gmail.com"
   git config --global user.email "$var"
 fi
-dot_trace "Git user email: $var"
+log_trace "Git user email: $var"
 
 git config --global core.autocrlf input
 git config --global core.fscache true
@@ -44,9 +44,9 @@ if [ -f "$gitignore_src" ]; then
   fi
   cp "$gitignore_src" "$gitignore_dest"
   git config --global core.excludesfile "$gitignore_dest"
-  dot_trace "Global gitignore installed: $gitignore_dest"
+  log_trace "Global gitignore installed: $gitignore_dest"
 else
-  dot_trace "Warning: Global gitignore template not found: $gitignore_src"
+  log_trace "Warning: Global gitignore template not found: $gitignore_src"
 fi
 
 # Colors
@@ -117,8 +117,8 @@ git config --global alias.wdiff 'diff --word-diff'
 git config --global alias.who 'shortlog -s -e --'
 git config --global alias.zap 'reset --hard HEAD'
 
-if command -V delta >/dev/null 2>&1; then
-  dot_trace "Setting delta as pager"
+if _has delta; then
+  log_trace "Setting delta as pager"
 
   git config --global core.pager "delta"
   git config --global interactive.diffFilter "delta --color-only"
@@ -126,16 +126,16 @@ if command -V delta >/dev/null 2>&1; then
   git config --bool --global delta.light false
   git config --global merge.conflictstyle "diff3"
   git config --global diff.colorMoved "default"
-elif command -V diff-so-fancy >/dev/null 2>&1; then
-  dot_trace "Setting diff-so-fancy as pager"
+elif _has diff-so-fancy; then
+  log_trace "Setting diff-so-fancy as pager"
 
   git config --global core.pager "diff-so-fancy | less --tabs=4 -RFX"
   git config --global interactive.diffFilter "diff-so-fancy --patch"
   git config --bool --global diff-so-fancy.markEmptyLines false
 fi
 
-if command -V difft >/dev/null 2>&1; then
-  dot_trace "Setting difftastic as diff tool"
+if _has difft; then
+  log_trace "Setting difftastic as diff tool"
 
   git config --bool --global pager.difftool true
   git config --bool --global difftool.prompt false
@@ -143,12 +143,11 @@ if command -V difft >/dev/null 2>&1; then
   git config --global difftool.difftastic.cmd "difft \$LOCAL \$REMOTE"
 fi
 
-os=$(uname -s)
-if [ "$os" = "Darwin" ]; then
+if $_is_osx; then
   git config --global alias.opendiff 'difftool --tool=opendiff --no-prompt'
 
-  if [ -f "/Applications/p4merge.app/Contents/Resources/launchp4merge" ]; then
-    dot_trace "Setting P4Merge as diff&merge tool"
+  if [[ -f "/Applications/p4merge.app/Contents/Resources/launchp4merge" ]]; then
+    log_trace "Setting P4Merge as diff&merge tool"
 
     git config --global mergetool.keepBackup false
     git config --global mergetool.keepTemporaries false
@@ -162,8 +161,8 @@ if [ "$os" = "Darwin" ]; then
 
     git config --global diff.tool p4mergetool
     git config --global difftool.p4mergetool.cmd "/Applications/p4merge.app/Contents/Resources/launchp4merge \$LOCAL \$REMOTE"
-  elif [ -f "/Applications/kdiff3.app/Contents/MacOS/kdiff3" ]; then
-    dot_trace "Setting KDiff3 as diff&merge tool"
+  elif [[ -f "/Applications/kdiff3.app/Contents/MacOS/kdiff3" ]]; then
+    log_trace "Setting KDiff3 as diff&merge tool"
 
     git config --global mergetool.keepBackup false
     git config --global mergetool.keepTemporaries false
@@ -180,4 +179,4 @@ if [ "$os" = "Darwin" ]; then
   fi
 fi
 
-dot_trace "Configuring git done."
+log_info "Configuring git done."
