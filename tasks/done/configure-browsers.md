@@ -71,7 +71,6 @@ Download URL pattern: `https://addons.mozilla.org/firefox/downloads/latest/<slug
 | Extension | ID | AMO slug | `jk-default` | `jk-research-trusted` | `jk-research-private` |
 |---|---|---|---|---|---|
 | uBlock Origin | `uBlock0@raymondhill.net` | `ublock-origin` | + | + | + |
-| New Tab Override | `{ab5d7449-f2be-4db7-91d9-aaab5e59ddcc}` | `new-tab-override` | + | + | + |
 | Multi-Account Containers | `@testpilot-containers` | `multi-account-containers` | + | + | - |
 | Vimium FF | `{d07ccf11-c0cd-4938-a265-2a4d6ad01189}` | `vimium-ff` | + | + | + |
 | Joplin Web Clipper | `joplin-web-clipper@joplin.cloud` | `joplin-web-clipper` | - | + | + |
@@ -285,7 +284,6 @@ Same drop-in approach as Firefox stable.
 | Extension | ID | AMO slug | `jk-dev-local` | `jk-home-network` |
 |---|---|---|---|---|
 | Vimium FF | `{d07ccf11-c0cd-4938-a265-2a4d6ad01189}` | `vimium-ff` | + | + |
-| New Tab Override | `{ab5d7449-f2be-4db7-91d9-aaab5e59ddcc}` | `new-tab-override` | + | + |
 
 **Common `prefs.js` prefs** (written to both Dev Edition profiles):
 

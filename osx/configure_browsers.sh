@@ -109,17 +109,29 @@ install_firefox_extension() {
   log_trace "installed extension: ${ext_id}"
 }
 
-# write_firefox_prefs_js <profile_dir> <content>
-# Writes prefs.js directly into the given profile directory.
-# No-op (silently) if the directory does not exist.
-write_firefox_prefs_js() {
+# write_firefox_user_js <profile_dir> <content>
+# Writes user.js into the given profile directory.
+#
+# Why user.js and not prefs.js:
+#   Firefox owns prefs.js — it writes runtime state there and would conflict
+#   with direct edits. user.js is the designated override mechanism: Firefox
+#   reads it at every startup and re-applies its values on top of prefs.js.
+#   This means the script's privacy settings are always enforced, while
+#   prefs.js (and any user changes stored there) is left untouched.
+#
+# Trade-off: preferences listed here are effectively "locked" — a user
+#   changing them in the UI will have the change reverted at next Firefox
+#   restart. That is intentional for privacy hardening settings.
+#
+# No-op (silently) if the profile directory does not exist.
+write_firefox_user_js() {
   local profile_dir="$1"
   local content="$2"
   if [[ -d "$profile_dir" ]]; then
-    log_trace "Writing prefs.js → $profile_dir"
-    printf '%s\n' "$content" > "${profile_dir}/prefs.js"
+    log_trace "Writing user.js → $profile_dir"
+    printf '%s\n' "$content" > "${profile_dir}/user.js"
   else
-    log_trace "Profile dir not found, skipping prefs.js: $profile_dir"
+    log_trace "Profile dir not found, skipping user.js: $profile_dir"
   fi
 }
 
@@ -225,21 +237,21 @@ user_pref("network.cookie.cookieBehavior", 2);
 user_pref("browser.sessionstore.privacy_level", 2);
 user_pref("browser.sessionstore.restore_on_demand", true);'
 
-write_firefox_prefs_js "${FF_PROFILES}/jk-default" \
+write_firefox_user_js "${FF_PROFILES}/jk-default" \
   "// Profile: jk-default — cookies and session restore
 
 ${FF_COMMON_PREFS}
 
 ${FF_DEFAULT_PREFS}"
 
-write_firefox_prefs_js "${FF_PROFILES}/jk-research-trusted" \
+write_firefox_user_js "${FF_PROFILES}/jk-research-trusted" \
   "// Profile: jk-research-trusted — cookies and session restore
 
 ${FF_COMMON_PREFS}
 
 ${FF_RESEARCH_TRUSTED_PREFS}"
 
-write_firefox_prefs_js "${FF_PROFILES}/jk-research-private" \
+write_firefox_user_js "${FF_PROFILES}/jk-research-private" \
   "// Profile: jk-research-private — fingerprinting resistance, cookies, stateless session
 
 ${FF_COMMON_PREFS}
@@ -248,15 +260,14 @@ ${FF_RESEARCH_PRIVATE_PREFS}"
 
 # ─── Firefox — extensions via XPI drop-in ────────────────────────────────────
 # Extension table (profile → extensions):
-#   jk-default:          ublock, new-tab-override, containers, vimium, stylus, sidebery
-#   jk-research-trusted: ublock, new-tab-override, containers, vimium, joplin, stylus, sidebery
-#   jk-research-private: ublock, new-tab-override, vimium, joplin, stylus, noscript, sidebery
+#   jk-default:          ublock, containers, vimium, stylus, sidebery
+#   jk-research-trusted: ublock, containers, vimium, joplin, stylus, sidebery
+#   jk-research-private: ublock, vimium, joplin, stylus, noscript, sidebery
 
 log_info "Installing Firefox extensions via XPI ..."
 
 install_extensions_into_profile "${FF_PROFILES}/jk-default" \
   "uBlock0@raymondhill.net"                    "ublock-origin" \
-  "{ab5d7449-f2be-4db7-91d9-aaab5e59ddcc}"     "new-tab-override" \
   "@testpilot-containers"                       "multi-account-containers" \
   "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"      "vimium-ff" \
   "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}"      "styl-us" \
@@ -264,7 +275,6 @@ install_extensions_into_profile "${FF_PROFILES}/jk-default" \
 
 install_extensions_into_profile "${FF_PROFILES}/jk-research-trusted" \
   "uBlock0@raymondhill.net"                    "ublock-origin" \
-  "{ab5d7449-f2be-4db7-91d9-aaab5e59ddcc}"     "new-tab-override" \
   "@testpilot-containers"                       "multi-account-containers" \
   "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"      "vimium-ff" \
   "joplin-web-clipper@joplin.cloud"             "joplin-web-clipper" \
@@ -273,7 +283,6 @@ install_extensions_into_profile "${FF_PROFILES}/jk-research-trusted" \
 
 install_extensions_into_profile "${FF_PROFILES}/jk-research-private" \
   "uBlock0@raymondhill.net"                    "ublock-origin" \
-  "{ab5d7449-f2be-4db7-91d9-aaab5e59ddcc}"     "new-tab-override" \
   "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"      "vimium-ff" \
   "joplin-web-clipper@joplin.cloud"             "joplin-web-clipper" \
   "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}"      "styl-us" \
@@ -328,12 +337,12 @@ user_pref("dom.security.https_only_mode", false);
 user_pref("privacy.trackingprotection.enabled", false);
 user_pref("network.trr.mode", 0);'
 
-write_firefox_prefs_js "${FF_PROFILES}/jk-dev-local" \
+write_firefox_user_js "${FF_PROFILES}/jk-dev-local" \
   "// Profile: jk-dev-local
 
 ${FFDX_COMMON_PREFS}"
 
-write_firefox_prefs_js "${FF_PROFILES}/jk-home-network" \
+write_firefox_user_js "${FF_PROFILES}/jk-home-network" \
   "// Profile: jk-home-network — local services, no HTTPS enforcement
 
 ${FFDX_COMMON_PREFS}
@@ -341,17 +350,15 @@ ${FFDX_COMMON_PREFS}
 ${FFDX_HOME_NETWORK_PREFS}"
 
 # ─── Firefox Developer Edition — extensions via XPI drop-in ──────────────────
-# Both profiles get: vimium-ff, new-tab-override
+# Both profiles get: vimium-ff
 
 log_info "Installing Firefox Developer Edition extensions via XPI ..."
 
 install_extensions_into_profile "${FF_PROFILES}/jk-dev-local" \
-  "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"  "vimium-ff" \
-  "{ab5d7449-f2be-4db7-91d9-aaab5e59ddcc}"  "new-tab-override"
+  "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"  "vimium-ff"
 
 install_extensions_into_profile "${FF_PROFILES}/jk-home-network" \
-  "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"  "vimium-ff" \
-  "{ab5d7449-f2be-4db7-91d9-aaab5e59ddcc}"  "new-tab-override"
+  "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"  "vimium-ff"
 
 # ─── Safari — scriptable defaults ────────────────────────────────────────────
 # macOS 15+ (Sequoia) gates the Safari container behind Full Disk Access (TCC).
