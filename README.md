@@ -154,9 +154,11 @@ See [`docs/testing.md`](./docs/testing.md) for details.
 | File | Contents |
 |------|----------|
 | [`docs/structure.md`](./docs/structure.md) | Repo layout, setup flow, orchestration invariants, where to add things |
+| [`docs/os-matrix.md`](./docs/os-matrix.md) | Cross-platform differences and OS-specific mappings |
 | [`docs/development.md`](./docs/development.md) | Development workflow and agent pipeline |
 | [`docs/testing.md`](./docs/testing.md) | Test architecture, environments, Docker images, test categories, scripts reference |
 | [`docs/coding-conventions.md`](./docs/coding-conventions.md) | Shell scripting conventions |
+| [`docs/mcp-servers.md`](./docs/mcp-servers.md) | MCP servers configured for AI agents |
 
 ---
 

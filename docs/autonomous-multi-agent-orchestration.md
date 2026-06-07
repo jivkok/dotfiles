@@ -149,7 +149,7 @@ Read all files in tasks/ready/. Pick the highest-priority one
 (priority field, then oldest Created date as tiebreaker).
 
 - Atomically claim it: move the file to tasks/in-progress/, set Status: in-progress.
-- Follow all conventions in AIAGENTS.md.
+- Follow all conventions in AGENTS.md.
 - Run the dev loop: build → test → fix → iterate until tests pass.
 - On success: move to tasks/done/, set Status: done, append "## Implementation Notes".
 - On unresolvable blocker: move to tasks/failed/, set Status: failed,
@@ -183,7 +183,7 @@ each agent in isolation:
 
 **`failed/` is a first-class state** — tasks that hit unresolvable blockers move to `tasks/failed/` with a documented reason. This keeps the queue clean and gives the user clear visibility into what needs manual attention.
 
-**AIAGENTS.md** — document the agent roles, task schema, and pipeline there so future users (and agents themselves) can understand and extend the system.
+**AGENTS.md** — document the agent roles, task schema, and pipeline there so future users (and agents themselves) can understand and extend the system.
 
 ---
 

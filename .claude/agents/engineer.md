@@ -15,7 +15,7 @@ The analyst has already resolved ambiguity. If you encounter something unexpecte
 ## How to Code and Test
 
 Follow the conventions, rules, and dev loop documented in:
-- `AIAGENTS.md` — repo orientation and workflow entry point
+- `AGENTS.md` — repo orientation and workflow entry point
 - `docs/development.md` — mandatory rules, conventions, refactoring playbook, validation checklists
 - `docs/testing.md` — testing approach, environments, and scripts reference
 - `docs/coding-conventions.md` — coding style and patterns
