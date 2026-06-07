@@ -53,7 +53,7 @@ alias nh='unset HISTFILE'
 alias mk='make'
 alias rr='ranger'
 # Tmux auto-attach
-command -v tmux >/dev/null && alias t='(tmux has-session 2>/dev/null && tmux attach) || (tmux new-session)'
+_has tmux && alias t='(tmux has-session 2>/dev/null && tmux attach -d) || (tmux new-session)'
 
 # Environment inspection
 alias envs='env | sort'

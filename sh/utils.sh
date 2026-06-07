@@ -259,48 +259,60 @@ function mac_lookup() {
 # Compares files or directories with the best available diff tool
 # Usage: jdiff file_or_dir_1 file_or_dir_2
 jdiff() {
-  if [ -z "$2" ]; then
+  if [ "$#" -ne 2 ]; then
     echo "Compares files or directories"
     echo "Usage: jdiff file_or_dir_1 file_or_dir_2"
     return 1
   fi
-  if [ ! -e "$1" ]; then
-    echo "$1: does not exist"
-    return 1
-  fi
-  if [ ! -e "$2" ]; then
-    echo "$2: does not exist"
-    return 1
-  fi
 
-  local -a _comp
-  if [ -d "$1" ]; then
-    if [ -d "$2" ]; then
-      _comp=('-Nur')
-    else
-      echo "Cannot compare directory ( $1 ) with a file ( $2 )"
-      return 1
-    fi
-  else
-    if [ ! -d "$2" ]; then
-      _comp=('-u')
-    else
-      echo "Cannot compare file ( $1 ) with a directory ( $2 )"
-      return 1
-    fi
+  local left="$1"
+  local right="$2"
+
+  if [ ! -e "$left" ]; then
+    echo "$left: does not exist"
+    return 1
+  fi
+  if [ ! -e "$right" ]; then
+    echo "$right: does not exist"
+    return 1
+  fi
+  if [ -d "$left" ] && [ ! -d "$right" ]; then
+    echo "Cannot compare directory ($left) with file ($right)"
+    return 1
+  fi
+  if [ ! -d "$left" ] && [ -d "$right" ]; then
+    echo "Cannot compare file ($left) with directory ($right)"
+    return 1
   fi
 
   if _has difft; then
-    diff "${_comp[@]}" "$1" "$2" | difft
-  elif _has delta; then
-    diff "${_comp[@]}" "$1" "$2" | delta
-  elif _has diff-so-fancy; then
-    diff "${_comp[@]}" "$1" "$2" | diff-so-fancy
-  elif _has ydiff; then
-    diff "${_comp[@]}" "$1" "$2" | ydiff
-  elif _has git; then
-    git diff --no-index "$1" "$2"
-  else
-    diff --color=auto "${_comp[@]}" "$1" "$2"
+    difft "$left" "$right"
+    return
   fi
+
+  local -a diff_args
+  if [ -d "$left" ]; then diff_args=(-Nur); else diff_args=(-u); fi
+
+  local prettifier=""
+  _has delta && prettifier="delta"
+  [[ -z "$prettifier" ]] && _has diff-so-fancy && prettifier="diff-so-fancy"
+  [[ -z "$prettifier" ]] && _has ydiff && prettifier="ydiff"
+
+  if [[ -n "$prettifier" ]]; then
+    local -a color_flag=()
+    [[ "$prettifier" == "diff-so-fancy" ]] && color_flag=(--color=always)
+    if _has git; then
+      git diff --no-index "${color_flag[@]}" -- "$left" "$right" | "$prettifier"
+    else
+      diff "${color_flag[@]}" "${diff_args[@]}" -- "$left" "$right" | "$prettifier"
+    fi
+    return "${PIPESTATUS[0]}"
+  fi
+
+  if _has git; then
+    git diff --no-index -- "$left" "$right"
+    return
+  fi
+
+  diff --color=auto "${diff_args[@]}" -- "$left" "$right"
 }

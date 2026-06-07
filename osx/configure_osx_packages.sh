@@ -74,7 +74,6 @@ install_brew_package bash-completion
 # Misc
 install_brew_package ansible # Automate deployment, configuration, and upgrading
 install_brew_package bat # cat-clone with syntax highlighting and Git integration
-install_brew_package bfg # Remove large files or passwords from Git history like git-filter-branch
 install_brew_package binwalk # Searches a binary image for embedded files and executable code
 install_brew_package ccat # Like cat but displays content with syntax highlighting
 install_brew_package cmake # Cross-platform make
@@ -184,7 +183,6 @@ install_cask_package postman # http APIs (REST/SOAP/GraphQL) development
 install_cask_package proxyman # capture http(s) traffic / web development proxy
 install_cask_package sourcetree # Git gui
 install_cask_package tableplus # relational databases (MySQL, PostgreSQL, SQLite, etc.) management
-install_cask_package uncrustifyx # Source Code Beautifier for C-style languages
 install_cask_package visual-studio-code # code/text editor
 install_cask_package vscodium # Binary releases of VS Code without MS branding/telemetry/licensing
 install_cask_package xbar # Put anything in your Mac OS X menu bar
@@ -196,7 +194,6 @@ install_cask_package handbrake # video transcoder
 install_cask_package joplin # evernote-like note-taking and web clipper
 install_cask_package karabiner-elements # keyboard customization
 install_cask_package keepassxc # passwords sync
-install_cask_package makemkv # video formats converter/transcoder
 install_cask_package mindforger # human mind inspired (Eisenhower matrix) personal knowledge management tool
 install_cask_package obsidian # Knowledge base that works on top of a local folder of plain text Markdown files
 install_cask_package omnidisksweeper # disk space utilization
@@ -263,13 +260,14 @@ mas update
 log_info "Installing AppStore apps."
 
 # AppStore apps:
-install_mas_package 1044484672 # ApolloOne - Photo Video Viewer. RAW files viewer & EXIF editor
+install_mas_package 302584613  # Amazon Kindle
 install_mas_package 1473079126 # Cleaner One: Disk Clean
-install_mas_package 1295203466 # Microsoft Remote Desktop
-install_mas_package 302584613 # Amazon Kindle
-# mas install 937984704 # Amphetamine - keep your Mac awake
-# mas install 576421334 # Converto - The Unit Converter
-# mas install 442160987 # Flycut (Clipboard manager)
+install_mas_package 6458534902 # FreeChat. AI Chat Client
+install_mas_package 1435127111 # KeePassium
+install_mas_package 462058435  # Microsoft Excel
+install_mas_package 985367838  # Microsoft Outlook
+install_mas_package 462054704  # Microsoft Word
+install_mas_package 1295203466 # Windows App (formerly Microsoft Remote Desktop)
 
 # Install these widget apps from the AppStore:
 # nothing currently
