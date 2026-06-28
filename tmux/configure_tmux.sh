@@ -19,12 +19,14 @@ fi
 
 # Config
 make_symlink "$dotdir/tmux/.tmux.conf" "$HOME"
+mkdir -p "$HOME/.tmux"
+make_symlink "$dotdir/tmux/osc52.sh" "$HOME/.tmux"
 
 # Plugins
 _tmux_plugins_dir="$HOME/.tmux/plugins"
 log_trace "Install & configure Tmux plugins into $_tmux_plugins_dir"
 mkdir -p "$_tmux_plugins_dir"
-for _plugin in {tpm,tmux-cpu,tmux-resurrect,tmux-yank}; do
+for _plugin in {tpm,tmux-cpu,tmux-resurrect}; do
   log_trace "Tmux plugin: $_plugin"
   clone_or_update_repo "https://github.com/tmux-plugins/$_plugin" "$_tmux_plugins_dir/$_plugin"
 done

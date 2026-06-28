@@ -103,6 +103,7 @@ COMMON_SETUP_FILES+=(
   "${repo_root}/vim/configure_vim.sh"
   "${repo_root}/zsh/configure_zsh.sh"
   "${repo_root}/tmux/configure_tmux.sh"
+  "${repo_root}/tmux/osc52.sh"
   "${repo_root}/fzf/configure_fzf.sh"
 )
 

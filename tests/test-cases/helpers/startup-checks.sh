@@ -61,7 +61,7 @@ check_symlink ~/.tmux.conf
 check_dir     ~/.tmux/plugins/tpm
 check_dir     ~/.tmux/plugins/tmux-resurrect
 check_dir     ~/.tmux/plugins/tmux-cpu
-check_dir     ~/.tmux/plugins/tmux-yank
+check_file    ~/.tmux/osc52.sh
 
 log_trace "---ZSH plugins ---"
 check_dir ~/.zsh/plugins/zsh-autosuggestions
