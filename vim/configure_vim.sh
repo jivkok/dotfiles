@@ -32,7 +32,7 @@ elif $_is_osx; then
   log_trace 'Installing Vim/NeoVim'
   install_or_upgrade_brew_package vim
   install_or_upgrade_brew_package neovim
-  python3.12 -m pip install --break-system-packages --upgrade pynvim >/dev/null
+  python3 -m pip install --break-system-packages --upgrade pynvim >/dev/null
 
 else
   log_error "Unsupported OS: ${_OS}"

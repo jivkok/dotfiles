@@ -101,6 +101,7 @@ install_brew_package lsof # Utility to list open files
 install_brew_package lua # Powerful, lightweight programming language
 install_brew_package lynx # Text-based web browser
 install_brew_package m-cli # Swiss Army Knife for macOS
+install_brew_package macmon # performance monitoring for Apple Silicon processors
 install_brew_package mas # Mac App Store command-line interface
 install_brew_package miller # Like sed, awk, cut, join & sort for name-indexed data such as CSV
 install_brew_package mtr # traceroute and ping in a single tool
