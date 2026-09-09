@@ -58,7 +58,7 @@ if command -v docker >/dev/null 2>&1; then
 fi
 
 _dc=''
-if command -v "docker compose" >/dev/null 2>&1; then
+if docker compose version >/dev/null 2>&1; then
   _dc='docker compose'
 elif command -v "docker-compose" >/dev/null 2>&1; then
   _dc='docker-compose'

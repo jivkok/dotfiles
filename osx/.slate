@@ -25,7 +25,7 @@ alias hyper ctrl;shift;alt;cmd
 alias mon-laptop    1728x1117
 alias mon-landscape 3840x2160
 alias mon-portrait  2160x3840
-alias mon-portrait-lowres 1440x2560
+alias mon-portrait-lowres 1080x1920
 
 ## Position aliases
 alias full                  move screenOriginX;screenOriginY                                screenSizeX;screenSizeY
@@ -61,165 +61,242 @@ default 3monitors-3p-lowres resolutions:${mon-laptop};${mon-landscape};${mon-por
 # default 3monitors-2p count:3
 
 ## 1monitor
+# Terminals
+layout 1monitor 'Ghostty':REPEAT            ${full}
 layout 1monitor 'iTerm2':REPEAT             ${full}
 layout 1monitor 'Terminal':REPEAT           ${full}
-layout 1monitor 'Finder':REPEAT             ${lefthalf}
-layout 1monitor 'SourceTree':REPEAT         ${full}
+# Development
 layout 1monitor 'Code':REPEAT               ${full}
 layout 1monitor 'Cursor':REPEAT             ${full}
 layout 1monitor 'VSCodium':REPEAT           ${full}
-layout 1monitor 'Xcode':REPEAT              ${full}
-layout 1monitor 'Google Chrome':REPEAT      ${full}
+layout 1monitor 'Xcode':REPEAT              ${full}layout 1monitor 'Sourcetree':REPEAT         ${full}
+# Browsers
+layout 1monitor 'Brave Browser':REPEAT      ${full}
 layout 1monitor 'Chromium':REPEAT           ${full}
-layout 1monitor 'Safari':REPEAT             ${full}
 layout 1monitor 'Firefox':REPEAT            ${full}
 layout 1monitor 'Firefox Developer Edition':REPEAT ${full}
+layout 1monitor 'Google Chrome':REPEAT      ${full}
+layout 1monitor 'Microsoft Edge':REPEAT     ${full}
 layout 1monitor 'Mullvad Browser':REPEAT    ${full}
-layout 1monitor 'Brave Browser':REPEAT      ${full}
+layout 1monitor 'Safari':REPEAT             ${full}
+# AI Assistants
+layout 1monitor 'Claude':REPEAT             ${full}
+# Media
 layout 1monitor 'Kindle':REPEAT             ${righthalf}
+# Communication
+layout 1monitor 'Messages':REPEAT           ${full}
+layout 1monitor 'Microsoft Outlook':REPEAT  ${full}
+layout 1monitor 'Microsoft Teams':REPEAT    ${full}
+# System & Utilities
 layout 1monitor 'Activity Monitor':REPEAT   ${full}
 layout 1monitor 'Console':REPEAT            ${full}
-layout 1monitor 'Messages':REPEAT           ${full}
-layout 1monitor 'KeePassXC':REPEAT          ${full}
+layout 1monitor 'Finder':REPEAT             ${lefthalf}
 layout 1monitor 'KeePassium':REPEAT         ${full}
+layout 1monitor 'KeePassXC':REPEAT          ${full}
 
 ## 2monitors
+# Terminals
+layout 2monitors 'Ghostty':REPEAT            ${full} ${mon-laptop}
 layout 2monitors 'iTerm2':REPEAT             ${bottom_leftthird} ${mon-landscape}
 layout 2monitors 'Terminal':REPEAT           ${full} ${mon-laptop}
-layout 2monitors 'Finder':REPEAT             ${top_leftthird} ${mon-landscape}
-layout 2monitors 'SourceTree':REPEAT         ${leftthird} ${mon-landscape}
+# Development
 layout 2monitors 'Code':REPEAT               ${middlethird} ${mon-landscape}
 layout 2monitors 'Cursor':REPEAT             ${middlehalf} ${mon-landscape}
 layout 2monitors 'VSCodium':REPEAT           ${middlethird} ${mon-landscape}
-layout 2monitors 'Xcode':REPEAT              ${middlethird} ${mon-landscape}
-layout 2monitors 'Google Chrome':REPEAT      ${rightthird} ${mon-landscape}
-layout 2monitors 'Chromium':REPEAT           ${rightthird} ${mon-landscape}
-layout 2monitors 'Safari':REPEAT             ${rightthird} ${mon-landscape}
+layout 2monitors 'Xcode':REPEAT              ${middlethird} ${mon-landscape}layout 2monitors 'Sourcetree':REPEAT         ${full} ${mon-laptop}
+# Browsers
+layout 2monitors 'Brave Browser':REPEAT      ${full} ${mon-laptop}
+layout 2monitors 'Chromium':REPEAT           ${full} ${mon-laptop}
 layout 2monitors 'Firefox':REPEAT            ${rightthird} ${mon-landscape}
 layout 2monitors 'Firefox Developer Edition':REPEAT ${rightthird} ${mon-landscape}
-layout 2monitors 'Mullvad Browser':REPEAT    ${rightthird} ${mon-landscape}
-layout 2monitors 'Brave Browser':REPEAT      ${rightthird} ${mon-landscape}
+layout 2monitors 'Google Chrome':REPEAT      ${full} ${mon-laptop}
+layout 2monitors 'Microsoft Edge':REPEAT     ${rightthird} ${mon-landscape}
+layout 2monitors 'Mullvad Browser':REPEAT    ${full} ${mon-laptop}
+layout 2monitors 'Safari':REPEAT             ${full} ${mon-laptop}
+# AI Assistants
+layout 2monitors 'Claude':REPEAT             ${rightthird} ${mon-landscape}
+# Media
 layout 2monitors 'Kindle':REPEAT             ${leftthird} ${mon-landscape}
+# Communication
+layout 2monitors 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 2monitors 'Microsoft Outlook':REPEAT  ${rightthird} ${mon-landscape}
+layout 2monitors 'Microsoft Teams':REPEAT    ${full} ${mon-laptop}
+# System & Utilities
 layout 2monitors 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
 layout 2monitors 'Console':REPEAT            ${full} ${mon-laptop}
-layout 2monitors 'Messages':REPEAT           ${full} ${mon-laptop}
-layout 2monitors 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 2monitors 'Finder':REPEAT             ${top_leftthird} ${mon-landscape}
 layout 2monitors 'KeePassium':REPEAT         ${full} ${mon-laptop}
+layout 2monitors 'KeePassXC':REPEAT          ${full} ${mon-laptop}
 
 ## 2monitors-external
+# Terminals
+layout 2monitors-external 'Ghostty':REPEAT            ${tophalf} ${mon-portrait-lowres}
 layout 2monitors-external 'iTerm2':REPEAT             ${leftthird} ${mon-landscape}
-layout 2monitors-external 'Terminal':REPEAT           ${tophalf} ${mon-portrait-lowres}
-layout 2monitors-external 'Finder':REPEAT             ${top_leftthird} ${mon-landscape}
-layout 2monitors-external 'SourceTree':REPEAT         ${leftthird} ${mon-landscape}
+layout 2monitors-external 'Terminal':REPEAT           ${bottomhalf} ${mon-portrait-lowres}
+# Development
 layout 2monitors-external 'Code':REPEAT               ${middlethird} ${mon-landscape}
 layout 2monitors-external 'Cursor':REPEAT             ${middlehalf} ${mon-landscape}
 layout 2monitors-external 'VSCodium':REPEAT           ${middlethird} ${mon-landscape}
-layout 2monitors-external 'Xcode':REPEAT              ${middlethird} ${mon-landscape}
-layout 2monitors-external 'Google Chrome':REPEAT      ${rightthird} ${mon-landscape}
-layout 2monitors-external 'Chromium':REPEAT           ${rightthird} ${mon-landscape}
-layout 2monitors-external 'Safari':REPEAT             ${rightthird} ${mon-landscape}
+layout 2monitors-external 'Xcode':REPEAT              ${middlethird} ${mon-landscape}layout 2monitors-external 'Sourcetree':REPEAT         ${bottomhalf} ${mon-portrait-lowres}
+# Browsers
+layout 2monitors-external 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Chromium':REPEAT           ${bottomhalf} ${mon-portrait-lowres}
 layout 2monitors-external 'Firefox':REPEAT            ${rightthird} ${mon-landscape}
-layout 2monitors-external 'Firefox Developer Edition':REPEAT ${rightthird} ${mon-landscape}
-layout 2monitors-external 'Mullvad Browser':REPEAT    ${rightthird} ${mon-landscape}
-layout 2monitors-external 'Brave Browser':REPEAT      ${rightthird} ${mon-landscape}
-layout 2monitors-external 'Kindle':REPEAT             ${leftthird} ${mon-landscape}
+layout 2monitors-external 'Firefox Developer Edition':REPEAT ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Google Chrome':REPEAT      ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Microsoft Edge':REPEAT     ${rightthird} ${mon-landscape}
+layout 2monitors-external 'Mullvad Browser':REPEAT    ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Safari':REPEAT             ${bottomhalf} ${mon-portrait-lowres}
+# AI Assistants
+layout 2monitors-external 'Claude':REPEAT             ${rightthird} ${mon-landscape}
+# Media
+layout 2monitors-external 'Kindle':REPEAT             ${bottomhalf} ${mon-portrait-lowres}
+# Communication
+layout 2monitors-external 'Messages':REPEAT           ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Microsoft Outlook':REPEAT  ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Microsoft Teams':REPEAT    ${tophalf} ${mon-portrait-lowres}
+# System & Utilities
 layout 2monitors-external 'Activity Monitor':REPEAT   ${tophalf} ${mon-portrait-lowres}
 layout 2monitors-external 'Console':REPEAT            ${tophalf} ${mon-portrait-lowres}
-layout 2monitors-external 'Messages':REPEAT           ${bottomhalf} ${mon-portrait-lowres}
-layout 2monitors-external 'KeePassXC':REPEAT          ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'Finder':REPEAT             ${top_leftthird} ${mon-landscape}
 layout 2monitors-external 'KeePassium':REPEAT         ${bottomhalf} ${mon-portrait-lowres}
+layout 2monitors-external 'KeePassXC':REPEAT          ${bottomhalf} ${mon-portrait-lowres}
 
 ## 3monitors-2p
+# Terminals
+layout 3monitors-2p 'Ghostty':REPEAT            ${tophalf} ${mon-portrait}
 layout 3monitors-2p 'iTerm2':REPEAT             ${tophalf} ${mon-portrait}
 layout 3monitors-2p 'Terminal':REPEAT           ${full} ${mon-laptop}
-layout 3monitors-2p 'Finder':REPEAT             ${full} ${mon-laptop}
-layout 3monitors-2p 'SourceTree':REPEAT         ${lefthalf} ${mon-landscape}
+# Development
 layout 3monitors-2p 'Code':REPEAT               ${righthalf} ${mon-landscape}
 layout 3monitors-2p 'Cursor':REPEAT             ${righthalf} ${mon-landscape}
 layout 3monitors-2p 'VSCodium':REPEAT           ${righthalf} ${mon-landscape}
-layout 3monitors-2p 'Xcode':REPEAT              ${righthalf} ${mon-landscape}
-layout 3monitors-2p 'Google Chrome':REPEAT      ${lefthalf} ${mon-landscape}
-layout 3monitors-2p 'Chromium':REPEAT           ${lefthalf} ${mon-landscape}
-layout 3monitors-2p 'Safari':REPEAT             ${lefthalf} ${mon-landscape}
+layout 3monitors-2p 'Xcode':REPEAT              ${righthalf} ${mon-landscape}layout 3monitors-2p 'Sourcetree':REPEAT         ${full} ${mon-laptop}
+# Browsers
+layout 3monitors-2p 'Brave Browser':REPEAT      ${full} ${mon-laptop}
+layout 3monitors-2p 'Chromium':REPEAT           ${full} ${mon-laptop}
 layout 3monitors-2p 'Firefox':REPEAT            ${lefthalf} ${mon-landscape}
-layout 3monitors-2p 'Firefox Developer Edition':REPEAT ${lefthalf} ${mon-landscape}
-layout 3monitors-2p 'Mullvad Browser':REPEAT    ${lefthalf} ${mon-landscape}
-layout 3monitors-2p 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait}
-layout 3monitors-2p 'Kindle':REPEAT             ${lefthalf} ${mon-landscape}
+layout 3monitors-2p 'Firefox Developer Edition':REPEAT ${bottomhalf} ${mon-portrait}
+layout 3monitors-2p 'Google Chrome':REPEAT      ${full} ${mon-laptop}
+layout 3monitors-2p 'Microsoft Edge':REPEAT     ${lefthalf} ${mon-landscape}
+layout 3monitors-2p 'Mullvad Browser':REPEAT    ${full} ${mon-laptop}
+layout 3monitors-2p 'Safari':REPEAT             ${full} ${mon-laptop}
+# AI Assistants
+layout 3monitors-2p 'Claude':REPEAT             ${lefthalf} ${mon-landscape}
+# Media
+layout 3monitors-2p 'Kindle':REPEAT             ${bottomhalf} ${mon-portrait}
+# Communication
+layout 3monitors-2p 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-2p 'Microsoft Outlook':REPEAT  ${bottomhalf} ${mon-portrait}
+layout 3monitors-2p 'Microsoft Teams':REPEAT    ${tophalf} ${mon-portrait}
+# System & Utilities
 layout 3monitors-2p 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
 layout 3monitors-2p 'Console':REPEAT            ${full} ${mon-laptop}
-layout 3monitors-2p 'Messages':REPEAT           ${full} ${mon-laptop}
-layout 3monitors-2p 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 3monitors-2p 'Finder':REPEAT             ${full} ${mon-laptop}
 layout 3monitors-2p 'KeePassium':REPEAT         ${full} ${mon-laptop}
+layout 3monitors-2p 'KeePassXC':REPEAT          ${full} ${mon-laptop}
 
 ## 3monitors-2p-lowres
+# Terminals
+layout 3monitors-2p-lowres 'Ghostty':REPEAT            ${tophalf} ${mon-portrait-lowres}
 layout 3monitors-2p-lowres 'iTerm2':REPEAT             ${tophalf} ${mon-portrait-lowres}
 layout 3monitors-2p-lowres 'Terminal':REPEAT           ${full} ${mon-laptop}
-layout 3monitors-2p-lowres 'Finder':REPEAT             ${full} ${mon-laptop}
-layout 3monitors-2p-lowres 'SourceTree':REPEAT         ${lefthalf} ${mon-landscape}
+# Development
 layout 3monitors-2p-lowres 'Code':REPEAT               ${righthalf} ${mon-landscape}
 layout 3monitors-2p-lowres 'Cursor':REPEAT             ${righthalf} ${mon-landscape}
 layout 3monitors-2p-lowres 'VSCodium':REPEAT           ${righthalf} ${mon-landscape}
-layout 3monitors-2p-lowres 'Xcode':REPEAT              ${righthalf} ${mon-landscape}
-layout 3monitors-2p-lowres 'Google Chrome':REPEAT      ${lefthalf} ${mon-landscape}
-layout 3monitors-2p-lowres 'Chromium':REPEAT           ${lefthalf} ${mon-landscape}
-layout 3monitors-2p-lowres 'Safari':REPEAT             ${lefthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Xcode':REPEAT              ${righthalf} ${mon-landscape}layout 3monitors-2p-lowres 'Sourcetree':REPEAT         ${full} ${mon-laptop}
+# Browsers
+layout 3monitors-2p-lowres 'Brave Browser':REPEAT      ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'Chromium':REPEAT           ${full} ${mon-laptop}
 layout 3monitors-2p-lowres 'Firefox':REPEAT            ${lefthalf} ${mon-landscape}
-layout 3monitors-2p-lowres 'Firefox Developer Edition':REPEAT ${lefthalf} ${mon-landscape}
-layout 3monitors-2p-lowres 'Mullvad Browser':REPEAT    ${lefthalf} ${mon-landscape}
-layout 3monitors-2p-lowres 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait-lowres}
-layout 3monitors-2p-lowres 'Kindle':REPEAT             ${lefthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Firefox Developer Edition':REPEAT ${bottomhalf} ${mon-portrait-lowres}
+layout 3monitors-2p-lowres 'Google Chrome':REPEAT      ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'Microsoft Edge':REPEAT     ${lefthalf} ${mon-landscape}
+layout 3monitors-2p-lowres 'Mullvad Browser':REPEAT    ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'Safari':REPEAT             ${full} ${mon-laptop}
+# AI Assistants
+layout 3monitors-2p-lowres 'Claude':REPEAT             ${lefthalf} ${mon-landscape}
+# Media
+layout 3monitors-2p-lowres 'Kindle':REPEAT             ${bottomhalf} ${mon-portrait-lowres}
+# Communication
+layout 3monitors-2p-lowres 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'Microsoft Outlook':REPEAT  ${bottomhalf} ${mon-portrait-lowres}
+layout 3monitors-2p-lowres 'Microsoft Teams':REPEAT    ${tophalf} ${mon-portrait-lowres}
+# System & Utilities
 layout 3monitors-2p-lowres 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
 layout 3monitors-2p-lowres 'Console':REPEAT            ${full} ${mon-laptop}
-layout 3monitors-2p-lowres 'Messages':REPEAT           ${full} ${mon-laptop}
-layout 3monitors-2p-lowres 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'Finder':REPEAT             ${full} ${mon-laptop}
 layout 3monitors-2p-lowres 'KeePassium':REPEAT         ${full} ${mon-laptop}
+layout 3monitors-2p-lowres 'KeePassXC':REPEAT          ${full} ${mon-laptop}
 
 ## 3monitors-3p
+# Terminals
+layout 3monitors-3p 'Ghostty':REPEAT            ${tophalf} ${mon-portrait}
 layout 3monitors-3p 'iTerm2':REPEAT             ${leftthird} ${mon-landscape}
-layout 3monitors-3p 'Terminal':REPEAT           ${tophalf} ${mon-portrait}
-layout 3monitors-3p 'Finder':REPEAT             ${full} ${mon-laptop}
-layout 3monitors-3p 'SourceTree':REPEAT         ${rightthird} ${mon-landscape}
+layout 3monitors-3p 'Terminal':REPEAT           ${full} ${mon-laptop}
+# Development
 layout 3monitors-3p 'Code':REPEAT               ${middlethird} ${mon-landscape}
 layout 3monitors-3p 'Cursor':REPEAT             ${middlehalf} ${mon-landscape}
 layout 3monitors-3p 'VSCodium':REPEAT           ${middlethird} ${mon-landscape}
-layout 3monitors-3p 'Xcode':REPEAT              ${middlethird} ${mon-landscape}
-layout 3monitors-3p 'Google Chrome':REPEAT      ${rightthird} ${mon-landscape}
-layout 3monitors-3p 'Chromium':REPEAT           ${rightthird} ${mon-landscape}
-layout 3monitors-3p 'Safari':REPEAT             ${rightthird} ${mon-landscape}
+layout 3monitors-3p 'Xcode':REPEAT              ${middlethird} ${mon-landscape}layout 3monitors-3p 'Sourcetree':REPEAT         ${full} ${mon-laptop}
+# Browsers
+layout 3monitors-3p 'Brave Browser':REPEAT      ${full} ${mon-laptop}
+layout 3monitors-3p 'Chromium':REPEAT           ${full} ${mon-laptop}
 layout 3monitors-3p 'Firefox':REPEAT            ${rightthird} ${mon-landscape}
-layout 3monitors-3p 'Firefox Developer Edition':REPEAT ${rightthird} ${mon-landscape}
-layout 3monitors-3p 'Mullvad Browser':REPEAT    ${rightthird} ${mon-landscape}
-layout 3monitors-3p 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait}
-layout 3monitors-3p 'Kindle':REPEAT             ${middlethird} ${mon-landscape}
+layout 3monitors-3p 'Firefox Developer Edition':REPEAT ${bottomhalf} ${mon-portrait}
+layout 3monitors-3p 'Google Chrome':REPEAT      ${full} ${mon-laptop}
+layout 3monitors-3p 'Microsoft Edge':REPEAT     ${rightthird} ${mon-landscape}
+layout 3monitors-3p 'Mullvad Browser':REPEAT    ${full} ${mon-laptop}
+layout 3monitors-3p 'Safari':REPEAT             ${full} ${mon-laptop}
+# AI Assistants
+layout 3monitors-3p 'Claude':REPEAT             ${rightthird} ${mon-landscape}
+# Media
+layout 3monitors-3p 'Kindle':REPEAT             ${bottomhalf} ${mon-portrait}
+# Communication
+layout 3monitors-3p 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-3p 'Microsoft Outlook':REPEAT  ${bottomhalf} ${mon-portrait}
+layout 3monitors-3p 'Microsoft Teams':REPEAT    ${tophalf} ${mon-portrait}
+# System & Utilities
 layout 3monitors-3p 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
 layout 3monitors-3p 'Console':REPEAT            ${full} ${mon-laptop}
-layout 3monitors-3p 'Messages':REPEAT           ${full} ${mon-laptop}
-layout 3monitors-3p 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 3monitors-3p 'Finder':REPEAT             ${full} ${mon-laptop}
 layout 3monitors-3p 'KeePassium':REPEAT         ${full} ${mon-laptop}
+layout 3monitors-3p 'KeePassXC':REPEAT          ${full} ${mon-laptop}
 
 ## 3monitors-3p-lowres
+# Terminals
+layout 3monitors-3p-lowres 'Ghostty':REPEAT            ${tophalf} ${mon-portrait-lowres}
 layout 3monitors-3p-lowres 'iTerm2':REPEAT             ${leftthird} ${mon-landscape}
-layout 3monitors-3p-lowres 'Terminal':REPEAT           ${tophalf} ${mon-portrait-lowres}
-layout 3monitors-3p-lowres 'Finder':REPEAT             ${full} ${mon-laptop}
-layout 3monitors-3p-lowres 'SourceTree':REPEAT         ${rightthird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Terminal':REPEAT           ${full} ${mon-laptop}
+# Development
 layout 3monitors-3p-lowres 'Code':REPEAT               ${middlethird} ${mon-landscape}
 layout 3monitors-3p-lowres 'Cursor':REPEAT             ${middlehalf} ${mon-landscape}
 layout 3monitors-3p-lowres 'VSCodium':REPEAT           ${middlethird} ${mon-landscape}
-layout 3monitors-3p-lowres 'Xcode':REPEAT              ${middlethird} ${mon-landscape}
-layout 3monitors-3p-lowres 'Google Chrome':REPEAT      ${rightthird} ${mon-landscape}
-layout 3monitors-3p-lowres 'Chromium':REPEAT           ${rightthird} ${mon-landscape}
-layout 3monitors-3p-lowres 'Safari':REPEAT             ${rightthird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Xcode':REPEAT              ${middlethird} ${mon-landscape}layout 3monitors-3p-lowres 'Sourcetree':REPEAT         ${full} ${mon-laptop}
+# Browsers
+layout 3monitors-3p-lowres 'Brave Browser':REPEAT      ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'Chromium':REPEAT           ${full} ${mon-laptop}
 layout 3monitors-3p-lowres 'Firefox':REPEAT            ${rightthird} ${mon-landscape}
-layout 3monitors-3p-lowres 'Firefox Developer Edition':REPEAT ${rightthird} ${mon-landscape}
-layout 3monitors-3p-lowres 'Mullvad Browser':REPEAT    ${rightthird} ${mon-landscape}
-layout 3monitors-3p-lowres 'Brave Browser':REPEAT      ${bottomhalf} ${mon-portrait-lowres}
-layout 3monitors-3p-lowres 'Kindle':REPEAT             ${middlethird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Firefox Developer Edition':REPEAT ${bottomhalf} ${mon-portrait-lowres}
+layout 3monitors-3p-lowres 'Google Chrome':REPEAT      ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'Microsoft Edge':REPEAT     ${rightthird} ${mon-landscape}
+layout 3monitors-3p-lowres 'Mullvad Browser':REPEAT    ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'Safari':REPEAT             ${full} ${mon-laptop}
+# AI Assistants
+layout 3monitors-3p-lowres 'Claude':REPEAT             ${rightthird} ${mon-landscape}
+# Media
+layout 3monitors-3p-lowres 'Kindle':REPEAT             ${bottomhalf} ${mon-portrait-lowres}
+# Communication
+layout 3monitors-3p-lowres 'Messages':REPEAT           ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'Microsoft Outlook':REPEAT  ${bottomhalf} ${mon-portrait-lowres}
+layout 3monitors-3p-lowres 'Microsoft Teams':REPEAT    ${tophalf} ${mon-portrait-lowres}
+# System & Utilities
 layout 3monitors-3p-lowres 'Activity Monitor':REPEAT   ${full} ${mon-laptop}
 layout 3monitors-3p-lowres 'Console':REPEAT            ${full} ${mon-laptop}
-layout 3monitors-3p-lowres 'Messages':REPEAT           ${full} ${mon-laptop}
-layout 3monitors-3p-lowres 'KeePassXC':REPEAT          ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'Finder':REPEAT             ${full} ${mon-laptop}
 layout 3monitors-3p-lowres 'KeePassium':REPEAT         ${full} ${mon-laptop}
+layout 3monitors-3p-lowres 'KeePassXC':REPEAT          ${full} ${mon-laptop}
 
 # Bindings
 
@@ -259,14 +336,17 @@ bind ]:${hyper}  throw next # move to next screen
 
 ## App bindings
 bind z:${hyper}     focus 'iTerm2'
+bind t:${hyper}     focus 'Ghostty'
 bind space:${hyper} focus 'VSCodium'
-bind b:${hyper}     focus 'Google Chrome'
-bind f:${hyper}     focus 'Finder'
-bind i:${hyper}     focus 'Safari'
 bind x:${hyper}     focus 'Code'
+bind b:${hyper}     focus 'Firefox'
+bind d:${hyper}     focus 'Firefox Developer Edition'
+bind w:${hyper}     focus 'Microsoft Edge'
+bind c:${hyper}     focus 'Claude'
+bind o:${hyper}     focus 'Microsoft Outlook'
 
-# Window Hints
-bind esc:${hyper} hint
+# Shortcut hints
+bind a:${hyper} shell "/Users/jivko/bin/slate-focus-shortcuts.swift"
 
 # Grid
 bind g:${hyper} grid padding:5 0:6,2 1:6,2

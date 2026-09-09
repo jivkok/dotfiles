@@ -63,6 +63,8 @@ log_trace "Configuring HOME bin directory done."
 # Tmux (symlink config only, no plugin cloning)
 log_trace "Configuring tmux ..."
 make_symlink "${dotdir}/tmux/.tmux.conf" "${HOME}"
+mkdir -p "${HOME}/.tmux"
+make_symlink "${dotdir}/tmux/osc52.sh" "${HOME}/.tmux"
 log_trace "Configuring tmux done."
 
 log_info "Setting up minimal remote VM complete."

@@ -352,7 +352,7 @@ Install only — no configuration. These browsers are either self-configuring by
 
 Steps that cannot be automated (require a running browser or manual UI interaction):
 
-1. **Firefox — create containers**: Open Firefox → Multi-Account Containers → create containers: Personal, Work, Shopping, Social. Container creation writes to the extension's IndexedDB and cannot be scripted without running the browser.
+1. **Firefox — create containers**: Open Firefox → Multi-Account Containers → create containers: Family, Finances, Homelab, Personal, Sandbox, Sandbox2, Shopping, Social, Work. Container creation writes to the extension's IndexedDB and cannot be scripted without running the browser.
 2. **Firefox — Sidebery panels**: Open each profile and create Sidebery tab panels per project manually.
 
 ---
