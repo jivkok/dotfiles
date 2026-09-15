@@ -45,6 +45,8 @@ if command -v docker >/dev/null 2>&1; then
   alias dstart='docker start'
   alias dstop='docker stop'
   alias deb='dexbash'
+  # shellcheck disable=SC2139  # $dotdir is a stable, exported env var; intentional expansion at definition time
+  alias cc-docker="$dotdir/ai/claude-code/claude-code-docker.sh"
 
   # Run a bash shell in the specified container
   dexbash() {

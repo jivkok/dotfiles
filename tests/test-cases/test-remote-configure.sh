@@ -30,6 +30,7 @@ if [[ "${_HAVE_DEPS}" == "1" ]]; then
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 CONTAINERS=()
+_CONTAINER_LABEL="dotfiles.test=remote-configure"
 
 cleanup() {
   for cid in "${CONTAINERS[@]}"; do
@@ -38,12 +39,18 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Reap containers orphaned by a prior run of this test that was killed before its
+# own EXIT trap could fire (e.g. an external timeout sending SIGKILL). The EXIT
+# trap above is not a safety net against that case, so do a label-based sweep
+# before starting any new containers.
+docker ps -aq --filter "label=${_CONTAINER_LABEL}" | xargs -r docker rm -f >/dev/null 2>&1 || true
+
 # Start a remote minimal container and return the SSH port via stdout.
 start_remote_container() {
   local image="$1"
   local cid port
 
-  cid=$(docker run -d --rm -P "${image}")
+  cid=$(docker run -d --rm -P --label "${_CONTAINER_LABEL}" "${image}")
   CONTAINERS+=("${cid}")
 
   # Get the mapped SSH port (container exposes 22)
