@@ -4,7 +4,9 @@ IFS=$'\n\t'
 # Run the ai/claude-code Docker image against the current directory.
 #
 # More flexible than docker compose for this single-container use case:
-#   - passes ANTHROPIC_API_KEY through to the container
+#   - forwards ANTHROPIC_API_KEY to the container only if it's set on the
+#     host (opt-in metered billing); otherwise Claude Code logs into your
+#     Claude.ai subscription via its normal browser flow, same as natively
 #   - mounts the current directory as /workspace
 #   - accepts extra host directories to mount as CLI arguments
 #   - reads a project-local config file (.aiproj / .aiproj.yaml / .aiproj.yml,
@@ -23,13 +25,16 @@ IFS=$'\n\t'
 # than the image silently drifting to whatever Claude Code ships next.
 # Bump BUILD and re-run after changing the Dockerfile/entrypoint to force a
 # fresh build (which also picks up whatever Claude Code version is current
-# at that time).
+# at that time). Independently of BUILD, downloads.claude.ai is also
+# re-checked at most once a day (stamped in a temp file) and the image is
+# rebuilt if a newer Claude Code version is available - see below.
 #
-# Runs claude with --permission-mode acceptEdits (auto-approves file
-# edits/writes and basic filesystem commands; Bash beyond that, WebFetch,
-# etc. still prompt normally) plus --add-dir for every mounted folder beyond
-# /workspace, since Claude Code scopes file-tool access to declared
-# directories independently of what the container itself can reach.
+# Runs claude with --permission-mode auto (a classifier judges each action
+# against Claude Code's built-in allow/soft_deny/hard_deny rules, rather than
+# prompting for everything beyond file edits the way acceptEdits does) plus
+# --add-dir for every mounted folder beyond /workspace, since Claude Code
+# scopes file-tool access to declared directories independently of what the
+# container itself can reach.
 #
 # Also, so each run isn't a fresh install:
 #   - persists Claude Code's own state (onboarding/trust/theme/settings)
@@ -45,33 +50,51 @@ IMAGE_NAME="ai-claude-code"
 BUILD_N="$(<"$IMAGE_DIR/BUILD")"
 CONFIG_CANDIDATES=(".aiproj" ".aiproj.yaml" ".aiproj.yml")
 
-if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
-  log_error "claude-code-docker.sh: ANTHROPIC_API_KEY is not set in the environment."
-  exit 1
-fi
-
-# Reuse whatever image is already tagged for this BUILD number, whatever
-# Claude Code version it happens to be pinned to - a rebuild is only needed
-# when BUILD changes (this image's own recipe changed) or nothing has been
-# built yet, not merely because upstream Claude Code shipped a new version
-# since. This also keeps a normal (cache-hit) run network-independent: the
-# Claude Code version is only resolved from downloads.claude.ai when an
-# actual build is about to happen.
+# Reuse whatever image is already tagged for this BUILD number - picking the
+# highest Claude Code version if more than one is somehow tagged for it -
+# then decide whether it's still worth asking downloads.claude.ai for
+# something newer. That check only actually runs (a) when no image exists
+# yet for this BUILD number at all, or (b) at most once a day otherwise,
+# tracked via a per-user stamp file in the temp dir (so a reboot, a cleared
+# /tmp, or a new day all naturally trigger a re-check). This keeps every
+# other run - already checked today - network-independent.
 IMAGE_TAG="$(docker images "$IMAGE_NAME" --format '{{.Repository}}:{{.Tag}}' 2>/dev/null \
   | grep -E "^${IMAGE_NAME}:[0-9]+\.[0-9]+\.[0-9]+\.${BUILD_N}\$" \
-  | head -n1)"
+  | sort -t: -k2 -V | tail -n1)"
 
-if [ -z "$IMAGE_TAG" ]; then
-  log_info "No image found for build ${BUILD_N}; resolving current Claude Code version ..."
+VERSION_CHECK_STAMP="${TMPDIR:-/tmp}/ai-claude-code-version-check-$(id -u)"
+_today="$(date +%Y-%m-%d)"
+_last_checked="$(cat "$VERSION_CHECK_STAMP" 2>/dev/null || true)"
+
+if [ -z "$IMAGE_TAG" ] || [ "$_last_checked" != "$_today" ]; then
+  if [ -z "$IMAGE_TAG" ]; then
+    log_info "No image found for build ${BUILD_N}; resolving current Claude Code version ..."
+  else
+    log_trace "Daily check: resolving current Claude Code version (last checked ${_last_checked:-never}) ..."
+  fi
+
   claude_code_version="$(curl -fsSL https://downloads.claude.ai/claude-code-releases/latest)"
-  if [[ ! "$claude_code_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  if [[ "$claude_code_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    # Only stamp today's date on a successful check - a network hiccup
+    # should retry next run, not silently wait out the rest of the day.
+    echo "$_today" >"$VERSION_CHECK_STAMP"
+    _resolved_tag="${IMAGE_NAME}:${claude_code_version}.${BUILD_N}"
+    if [ "$_resolved_tag" != "$IMAGE_TAG" ]; then
+      log_info "${IMAGE_TAG:+Newer Claude Code version found; }Building ${_resolved_tag} ..."
+      docker build --build-arg CLAUDE_CODE_VERSION="$claude_code_version" \
+        -t "$_resolved_tag" -t "${IMAGE_NAME}:latest" "$IMAGE_DIR"
+      # Drop the now-superseded version tag for this BUILD number so images
+      # don't quietly pile up on every upstream release; best-effort only,
+      # e.g. a container still using it shouldn't block this run.
+      [ -n "$IMAGE_TAG" ] && docker rmi "$IMAGE_TAG" >/dev/null 2>&1
+      IMAGE_TAG="$_resolved_tag"
+    fi
+  elif [ -z "$IMAGE_TAG" ]; then
     log_error "claude-code-docker.sh: couldn't resolve the current Claude Code version (got \"${claude_code_version}\")."
     exit 1
+  else
+    log_warning "claude-code-docker.sh: couldn't check for a newer Claude Code version (got \"${claude_code_version}\"); using cached image ${IMAGE_TAG}."
   fi
-  IMAGE_TAG="${IMAGE_NAME}:${claude_code_version}.${BUILD_N}"
-  log_info "Image ${IMAGE_TAG} not found locally; building ..."
-  docker build --build-arg CLAUDE_CODE_VERSION="$claude_code_version" \
-    -t "$IMAGE_TAG" -t "${IMAGE_NAME}:latest" "$IMAGE_DIR"
 fi
 
 docker_args=(run --rm)
@@ -83,7 +106,6 @@ else
 fi
 
 docker_args+=(
-  -e "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}"
   -v "$(pwd):/workspace"
   -w /workspace
   # Run as the host's own uid:gid, not the image's baked-in claude user, so
@@ -95,6 +117,20 @@ docker_args+=(
   # (including which clipboard integration path to use).
   -e "TERM=${TERM:-xterm-256color}"
 )
+
+# Only forward ANTHROPIC_API_KEY if it's actually set in the host shell -
+# it's deliberately not required. Setting it switches Claude Code to
+# pay-per-token API billing (credits) instead of a logged-in Claude.ai
+# subscription (Pro/Max/Team), which is almost certainly not what you want
+# for everyday use. Leave it unset and Claude Code falls back to its normal
+# browser-based account login on first run inside the container, same as a
+# native install; that login persists into $STATE_DIR/claude/.credentials.json
+# below (already covered by the ~/.claude bind mount, no extra mount needed)
+# so you only log in once. Only export ANTHROPIC_API_KEY before running this
+# script if you specifically want metered API billing for this session.
+if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+  docker_args+=(-e "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}")
+fi
 
 # Claude Code's fullscreen TUI (enabled by default in this image) captures
 # mouse events for its own use — including, when it detects $TMUX, writing
@@ -111,6 +147,36 @@ if [ -n "${TMUX:-}" ] && [ -S "${TMUX%%,*}" ]; then
   docker_args+=(-e "TMUX=${TMUX}" -v "${TMUX%%,*}:${TMUX%%,*}")
 else
   docker_args+=(-e "CLAUDE_CODE_DISABLE_MOUSE_CLICKS=1")
+fi
+
+# Pass through the host's effective git identity (user.name / user.email,
+# resolved the same way any git command run outside Docker would resolve
+# them for this directory - i.e. respecting a repo-local override) as a
+# minimal global .gitconfig inside the container, so Claude can create
+# commits without extra setup. Written as a *global* config, not
+# GIT_AUTHOR_NAME/EMAIL env vars, so precedence still matches normal git
+# behavior: the mounted repo's own local config (e.g. a per-project identity
+# override) continues to win over this default, whereas env vars would
+# incorrectly override even that. Only user.name/email are propagated -
+# deliberately not the rest of the host's ~/.gitconfig (credential helpers,
+# GPG signing, core.editor, etc.), since those commonly point at host-only
+# binaries/keys that don't exist in this ephemeral container and would
+# break git operations rather than help them. Regenerated fresh on every
+# run (not persisted in STATE_DIR below) so it always reflects the host's
+# current config.
+_git_user_name="$(git config user.name 2>/dev/null || true)"
+_git_user_email="$(git config user.email 2>/dev/null || true)"
+if [ -n "$_git_user_name" ] || [ -n "$_git_user_email" ]; then
+  _gitconfig_tmp="$(mktemp)"
+  trap '[ -n "${_gitconfig_tmp:-}" ] && rm -f "$_gitconfig_tmp"' EXIT
+  {
+    echo "[user]"
+    [ -n "$_git_user_name" ] && printf '\tname = %s\n' "$_git_user_name"
+    [ -n "$_git_user_email" ] && printf '\temail = %s\n' "$_git_user_email"
+  } >"$_gitconfig_tmp"
+  docker_args+=(-v "$_gitconfig_tmp:/home/claude/.gitconfig:ro")
+else
+  log_warning "claude-code-docker.sh: no git user.name/email configured on the host; commits made inside the container won't have an author identity unless set manually."
 fi
 
 # Match the container's clock to the host's (the image otherwise defaults to
@@ -198,7 +264,7 @@ if [ -n "$_config_file" ]; then
   fi
 fi
 
-docker_args+=("$IMAGE_TAG" claude --permission-mode acceptEdits)
+docker_args+=("$IMAGE_TAG" claude --permission-mode auto)
 for add_dir in "${CLAUDE_ADD_DIRS[@]}"; do
   docker_args+=(--add-dir "$add_dir")
 done

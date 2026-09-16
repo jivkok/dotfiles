@@ -57,6 +57,7 @@ RUN apt-get update -qq && \
   curl \
   git \
   jq \
+  python3 \
   tmux \
   tzdata \
   unzip \
@@ -121,16 +122,17 @@ USER ${CLAUDE_USER}
 
 WORKDIR /workspace
 
-# --permission-mode acceptEdits auto-approves file edits/writes and basic
-# filesystem commands (mkdir, rm, mv, cp, sed, ...) without prompting, since
-# only explicitly bind-mounted folders are reachable here anyway; Bash
-# beyond those file operations, WebFetch, and other tool categories still
-# prompt normally, unlike --dangerously-skip-permissions (considered and
-# rejected: it bypasses those checks too, and its own docs recommend it only
-# for sandboxes with no internet access — this container has normal internet
-# access, by earlier explicit choice). claude-code-docker.sh overrides this
-# default with the same flag plus --add-dir for every mounted folder beyond
-# /workspace, since Claude Code scopes file-tool access to declared
-# directories regardless of what the container itself can reach.
+# --permission-mode auto runs every action (file edits, Bash, WebFetch, ...)
+# past Claude Code's built-in classifier instead of prompting for it, since
+# only explicitly bind-mounted folders are reachable here anyway; the
+# classifier's own hard-deny rules (credential exfiltration, destructive ops
+# outside project scope, force-pushes, etc.) still apply, unlike
+# --dangerously-skip-permissions (considered and rejected: it bypasses those
+# checks too, and its own docs recommend it only for sandboxes with no
+# internet access — this container has normal internet access, by earlier
+# explicit choice). claude-code-docker.sh overrides this default with the
+# same flag plus --add-dir for every mounted folder beyond /workspace, since
+# Claude Code scopes file-tool access to declared directories regardless of
+# what the container itself can reach.
 ENTRYPOINT ["/usr/local/bin/claude-entrypoint.sh"]
-CMD ["claude", "--permission-mode", "acceptEdits"]
+CMD ["claude", "--permission-mode", "auto"]
