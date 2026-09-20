@@ -37,6 +37,9 @@ if [[ "$OSTYPE" = darwin* ]]; then
   done
 fi
 
+# JS
+_prepend_to_path "$HOME/.bun/bin"
+
 # .Net
 _prepend_to_path "$HOME/.dotnet/tools"
 _prepend_to_path "$HOME/.dotnet"

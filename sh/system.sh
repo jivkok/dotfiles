@@ -159,12 +159,6 @@ function update_os() {
     echo -e "\nUpdating ZSH plugins done.\n"
   fi
 
-  if [ -d "$HOME/.tmux/plugins/tpm/bin/update_plugins" ]; then
-    echo -e "\nUpdating Tmux plugins ...\n"
-    "$HOME/.tmux/plugins/tpm/bin/update_plugins" all
-    echo -e "\nUpdating Tmux plugins done.\n"
-  fi
-
   if command -v vim >/dev/null 2>&1; then
     echo -e "\nUpdating Vim plugins ...\n"
     vim +PlugUpdate +qall
