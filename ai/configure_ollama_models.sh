@@ -7,8 +7,10 @@ IFS=$'\n\t'
 # different context-length profiles:
 #   qwen3.8-27b-claw -> OpenClaw / general orchestration (32k context)
 #   qwen3.8-27b-code -> OpenCode / coding agents (64k context)
-# Also pulls a smaller base model as-is, with no custom alias:
+# Also pulls smaller base models as-is, with no custom alias:
 #   qwen3:30b-a3b-instruct-2507-q4_K_M -> transcription/summarization (non-thinking instruct model)
+#   mxbai-embed-large                  -> embeddings (OpenClaw)
+#   qwen3.5:9b                         -> OpenClaw journal
 #
 # Requires ai/configure_ollama.sh to have been run first (Ollama installed
 # and its API reachable). Fully idempotent — safe to re-run at any time.
@@ -20,6 +22,8 @@ BASE_MODEL="qwen3.8:27b"
 MODEL_CLAW="qwen3.8-27b-claw"
 MODEL_CODE="qwen3.8-27b-code"
 TRANSCRIBE_MODEL="qwen3:30b-a3b-instruct-2507-q4_K_M"
+EMBED_MODEL="mxbai-embed-large"
+JOURNAL_MODEL="qwen3.5:9b"
 
 # macOS only
 if ! $_is_osx; then
@@ -59,6 +63,8 @@ pull_model_if_missing() {
 
 pull_model_if_missing "$BASE_MODEL"
 pull_model_if_missing "$TRANSCRIBE_MODEL"
+pull_model_if_missing "$EMBED_MODEL"
+pull_model_if_missing "$JOURNAL_MODEL"
 
 # Creates a model alias from BASE_MODEL with a custom context length.
 # Arguments:
@@ -89,7 +95,7 @@ create_model_alias "$MODEL_CODE" 65536
 
 log_trace "Verifying installed models ..."
 _missing=0
-for m in "$MODEL_CLAW" "$MODEL_CODE"; do
+for m in "$MODEL_CLAW" "$MODEL_CODE" "$TRANSCRIBE_MODEL" "$EMBED_MODEL" "$JOURNAL_MODEL"; do
   if ! _ollama_model_exists "$m"; then
     log_error "configure_ollama_models.sh: expected model ${m} not found in 'ollama list'."
     _missing=1
