@@ -210,6 +210,11 @@ sync_fonts_cache() {
 }
 
 install_fonts_macos() {
+  if $_skip_gui; then
+    log_trace "macOS: headless mode (DOT_SKIP_GUI); skipping font installation."
+    return 0
+  fi
+
   need_cmd rsync
   local target="$HOME/Library/Fonts"
   mkdir -p "$target"

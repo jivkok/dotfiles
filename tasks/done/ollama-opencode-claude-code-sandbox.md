@@ -67,6 +67,8 @@ See the updated Acceptance Criteria, Assumptions, and a new Implementation Notes
 - [x] Re-running when both aliases already exist with identical Modelfile content is a no-op — no error, no unnecessary recreation. — verified live (second run completed in ~1s).
 - [ ] If only one of the two aliases exists, creates just the missing one. — code-reviewed only; not exercised live (would require deleting one alias from a real, already-pulled model set).
 - [x] Verifies both alias names appear in `ollama list` output after running. — verified live.
+- [x] Pulls `mxbai-embed-large` via `ollama pull` if not already present (checked via `ollama list`); no custom alias — OpenClaw's embeddings model. — verified live on the remote SSH-only Mac (2026-09-20).
+- [x] Pulls `qwen3.5:9b` via `ollama pull` if not already present (checked via `ollama list`); no custom alias — OpenClaw's journal model. — verified live on the remote SSH-only Mac (2026-09-20).
 
 **ai/configure_opencode.sh**
 - [x] Runs on macOS and Linux (`_is_osx || _is_linux`); skips cleanly with a trace log on any other OS. — macOS path verified live; the Linux/skip-elsewhere branches are code-reviewed only (same proven `_is_osx`/`_is_linux` pattern as the other scripts).
@@ -256,3 +258,11 @@ See the updated Acceptance Criteria, Assumptions, and a new Implementation Notes
 **Post-completion addendum (2026-09-13):** `qwen3.5:9b` was replaced with `qwen3:30b-a3b-instruct-2507-q4_K_M` as the script's secondary/no-alias model pull, intended for transcription/summarization (a non-thinking instruct model). The user pulled the new model manually before mentioning the swap; `configure_ollama_models.sh` was updated to match (removed `SMALL_MODEL`, added `TRANSCRIBE_MODEL`) and a live re-run confirmed it correctly recognizes the already-pulled model as a no-op. `qwen3.5:9b` itself was left installed on this machine (not uninstalled) since only the script's tracked-model set changed, not a request to remove it from Ollama.
 
 Also noticed but **not acted on**: `ollama list` on this machine also shows `qwen3:14b` (pulled the same session as the transcription model) that isn't referenced anywhere in these scripts or the task — flagging in case it was meant to be tracked too.
+
+**Post-completion addendum (2026-09-20) — OpenClaw's full model set now tracked, on a new headless/SSH-only remote Mac:** the user is running this repo's setup on a second Mac administered purely over SSH (no monitor/keyboard — see the new `DOT_SKIP_GUI`/`_skip_gui` headless-mode support added elsewhere in the repo this session, unrelated to this task's scripts since Ollama is a CLI/service tool, not GUI). Confirmed live on that machine that `launchctl print gui/$(id -u)` reports an active session (auto-login), so `ai/configure_ollama.sh`'s per-user LaunchAgent approach (`launchctl bootstrap gui/<uid>`) works unmodified — no code changes needed there.
+
+The user identified OpenClaw's actual three required models: `qwen3.8-27b-claw` (agent framework — already covered by the existing alias), `mxbai-embed-large` (embeddings), and `qwen3.5:9b` (journal). The latter two were added to `ai/configure_ollama_models.sh` as plain `pull_model_if_missing` calls (`EMBED_MODEL`, `JOURNAL_MODEL` — no alias/Modelfile needed, OpenClaw references them by their real names) and folded into the existing post-pull verification loop.
+
+Note on `qwen3.5:9b` specifically: the 2026-09-13 addendum above recorded it being *removed* from the script's tracked set, replaced by `qwen3:30b-a3b-instruct-2507-q4_K_M` in the transcription/summarization slot. This isn't a reversal of that decision — `qwen3.5:9b` is being re-added here for a different purpose entirely (OpenClaw's journal model), in its own slot, alongside the still-separate transcription model. Both are now tracked.
+
+Live-verified on the remote Mac: the user ran `configure_ollama_models.sh` and confirmed both new pulls (`mxbai-embed-large`, `qwen3.5:9b`) landed successfully.

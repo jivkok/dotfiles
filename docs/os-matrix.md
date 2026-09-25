@@ -42,6 +42,11 @@
   - Paths often differ from Linux; prefer `command -v` checks.
 - Symlinks:
   - `osx/` dotfiles may be symlinked into `$HOME` (in addition to `misc/`).
+- Headless / SSH-only Macs:
+  - Same full CLI toolset as interactive macOS, but Homebrew casks, `mas`
+    (App Store) apps, browser installs (`osx/configure_browsers.sh`), and font
+    installation (`bin/configure_fonts.sh`) are skipped — see
+    `docs/structure.md` for the `DOT_SKIP_GUI` / SSH auto-detection details.
 
 ## Linux — Debian/Ubuntu
 - Setup: `linux/configure_packages_debian.sh`

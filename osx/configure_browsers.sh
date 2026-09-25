@@ -29,6 +29,13 @@ if ! $_is_osx; then
   exit 0
 fi
 
+# GUI-only: browser installs and profile configuration are meaningless on a
+# headless / SSH-only machine.
+if $_skip_gui; then
+  log_trace "configure_browsers.sh: skipping (headless mode, DOT_SKIP_GUI)."
+  exit 0
+fi
+
 # ─── Helper functions ────────────────────────────────────────────────────────
 
 # create_firefox_profile <app_support_dir> <profile_name> [is_default=0|1]

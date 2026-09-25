@@ -27,6 +27,20 @@ Flow:
    - symlinks to misc config files (in `misc/`, `osx/`) into `$HOME`
    - configure components: `git/`, `python/`, `vim/`, `zsh/`, `tmux/`, `fzf/`, etc.
 
+##### macOS — headless / SSH-only Macs
+`osx/configure_osx.sh` still installs the full CLI toolset (Homebrew formulas, git,
+vim, zsh, tmux, etc.) but skips anything GUI-only: Homebrew casks, Mac App Store
+(`mas`) apps, browser installs/profile setup (`osx/configure_browsers.sh`), and
+font installation into `~/Library/Fonts` (`bin/configure_fonts.sh`).
+
+This is controlled by `_skip_gui` (`sh/helpers.sh`): auto-detected from an active
+SSH session (`$SSH_CONNECTION`/`$SSH_TTY`), overridable with `DOT_SKIP_GUI=1`
+(force skip) or `DOT_SKIP_GUI=0` (force GUI installs even over SSH). The gating
+lives centrally in `install_cask_package`/`install_or_upgrade_cask_package`
+(`setup/setup_functions.sh`) and `install_mas_package`
+(`osx/configure_osx_packages.sh`), so individual install call sites don't need
+per-line guards.
+
 #### Linux remote VMs — "minimal" profile
 Two scripts handle the minimal workflow:
 - `setup/setup-remote-vm.sh` — on-VM entrypoint. Runs directly on the target Linux system (Linux-only; exits with error on macOS). Installs the minimal package set, sets up bash profiles (no zsh), home symlinks, locale, and tmux config.

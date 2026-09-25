@@ -10,6 +10,11 @@ install_mas_package() {
     return
   fi
 
+  if $_skip_gui; then
+    log_trace "install_mas_package: skipping GUI package (headless mode): $1"
+    return
+  fi
+
   local package="$1"
   local installed
   installed=$(mas list | grep "$package")
@@ -165,6 +170,10 @@ install_brew_package zoxide # Shell extension to easily jump to frequently acces
 # brew install xz # General-purpose data compression with high compression ratio
 # brew install zopfli # New zlib (gzip, deflate) compatible compressor
 
+if $_skip_gui; then
+  log_info "Headless mode (DOT_SKIP_GUI): skipping cask packages."
+else
+
 log_info "Updating existing cask packages."
 brew upgrade --cask --greedy-auto-updates --quiet
 
@@ -252,8 +261,14 @@ install_cask_package claude # Anthropic's Claude AI desktop app
 # brew install --cask xquartz # X11
 # https://www.trankynam.com/atext and http://www.phraseexpress.com/ - text expansion. Note: Alfred also does text expansion
 
+fi # $_skip_gui (cask packages)
+
 log_trace "brew cleanup."
 brew cleanup
+
+if $_skip_gui; then
+  log_info "Headless mode (DOT_SKIP_GUI): skipping AppStore apps."
+else
 
 log_info "Updating existing AppStore apps."
 mas update
@@ -272,5 +287,7 @@ install_mas_package 1295203466 # Windows App (formerly Microsoft Remote Desktop)
 
 # Install these widget apps from the AppStore:
 # nothing currently
+
+fi # $_skip_gui (AppStore apps)
 
 log_info "Configuring OSX packages done."

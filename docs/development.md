@@ -76,6 +76,7 @@ If a package is not available in a distro's package manager, do **not** add it t
 - Determine repo root consistently: `dotdir="$(cd "$(dirname "$0")/.." && pwd)"`
 - Source helpers early: `source "$dotdir/setup/setup_functions.sh"`
 - OS detection: use `_is_osx`, `_is_linux`, `_is_arch`, `_is_debian` (from `sh/helpers.sh`, available after sourcing `setup_functions.sh`). No inline `uname -s`.
+- Headless/GUI detection (macOS): use `_skip_gui` (from `sh/helpers.sh`) to gate anything GUI-only (casks, `mas` apps, browsers, fonts). Auto-detected from SSH sessions; overridable via `DOT_SKIP_GUI`. Prefer gating at a shared helper (e.g. `install_cask_package`) over scattering `if $_skip_gui` checks at each call site.
 - Command detection: use `_has <cmd>`. No inline `command -v`.
 
 ### Logging

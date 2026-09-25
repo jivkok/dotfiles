@@ -16,6 +16,11 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../sh/helpers.sh"
 # "info" from a test harness that uses a different LOG_LEVEL convention).
 [[ "${LOG_LEVEL:-2}" =~ ^[0-9]+$ ]] && _LOG_LEVEL="${LOG_LEVEL:-2}" || _LOG_LEVEL=2
 
+# Homebrew's "ask mode" prompts for confirmation before every install/upgrade
+# by default, which would hang unattended/automated runs (e.g. over SSH).
+# No-op on non-macOS.
+export HOMEBREW_NO_ASK=1
+
 #######################################
 # Logs trace messages (level 3)
 # Arguments:
@@ -328,6 +333,11 @@ function install_cask_package() {
     return 2
   fi
 
+  if $_skip_gui; then
+    log_trace "install_cask_package: skipping GUI package (headless mode): $pkg_name"
+    return 1
+  fi
+
   if ! brew list --versions --cask "$pkg_name" >/dev/null 2>&1; then
     brew install --cask "$pkg_name" 2>&1
     return 0
@@ -392,6 +402,11 @@ function install_or_upgrade_cask_package() {
   if [ -z "$pkg_name" ]; then
     log_error "install_or_upgrade_cask_package: package name is required."
     return 2
+  fi
+
+  if $_skip_gui; then
+    log_trace "install_or_upgrade_cask_package: skipping GUI package (headless mode): $pkg_name"
+    return 1
   fi
 
   local installed
