@@ -6,6 +6,13 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=testlib.sh
 source "${tests_root}/testlib.sh"
 
+# --print-setup-files: print every file that feeds any setup hash (repo-relative,
+# one per line) and exit without building anything. Used by run-tests.sh --changed.
+print_setup_files=0
+if [[ "${1:-}" == "--print-setup-files" ]]; then
+  print_setup_files=1
+fi
+
 # Compute a sha256 hash of a list of files (combined content).
 hash_files() {
   local files=("$@")
@@ -114,6 +121,17 @@ REMOTE_COMMON_SETUP_FILES=(
   "${repo_root}/setup/configure_home_symlinks.sh"
   "${repo_root}/setup/configure_locale.sh"
 )
+
+if (( print_setup_files )); then
+  {
+    printf '%s\n' "${COMMON_SETUP_FILES[@]}" "${OS_SETUP_EXTRA_FILES[@]}" \
+      "${REMOTE_COMMON_SETUP_FILES[@]}" "${REMOTE_SETUP_EXTRA_FILES[@]}"
+    for dockerfile in "${OS_DOCKERFILE[@]}" "${REMOTE_DOCKERFILE[@]}"; do
+      printf '%s\n' "${tests_root}/${dockerfile}"
+    done
+  } | sed "s|^${repo_root}/||" | sort -u
+  exit 0
+fi
 
 # Compute current setup hashes for each OS
 for os in "${TARGET_OSES[@]}"; do

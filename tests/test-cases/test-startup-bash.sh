@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# COVERS: setup/*.sh sh/*.sh fzf/configure_fzf.sh git/configure_git.sh nodejs/configure_nodejs.sh python/configure_python.sh tmux/configure_tmux.sh tmux/osc52.sh vim/configure_vim.sh linux/configure_packages_debian.sh linux/configure_packages_arch.sh osx/configure_osx.sh osx/configure_osx_packages.sh osx/setenv.sh bash/*.sh
 set -euo pipefail
 IFS=$'\n\t'
 

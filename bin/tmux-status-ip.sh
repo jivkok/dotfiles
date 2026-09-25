@@ -42,6 +42,8 @@ get_external_ip() {
         # Return stale cache if all fetches failed
         cat "$cache_file"
     fi
+    # Nothing to show is not an error for a status-bar segment.
+    return 0
 }
 
 get_local_ip() {
@@ -84,18 +86,25 @@ get_vpn_ip() {
     [[ -n "$vpn_ip" ]] && echo "vpn $vpn_ip"
 }
 
-case "${1:-all}" in
-    external) get_external_ip ;;
-    local)    get_local_ip ;;
-    vpn)      get_vpn_ip ;;
-    all)
-        local_ip=$(get_local_ip)
-        ext_ip=$(get_external_ip)
-        vpn_seg=$(get_vpn_ip)
-        echo "↑${ext_ip} ↓${local_ip}${vpn_seg:+ $vpn_seg}"
-        ;;
-    *)
-        echo "Usage: $(basename "$0") external|local|vpn|all" >&2
-        exit 1
-        ;;
-esac
+main() {
+    case "${1:-all}" in
+        external) get_external_ip ;;
+        local)    get_local_ip ;;
+        vpn)      get_vpn_ip ;;
+        all)
+            local_ip=$(get_local_ip)
+            ext_ip=$(get_external_ip)
+            vpn_seg=$(get_vpn_ip)
+            echo "↑${ext_ip} ↓${local_ip}${vpn_seg:+ $vpn_seg}"
+            ;;
+        *)
+            echo "Usage: $(basename "$0") external|local|vpn|all" >&2
+            exit 1
+            ;;
+    esac
+}
+
+# Sourcing (tests) only defines the functions above.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main "$@"
+fi

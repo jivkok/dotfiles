@@ -23,7 +23,8 @@ prepare_and_copy_vscode_config_files () {
   mkdir -p "${vscode_user_dir}"
 
   if [ -f "${vscode_user_dir}/${config_filename}" ]; then
-    local backup_file="${vscode_user_dir}/${config_filename}.$(date +"%Y%m%d%H%M%S")"
+    local backup_file
+    backup_file="${vscode_user_dir}/${config_filename}.$(date +"%Y%m%d%H%M%S")"
     if ! mv "${vscode_user_dir}/${config_filename}" "${backup_file}" 2>/dev/null; then
       log_error "Failed to backup existing config file: ${vscode_user_dir}/${config_filename}"
       return 1

@@ -1,4 +1,5 @@
 # shellcheck shell=bash
+# shellcheck disable=SC2015  # 'cond && ok || fail': ok always returns 0, so fail runs only when cond fails
 # Shared test library for the test suite.
 #
 # Source this file AFTER LOG_LEVEL has been set (or leave unset for the default).
@@ -20,6 +21,12 @@
 #                        blocks that do more than print a single message.
 #   ok   <msg>         — record a passing assertion; prints via log_trace.
 #   fail <msg>         — record a failing assertion; always prints to stderr.
+#   assert_* / check / check_not / run_capture / write_stub — see definitions below.
+
+# ── Shell options ──────────────────────────────────────────────────────────────
+# Docker runs tests via `bash -li`, which loads the dotfiles' interactive options;
+# noclobber there would break tests that truncate or overwrite their temp files.
+set +o noclobber
 
 # ── Colors ─────────────────────────────────────────────────────────────────────
 # Disabled when stdout is not a TTY or NO_COLOR is set (any non-empty value).
@@ -137,6 +144,50 @@ assert_eq() {
   else
     fail "$label (expected: '$expected', got: '$actual')"
   fi
+}
+
+# assert_contains <label> <needle> <haystack>  — pass if haystack contains needle.
+assert_contains() {
+  if [[ "$3" == *"$2"* ]]; then ok "$1"; else fail "$1 (expected '$2' in: $3)"; fi
+}
+
+# check <label> <cmd...>      — pass if cmd succeeds.
+# check_not <label> <cmd...>  — pass if cmd fails.
+check()     { local label="$1"; shift; if "$@"; then ok "$label"; else fail "$label"; fi; }
+check_not() { local label="$1"; shift; if "$@"; then fail "$label"; else ok "$label"; fi; }
+
+# run_capture <cmd...>  — run cmd, setting `out` (stdout+stderr) and `rc` (exit code).
+# shellcheck disable=SC2034  # out/rc are read by the caller
+run_capture() {
+  rc=0
+  out="$("$@" 2>&1)" || rc=$?
+}
+
+# write_stub <path> <body>  — write an executable bash script with the given body.
+write_stub() {
+  printf '#!/usr/bin/env bash\n%s\n' "$2" > "$1"
+  chmod +x "$1"
+}
+
+# path_without <cmd> <scratch-dir>  — print $PATH with <cmd> hidden: every PATH
+# dir that holds <cmd> is replaced by a symlink mirror of it (under
+# <scratch-dir>) minus <cmd>, so everything else in that dir stays reachable.
+path_without() {
+  local cmd="$1" scratch="$2" result="" dir entry i=0
+  local -a dirs
+  IFS=':' read -r -a dirs <<< "$PATH"
+  for dir in "${dirs[@]}"; do
+    if [[ -e "${dir}/${cmd}" ]]; then
+      i=$((i + 1))
+      mkdir -p "${scratch}/no-${cmd}-${i}"
+      for entry in "$dir"/*; do
+        [[ "${entry##*/}" == "$cmd" ]] || ln -sf "$entry" "${scratch}/no-${cmd}-${i}/${entry##*/}"
+      done
+      dir="${scratch}/no-${cmd}-${i}"
+    fi
+    result+="${result:+:}${dir}"
+  done
+  printf '%s' "$result"
 }
 
 # finish_test  — print summary and exit 1 if any assertions failed.

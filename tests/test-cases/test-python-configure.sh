@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
+# COVERS: python/configure_python.sh
 set -euo pipefail
-
-DOTDIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
 # Ensure pipx-installed binaries are on PATH.
 # pipx defaults to ~/.local/bin; on macOS brew also links into its prefix.

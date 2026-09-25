@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # Shell bookmarks
 
-export MARKPATH=$HOME/.marks
+export MARKPATH="${MARKPATH:-$HOME/.marks}"
 
 # Change to a bookmarked directory
 function to {
@@ -51,7 +51,7 @@ function cdm {
   fi
 }
 
-if [[ -n "$BASH_VERSION" ]]; then
+if [[ -n "${BASH_VERSION:-}" ]]; then
   _completemarks() {
     local curw=${COMP_WORDS[COMP_CWORD]}
     local marks=()
@@ -65,7 +65,7 @@ if [[ -n "$BASH_VERSION" ]]; then
   }
 
   complete -F _completemarks to unmark
-elif [[ -n "$ZSH_VERSION" ]]; then
+elif [[ -n "${ZSH_VERSION:-}" ]]; then
   function _completemarks {
     local marks=()
     local mark

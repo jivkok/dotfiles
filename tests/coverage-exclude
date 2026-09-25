@@ -1,0 +1,26 @@
+# Scripts intentionally without a covering test (see docs/testing.md — Coverage map).
+# Format: <path-or-glob>  # <reason>
+# Every entry must match at least one tracked file; test-coverage-map.sh enforces it.
+
+# Follow-up: tests planned but not yet written.
+ai/configure_ollama.sh                      # TODO: test (follow-up)
+ai/configure_ollama_models.sh               # TODO: test (follow-up)
+ai/configure_opencode.sh                    # TODO: test (follow-up)
+rust/configure_rust.sh                      # TODO: test (follow-up)
+bin/configure_fonts.sh                      # TODO: test (follow-up)
+linux/generate_distro_package_setup_code.sh # TODO: test (follow-up)
+sublimetext/configure_sublimetext.sh        # TODO: test (follow-up)
+
+# Not testable in the Linux/Docker test environments.
+osx/alfred.sh                               # macOS GUI app (Alfred) configuration only
+osx/XBarPlugins/*                           # macOS menu-bar plugin; depends on macOS-only top/ifconfig output
+ai/claude-code/entrypoint.sh                # runs only as the ai/claude-code container entrypoint
+
+# Inputs to other scripts rather than scripts under test.
+linux/packages_shell_debian_1.sh            # generator input; inlined into linux/configure_packages_debian.sh
+
+# Out of scope: non-shell code (no shell test harness).
+bin/heic2jpg.py                             # Python helper; out of scope for the shell test suite
+vscode/*.py                                 # Python helper; out of scope for the shell test suite
+setup/setup.ps1                             # Windows PowerShell; out of scope
+windows/*.ps1                               # Windows PowerShell; out of scope

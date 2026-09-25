@@ -13,3 +13,4 @@ source "$dotdir/sh/marks.sh"
 [ -f "$dotdir/git/git.sh" ] && source "$dotdir/git/git.sh"
 [ -f "$dotdir/docker/docker.sh" ] && source "$dotdir/docker/docker.sh"
 $_is_osx && source "$dotdir/osx/setenv.sh"
+true  # keep the file's status 0 when the OS-specific source above is skipped

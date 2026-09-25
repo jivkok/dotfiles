@@ -33,7 +33,9 @@ if $_is_debian; then
   # Check both the shared venv and individual package venvs — the shared lib may have been
   # updated already while individual venvs still reference the old interpreter.
   _sys_python_minor=$(python3 -c "import sys; print(sys.version_info.minor)" 2>/dev/null)
+  # shellcheck disable=SC2010  # names of pipx-managed python dirs only; no unusual filenames
   _shared_python=$(ls ~/.local/pipx/shared/lib/ 2>/dev/null | grep '^python' | head -1 | sed 's/python//')
+  # shellcheck disable=SC2010  # names of pipx-managed python dirs only; no unusual filenames
   _stale_venv=$(ls ~/.local/pipx/venvs/*/lib/ 2>/dev/null | grep '^python' | grep -v "^python3\.${_sys_python_minor}$" | head -1)
   if { [ -n "$_shared_python" ] && [ "$_shared_python" != "3.${_sys_python_minor}" ]; } || [ -n "$_stale_venv" ]; then
     log_trace "Pipx venvs use stale Python (shared=${_shared_python}, stale_venv=${_stale_venv}): rebuilding against 3.${_sys_python_minor}"
@@ -64,7 +66,9 @@ elif $_is_osx; then
   esac
 
   _pipx_python_minor=$(python3 -c "import sys; print(sys.version_info.minor)" 2>/dev/null)
+  # shellcheck disable=SC2010  # names of pipx-managed python dirs only; no unusual filenames
   _shared_python=$(ls ~/.local/pipx/shared/lib/ 2>/dev/null | grep '^python' | head -1 | sed 's/python//')
+  # shellcheck disable=SC2010  # names of pipx-managed python dirs only; no unusual filenames
   _stale_venv=$(ls ~/.local/pipx/venvs/*/lib/ 2>/dev/null | grep '^python' | grep -v "^python3\.${_pipx_python_minor}$" | head -1)
   if { [ -n "$_shared_python" ] && [ "$_shared_python" != "3.${_pipx_python_minor}" ]; } || [ -n "$_stale_venv" ]; then
     log_trace "Pipx venvs use stale Python (shared=${_shared_python}, stale_venv=${_stale_venv}): rebuilding against 3.${_pipx_python_minor}"

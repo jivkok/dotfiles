@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # REQUIRES: git
+# COVERS: git/git.sh
 set -euo pipefail
 
 DOTDIR="$(cd "$(dirname "$0")/../.." && pwd)"

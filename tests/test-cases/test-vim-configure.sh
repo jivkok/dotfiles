@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # REQUIRES: vim
+# COVERS: vim/configure_vim.sh
 set -euo pipefail
 
 DOTDIR="$(cd "$(dirname "$0")/../.." && pwd)"

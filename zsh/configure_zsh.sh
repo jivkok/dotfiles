@@ -27,7 +27,7 @@ log_trace "Installing zsh plugins done."
 
 _zsh=$(command -v zsh)
 
-if [ -z "$(grep "$_zsh" /etc/shells)" ]; then
+if ! grep -q "$_zsh" /etc/shells; then
   log_trace "Adding ZSH as supported shell"
   echo "$_zsh" | sudo tee -a /etc/shells
 else

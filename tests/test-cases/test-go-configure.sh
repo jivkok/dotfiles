@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # REQUIRES: go
+# COVERS: go/configure_go.sh
 set -euo pipefail
 
 # Ensure GOPATH/bin is on PATH so go-installed tools are reachable.

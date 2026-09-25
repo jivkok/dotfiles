@@ -20,21 +20,13 @@ IFS=$'\n\t'
 #     3. Multi-Account Containers → create: Family, Finances, Homelab, Personal,
 #        Sandbox, Sandbox2, Shopping, Social, Work
 
-dotdir="$(cd "$(dirname "$0")/.." && pwd)"
+#
+# Sourcing this file only defines functions and preference constants (used by
+# tests/test-cases/test-browsers-configure.sh); running it executes main.
+
+dotdir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=../setup/setup_functions.sh
 source "$dotdir/setup/setup_functions.sh"
-
-# macOS only
-if ! $_is_osx; then
-  log_trace "configure_browsers.sh: skipping (not macOS)."
-  exit 0
-fi
-
-# GUI-only: browser installs and profile configuration are meaningless on a
-# headless / SSH-only machine.
-if $_skip_gui; then
-  log_trace "configure_browsers.sh: skipping (headless mode, DOT_SKIP_GUI)."
-  exit 0
-fi
 
 # ─── Helper functions ────────────────────────────────────────────────────────
 
@@ -236,29 +228,7 @@ install_extensions_into_profile() {
   done
 }
 
-# ─── Install browsers ────────────────────────────────────────────────────────
-
-log_info "Installing browsers ..."
-
-install_or_upgrade_cask_package firefox
-install_or_upgrade_cask_package firefox@developer-edition
-install_or_upgrade_cask_package mullvad-browser
-install_or_upgrade_cask_package duckduckgo
-install_or_upgrade_cask_package tor-browser
-install_or_upgrade_cask_package microsoft-edge
-install_or_upgrade_cask_package google-chrome
-install_or_upgrade_cask_package opera
-
-# ─── Firefox — profiles, user.js and extensions ──────────────────────────────
-
-FF_APP_SUPPORT="${HOME}/Library/Application Support/Firefox"
-
-log_info "Configuring Firefox profiles ..."
-
-ff_default_dir=$(create_firefox_profile "$FF_APP_SUPPORT" "jk-default"          1)
-ff_trusted_dir=$(create_firefox_profile "$FF_APP_SUPPORT" "jk-research-trusted"  )
-ff_private_dir=$(create_firefox_profile "$FF_APP_SUPPORT" "jk-research-private"  )
-ff_home_net_dir=$(create_firefox_profile "$FF_APP_SUPPORT" "jk-home-network"     )
+# ─── Preferences ─────────────────────────────────────────────────────────────
 
 # Common prefs applied to all three Firefox stable profiles.
 # Note: category="strict" causes Firefox to manage ETP sub-prefs internally;
@@ -365,122 +335,170 @@ user_pref("dom.security.https_only_mode", false);
 user_pref("privacy.trackingprotection.enabled", false);
 user_pref("network.trr.mode", 0);'
 
-write_firefox_user_js "$ff_default_dir" \
-  "// Profile: jk-default — cookies and session restore
+# ─── Main ────────────────────────────────────────────────────────────────────
+
+main() {
+  # macOS only
+  if ! $_is_osx; then
+    log_trace "configure_browsers.sh: skipping (not macOS)."
+    return 0
+  fi
+
+  # GUI-only: browser installs and profile configuration are meaningless on a
+  # headless / SSH-only machine.
+  if $_skip_gui; then
+    log_trace "configure_browsers.sh: skipping (headless mode, DOT_SKIP_GUI)."
+    return 0
+  fi
+
+  # ─── Install browsers ────────────────────────────────────────────────────────
+
+  log_info "Installing browsers ..."
+
+  install_or_upgrade_cask_package firefox
+  install_or_upgrade_cask_package firefox@developer-edition
+  install_or_upgrade_cask_package mullvad-browser
+  install_or_upgrade_cask_package duckduckgo
+  install_or_upgrade_cask_package tor-browser
+  install_or_upgrade_cask_package microsoft-edge
+  install_or_upgrade_cask_package google-chrome
+  install_or_upgrade_cask_package opera
+
+  # ─── Firefox — profiles, user.js and extensions ──────────────────────────────
+
+  local ff_app_support="${HOME}/Library/Application Support/Firefox"
+
+  log_info "Configuring Firefox profiles ..."
+
+  local ff_default_dir ff_trusted_dir ff_private_dir ff_home_net_dir
+  ff_default_dir=$(create_firefox_profile "$ff_app_support" "jk-default"          1)
+  ff_trusted_dir=$(create_firefox_profile "$ff_app_support" "jk-research-trusted"  )
+  ff_private_dir=$(create_firefox_profile "$ff_app_support" "jk-research-private"  )
+  ff_home_net_dir=$(create_firefox_profile "$ff_app_support" "jk-home-network"     )
+
+  write_firefox_user_js "$ff_default_dir" \
+    "// Profile: jk-default — cookies and session restore
 
 ${FF_COMMON_PREFS}
 
 ${FF_DEFAULT_PREFS}"
 
-write_firefox_user_js "$ff_trusted_dir" \
-  "// Profile: jk-research-trusted — cookies and session restore
+  write_firefox_user_js "$ff_trusted_dir" \
+    "// Profile: jk-research-trusted — cookies and session restore
 
 ${FF_COMMON_PREFS}
 
 ${FF_RESEARCH_TRUSTED_PREFS}"
 
-write_firefox_user_js "$ff_private_dir" \
-  "// Profile: jk-research-private — fingerprinting resistance, cookies, stateless session
+  write_firefox_user_js "$ff_private_dir" \
+    "// Profile: jk-research-private — fingerprinting resistance, cookies, stateless session
 
 ${FF_COMMON_PREFS}
 
 ${FF_RESEARCH_PRIVATE_PREFS}"
 
-write_firefox_user_js "$ff_home_net_dir" \
-  "// Profile: jk-home-network — local services, no HTTPS enforcement
+  write_firefox_user_js "$ff_home_net_dir" \
+    "// Profile: jk-home-network — local services, no HTTPS enforcement
 
 ${FFDX_COMMON_PREFS}
 
 ${FFDX_HOME_NETWORK_PREFS}"
 
-# ─── Firefox — extensions via XPI drop-in ────────────────────────────────────
-# Extension table (profile → extensions):
-#   jk-default:          ublock, containers, vimium, stylus, sidebery
-#   jk-research-trusted: ublock, containers, vimium, joplin, stylus, sidebery
-#   jk-research-private: ublock, vimium, joplin, stylus, noscript, sidebery
-#   jk-home-network:     vimium
+  # ─── Firefox — extensions via XPI drop-in ────────────────────────────────────
+  # Extension table (profile → extensions):
+  #   jk-default:          ublock, containers, vimium, stylus, sidebery
+  #   jk-research-trusted: ublock, containers, vimium, joplin, stylus, sidebery
+  #   jk-research-private: ublock, vimium, joplin, stylus, noscript, sidebery
+  #   jk-home-network:     vimium
 
-log_info "Installing Firefox extensions via XPI ..."
+  log_info "Installing Firefox extensions via XPI ..."
 
-install_extensions_into_profile "$ff_default_dir" \
-  "uBlock0@raymondhill.net"                    "ublock-origin" \
-  "@testpilot-containers"                       "multi-account-containers" \
-  "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"      "vimium-ff" \
-  "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}"      "styl-us" \
-  "{3c078156-979c-498b-8990-85f7987dd929}"       "sidebery"
+  install_extensions_into_profile "$ff_default_dir" \
+    "uBlock0@raymondhill.net"                    "ublock-origin" \
+    "@testpilot-containers"                       "multi-account-containers" \
+    "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"      "vimium-ff" \
+    "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}"      "styl-us" \
+    "{3c078156-979c-498b-8990-85f7987dd929}"       "sidebery"
 
-install_extensions_into_profile "$ff_trusted_dir" \
-  "uBlock0@raymondhill.net"                    "ublock-origin" \
-  "@testpilot-containers"                       "multi-account-containers" \
-  "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"      "vimium-ff" \
-  "joplin-web-clipper@joplin.cloud"             "joplin-web-clipper" \
-  "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}"      "styl-us" \
-  "{3c078156-979c-498b-8990-85f7987dd929}"       "sidebery"
+  install_extensions_into_profile "$ff_trusted_dir" \
+    "uBlock0@raymondhill.net"                    "ublock-origin" \
+    "@testpilot-containers"                       "multi-account-containers" \
+    "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"      "vimium-ff" \
+    "joplin-web-clipper@joplin.cloud"             "joplin-web-clipper" \
+    "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}"      "styl-us" \
+    "{3c078156-979c-498b-8990-85f7987dd929}"       "sidebery"
 
-install_extensions_into_profile "$ff_private_dir" \
-  "uBlock0@raymondhill.net"                    "ublock-origin" \
-  "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"      "vimium-ff" \
-  "joplin-web-clipper@joplin.cloud"             "joplin-web-clipper" \
-  "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}"      "styl-us" \
-  "{73a6fe31-595d-460b-a920-fcc0f8843232}"       "noscript" \
-  "{3c078156-979c-498b-8990-85f7987dd929}"       "sidebery"
+  install_extensions_into_profile "$ff_private_dir" \
+    "uBlock0@raymondhill.net"                    "ublock-origin" \
+    "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"      "vimium-ff" \
+    "joplin-web-clipper@joplin.cloud"             "joplin-web-clipper" \
+    "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}"      "styl-us" \
+    "{73a6fe31-595d-460b-a920-fcc0f8843232}"       "noscript" \
+    "{3c078156-979c-498b-8990-85f7987dd929}"       "sidebery"
 
-install_extensions_into_profile "$ff_home_net_dir" \
-  "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"  "vimium-ff"
+  install_extensions_into_profile "$ff_home_net_dir" \
+    "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"  "vimium-ff"
 
-# ─── Firefox Developer Edition — profiles, user.js and extensions ─────────────
-# Firefox Developer Edition uses its own app support directory on macOS,
-# separate from Firefox stable.
+  # ─── Firefox Developer Edition — profiles, user.js and extensions ─────────────
+  # Firefox Developer Edition uses its own app support directory on macOS,
+  # separate from Firefox stable.
 
-FFDX_APP_SUPPORT="${HOME}/Library/Application Support/Firefox Developer Edition"
+  local ffdx_app_support="${HOME}/Library/Application Support/Firefox Developer Edition"
 
-log_info "Configuring Firefox Developer Edition profiles ..."
+  log_info "Configuring Firefox Developer Edition profiles ..."
 
-ffdx_dev_local_dir=$(create_firefox_profile "$FFDX_APP_SUPPORT" "jk-dev-local")
+  local ffdx_dev_local_dir
+  ffdx_dev_local_dir=$(create_firefox_profile "$ffdx_app_support" "jk-dev-local")
 
-write_firefox_user_js "$ffdx_dev_local_dir" \
-  "// Profile: jk-dev-local
+  write_firefox_user_js "$ffdx_dev_local_dir" \
+    "// Profile: jk-dev-local
 
 ${FFDX_COMMON_PREFS}"
 
-# ─── Firefox Developer Edition — extensions via XPI drop-in ──────────────────
-# jk-dev-local: vimium-ff
+  # ─── Firefox Developer Edition — extensions via XPI drop-in ──────────────────
+  # jk-dev-local: vimium-ff
 
-log_info "Installing Firefox Developer Edition extensions via XPI ..."
+  log_info "Installing Firefox Developer Edition extensions via XPI ..."
 
-install_extensions_into_profile "$ffdx_dev_local_dir" \
-  "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"  "vimium-ff"
+  install_extensions_into_profile "$ffdx_dev_local_dir" \
+    "{d07ccf11-c0cd-4938-a265-2a4d6ad01189}"  "vimium-ff"
 
-# ─── Safari — scriptable defaults ────────────────────────────────────────────
-# macOS 15+ (Sequoia) gates the Safari container behind Full Disk Access (TCC).
-# Probe the Preferences directory: if ls fails with EPERM, FDA is not granted.
+  # ─── Safari — scriptable defaults ────────────────────────────────────────────
+  # macOS 15+ (Sequoia) gates the Safari container behind Full Disk Access (TCC).
+  # Probe the Preferences directory: if ls fails with EPERM, FDA is not granted.
 
-log_info "Configuring Safari ..."
+  log_info "Configuring Safari ..."
 
-SAFARI_CONTAINER="${HOME}/Library/Containers/com.apple.Safari"
-SAFARI_PREFS_DIR="${SAFARI_CONTAINER}/Data/Library/Preferences"
-SAFARI_PREFS="${SAFARI_PREFS_DIR}/com.apple.Safari"
+  local safari_container safari_prefs_dir safari_prefs
+  safari_container="${HOME}/Library/Containers/com.apple.Safari"
+  safari_prefs_dir="${safari_container}/Data/Library/Preferences"
+  safari_prefs="${safari_prefs_dir}/com.apple.Safari"
 
-if ! ls "$SAFARI_PREFS_DIR" &>/dev/null; then
-  log_trace "Safari: Full Disk Access not granted — apply these settings manually in Safari → Settings:"
-  log_trace "  General  → \"Open 'safe' files after downloading\": uncheck"
-  log_trace "  Search   → \"Include Safari Suggestions\": uncheck"
-  log_trace "  Search   → \"Enable Quick Website Search\": uncheck"
-  log_trace "  Privacy  → \"Prevent cross-site tracking\": check"
-  log_trace "  Privacy  → \"Hide IP Address\": Trackers and Websites"
-  log_trace "  Advanced → \"Warn when visiting a fraudulent website\": check"
-  log_trace "  Advanced → (Websites tab) \"Block pop-up windows\": check"
-else
-  defaults write "$SAFARI_PREFS" AutoOpenSafeDownloads -bool false
-  defaults write "$SAFARI_PREFS" SuppressSearchSuggestions -bool true
-  defaults write "$SAFARI_PREFS" UniversalSearchEnabled -bool false
-  defaults write "$SAFARI_PREFS" SendDoNotTrackHTTPHeader -bool true
-  defaults write "$SAFARI_PREFS" WarnAboutFraudulentWebsites -bool true
-  defaults write "$SAFARI_PREFS" WebKitJavaScriptCanOpenWindowsAutomatically -bool false
-  defaults write "$SAFARI_PREFS" \
-    "com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically" \
-    -bool false
+  if ! ls "$safari_prefs_dir" &>/dev/null; then
+    log_trace "Safari: Full Disk Access not granted — apply these settings manually in Safari → Settings:"
+    log_trace "  General  → \"Open 'safe' files after downloading\": uncheck"
+    log_trace "  Search   → \"Include Safari Suggestions\": uncheck"
+    log_trace "  Search   → \"Enable Quick Website Search\": uncheck"
+    log_trace "  Privacy  → \"Prevent cross-site tracking\": check"
+    log_trace "  Privacy  → \"Hide IP Address\": Trackers and Websites"
+    log_trace "  Advanced → \"Warn when visiting a fraudulent website\": check"
+    log_trace "  Advanced → (Websites tab) \"Block pop-up windows\": check"
+  else
+    defaults write "$safari_prefs" AutoOpenSafeDownloads -bool false
+    defaults write "$safari_prefs" SuppressSearchSuggestions -bool true
+    defaults write "$safari_prefs" UniversalSearchEnabled -bool false
+    defaults write "$safari_prefs" SendDoNotTrackHTTPHeader -bool true
+    defaults write "$safari_prefs" WarnAboutFraudulentWebsites -bool true
+    defaults write "$safari_prefs" WebKitJavaScriptCanOpenWindowsAutomatically -bool false
+    defaults write "$safari_prefs" \
+      "com.apple.Safari.ContentPageGroupIdentifier.WebKit2JavaScriptCanOpenWindowsAutomatically" \
+      -bool false
+  fi
+
+  log_trace "Manual steps required — see script header."
+  log_info "Installing browsers done."
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
 fi
-
-log_trace "Manual steps required — see script header."
-log_info "Installing browsers done."

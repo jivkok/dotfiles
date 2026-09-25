@@ -3,7 +3,7 @@
 export EDITOR="vi"
 export VISUAL='vi'
 
-if [ "$SSH_TTY" = "" ] && { command -v code >/dev/null 2>&1 || command -v codium >/dev/null 2>&1; }; then
+if [ -z "${SSH_TTY:-}" ] && { command -v code >/dev/null 2>&1 || command -v codium >/dev/null 2>&1; }; then
   alias e='code'
   alias ee='codium'
   if command -v codium >/dev/null 2>&1; then # prefer VSCodium

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# COVERS: setup/setup_functions.sh
 # Unit tests for shared helpers in setup/setup_functions.sh.
 # No specific tool required — runs locally and in all Docker environments.
 set -uo pipefail
@@ -175,6 +176,28 @@ append_or_merge_file "$tmpdir/src.txt" "$tmpdir/partial.txt"
 assert_file_content "$tmpdir/partial.txt" "line2"
 line_count=$(grep -c '' "$tmpdir/partial.txt")
 assert_eq "append_or_merge_file: missing line appended" "2" "$line_count"
+
+# ── Homebrew: headless mode / unattended runs ─────────────────────────────────
+log_trace "--- cask installs in headless mode ---"
+
+assert_eq "HOMEBREW_NO_ASK exported" "1" "$(bash -c "source '$DOTDIR/setup/setup_functions.sh'; printenv HOMEBREW_NO_ASK")"
+
+# brew stub records every invocation; in headless mode no cask call may reach it.
+mkdir -p "$tmpdir/stubs"
+write_stub "$tmpdir/stubs/brew" "echo \"\$*\" >> '$tmpdir/brew.log'"
+for fn in install_cask_package install_or_upgrade_cask_package; do
+  rm -f "$tmpdir/brew.log"
+  run_capture env PATH="$tmpdir/stubs:$PATH" bash -c \
+    "source '$DOTDIR/setup/setup_functions.sh'; _skip_gui=true; $fn some-gui-app"
+  assert_eq "$fn: headless returns 1 (not installed)" "1" "$rc"
+  assert_file_absent "$tmpdir/brew.log"
+done
+
+# Not headless: the same call reaches brew (the stub reports it installed).
+rm -f "$tmpdir/brew.log"
+run_capture env PATH="$tmpdir/stubs:$PATH" bash -c \
+  "source '$DOTDIR/setup/setup_functions.sh'; _skip_gui=false; install_cask_package some-gui-app"
+assert_file_content "$tmpdir/brew.log" "list --versions --cask some-gui-app"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 finish_test

@@ -82,14 +82,21 @@ fmt() {
     printf '#[fg=%s]%s:%s%%#[default]' "$(color_for "$2")" "$1" "$2"
 }
 
-case "${1:-all}" in
-    cpu) fmt CPU "$(cpu_percentage)" ;;
-    ram) fmt RAM "$(ram_percentage)" ;;
-    all)
-        printf '%s %s' "$(fmt CPU "$(cpu_percentage)")" "$(fmt RAM "$(ram_percentage)")"
-        ;;
-    *)
-        echo "Usage: $(basename "$0") cpu|ram|all" >&2
-        exit 1
-        ;;
-esac
+main() {
+    case "${1:-all}" in
+        cpu) fmt CPU "$(cpu_percentage)" ;;
+        ram) fmt RAM "$(ram_percentage)" ;;
+        all)
+            printf '%s %s' "$(fmt CPU "$(cpu_percentage)")" "$(fmt RAM "$(ram_percentage)")"
+            ;;
+        *)
+            echo "Usage: $(basename "$0") cpu|ram|all" >&2
+            exit 1
+            ;;
+    esac
+}
+
+# Sourcing (tests) only defines the functions above.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main "$@"
+fi

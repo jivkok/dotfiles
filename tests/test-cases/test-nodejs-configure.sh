@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # REQUIRES: node
+# COVERS: nodejs/configure_nodejs.sh
 set -euo pipefail
-
-DOTDIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
 # In non-login bash subshells the PATH is minimal. Restore the locations that
 # configure_nodejs.sh uses: Homebrew's prefix, the npm global bin dir, and

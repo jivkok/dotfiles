@@ -34,5 +34,6 @@ install_apt_package strace
 # debian-specific:
 
 install_apt_package fd-find
+install_apt_package locales
 
 log_info "Configuring packages for Linux (Debian and derivative distros) done."

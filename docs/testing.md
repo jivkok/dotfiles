@@ -44,8 +44,10 @@ The setup hash for each OS is computed from the combined content of its relevant
 ## Workflow
 
 ```bash
-bash tests/run-tests.sh [--all | --filter <cmd>]
+bash tests/run-tests.sh [--all | --filter <cmd>] [--changed [<ref>]] [--list]
 ```
+
+While iterating, run only the tests relevant to your change with `--changed`; run the full suite (no `--changed`) before reporting work done.
 
 ### Environment setup (create-test-envs.sh)
 
@@ -75,15 +77,21 @@ This script:
 | _(none)_ | **Default.** Runs core tests and any optional tests whose required tools are installed. Tests with unmet requirements are skipped with a `SKIPPED:` notice. |
 | `--all` | Runs every test unconditionally. Fails immediately if a required tool is missing. Use this for a full audit. |
 | `--filter <cmd>` | Runs only tests that declare `<cmd>` in their `REQUIRES` header. Useful for verifying a specific optional tool after installing it. |
+| `--changed [<ref>]` | Runs only tests relevant to changed files (see [Coverage map and change-based selection](#coverage-map-and-change-based-selection)). Without `<ref>`, compares against `HEAD` (staged, unstaged, and untracked non-ignored files); with `<ref>`, also includes commits in `<ref>...HEAD`. Combines with the flags above. |
+| `--list` | Prints the selected tests (`<name><TAB><COVERS>`), one per line, and exits without running tests or building environments. Combines with every other flag. |
 
 This script:
 
 1. Discovers all test files matching `tests/test-cases/test-*.sh` (sorted).
-2. Filters tests according to the flag and the `REQUIRES` header of each file (see [Test categories](#test-categories) below).
-3. Runs selected tests locally first.
-4. Reads `tests/.testenv` for `*_DOCKER_IMAGE` variables. Each non-empty value is a Docker image to test in.
-5. For each Docker image, evaluates `REQUIRES` headers **inside the container** (using `bash -li` so the full PATH is available) and skips tests whose required tools are absent — independently of the local machine. In **default mode** all discovered tests are considered per container; in **filter/all mode** the already-filtered list is used. Tests run with `bash -li` so PATH and shell environment are fully initialised. The `tests/` directory is bind-mounted read-only into the container at `/home/test/dotfiles/tests`, so test file changes take effect without rebuilding the image.
-6. Fails immediately on any test error.
+2. With `--changed`, narrows them to the tests selected by the changed files and exports `CHANGED_FILES`.
+3. Filters tests according to the flag and the `REQUIRES` header of each file (see [Test categories](#test-categories) below).
+4. With `--list`, prints the selection and exits. If nothing is selected, prints `No tests selected.` and exits 0.
+5. Runs `create-test-envs.sh`, then runs selected tests locally first.
+6. Reads `tests/.testenv` for `*_DOCKER_IMAGE` variables. Each non-empty value is a Docker image to test in.
+7. For each Docker image, evaluates `REQUIRES` headers **inside the container** (using `bash -li` so the full PATH is available) and skips tests whose required tools are absent — independently of the local machine. In **default mode** all candidate tests (all discovered, or the `--changed` selection) are considered per container; in **filter/all mode** the already-filtered list is used. Tests run with `bash -li` so PATH and shell environment are fully initialised.
+8. Reports pass/fail counts; exits non-zero if any test failed.
+
+**Working-tree mount.** The whole working-tree repo is bind-mounted **read-only** over the image's baked copy at `/home/test/dotfiles`. Scripts that are not part of the setup hash (`sh/`, `bin/`, `git/git.sh`, ...) are therefore always tested at their current version without rebuilding an image, and new files are visible immediately. The image still supplies everything setup produced (packages, generated files, `$HOME` symlinks — which point into `/home/test/dotfiles` and so resolve to the working tree). Setup also writes git-ignored artifacts inside the repo (`vim/.vim/autoload/`, `vim/.vim/plugins/`); `run-tests.sh` overlays those directories with anonymous volumes seeded from the image, so tests see what the image installed rather than whatever the host happens to have (a fresh clone has nothing there). Add any new in-repo setup output directory to that list in `run_in_docker`. Setup-affecting changes still rebuild the image through the setup hash.
 
 ---
 
@@ -158,6 +166,63 @@ This builds a new image `FROM` the existing one, re-copies the current dotfiles,
 
 ---
 
+## Coverage map and change-based selection
+
+### Headers
+
+Every test file declares, within its first 15 lines, exactly one header listing the repo-relative paths or globs it exercises:
+
+```bash
+# COVERS: bin/tmux-status-cpu.sh bin/tmux-status-ip.sh
+```
+
+Globs: `*` and `?` do not cross `/`; `**` matches any number of path segments (`**/*.sh` also matches top-level `*.sh`).
+
+Tests whose `COVERS` entries should select them but must not count as coverage (lint, the coverage map itself) also declare `# COVERAGE: meta`.
+
+### `tests/coverage-exclude`
+
+Scripts deliberately left without a test, one per line: `<path-or-glob>  # <reason>`. Entries still awaiting a test use the reason `TODO: test (follow-up)`.
+
+### Enforcement: `test-coverage-map.sh`
+
+Fails when:
+- a tracked script (`*.sh`, `*.zsh`, or `bin/*`, outside `tests/`) matches neither a non-meta test's `COVERS` nor `coverage-exclude`;
+- a `COVERS` or `coverage-exclude` entry matches no tracked file (stale mapping);
+- a `coverage-exclude` entry has no `# reason`;
+- a test file does not have exactly one `# COVERS:` header.
+
+When you add a script, add it to a test's `COVERS` (or to `coverage-exclude` with a reason).
+
+### `--changed` selection rules
+
+For each changed file (renames count as a delete of the old path plus an add of the new one):
+
+| Rule | Changed file | Selects |
+|------|--------------|---------|
+| A | `tests/test-cases/test-X.sh` | `test-X.sh` |
+| B | `tests/testlib.sh`, `tests/run-tests.sh`, `tests/create-test-envs.sh`, `tests/coverage-lib.sh`, `tests/docker/*` | every test |
+| C | `tests/test-cases/helpers/H.sh` | the tests that reference `helpers/H.sh` |
+| D | any file in the setup hash (`create-test-envs.sh --print-setup-files`) | every test |
+| E | a script that is neither covered nor excluded | every test, plus a `WARN: unmapped ...` line |
+| F | anything else not matched by a `COVERS` entry (`*.md`, `docs/**`, `tasks/**`, ...) | nothing |
+| G | a file matching tests' `COVERS` entries | those tests (including meta tests such as `test-lint.sh`) |
+| H | any added, deleted, or renamed file | additionally `test-coverage-map.sh` |
+
+`tests/coverage-exclude` changes select `test-coverage-map.sh`. A deleted file that was covered still selects its tests, so they fail loudly.
+
+`--changed` exits non-zero with an `ERROR:` before running anything if `<ref>` is unknown or the repo is not a git work tree.
+
+**`CHANGED_FILES`**: in `--changed` mode the runner exports the newline-separated list of changed, still-existing paths to every test (locally and in Docker). `test-lint.sh` uses it to lint only those files.
+
+**`CHANGED_FILES_OVERRIDE`** (testing only): newline-separated `<status>\t<path>` (or bare `<path>`, status `M`) used instead of asking git. `test-run-tests-selection.sh` uses it to exercise the rules.
+
+### Lint: `test-lint.sh`
+
+Runs `zsh -n` on zsh files (under `zsh/` without a bash shebang, or `*.zsh`), and `bash -n` plus `shellcheck` (honouring `.shellcheckrc`) on every other `*.sh` and on `bin/*` files with a sh/bash shebang. Findings must be fixed or suppressed inline with `# shellcheck disable=SCxxxx  # <reason>`.
+
+---
+
 ## Test library
 
 `tests/testlib.sh` is sourced by every test script and by the runner. It provides shared functions (log-level constants, log error/info/trace functions, ANSI colors, assertions, etc.).
@@ -167,6 +232,8 @@ This builds a new image `FROM` the existing one, re-copies the current dotfiles,
 ## Test categories
 
 Test files live in `tests/test-cases/` and are named `test-*.sh`. The runner auto-discovers them. Shared helpers live in `tests/test-cases/helpers/` and are not run directly.
+
+Tests exercise the real scripts: to unit-test functions in a script, give the script a main guard (`if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi`) and source it from the test. Do not copy functions into test helpers.
 
 ### Core tests (always run)
 
@@ -229,8 +296,10 @@ If `create-test-envs.sh` prints `WARN: no SSH public key found — skipping remo
 | Script | Purpose |
 |--------|---------|
 | `tests/testlib.sh` | Shared test library (colors, log levels, `ok`/`fail`, counters). Sourced by all test scripts and the runner. |
-| `tests/create-test-envs.sh` | Build/update test environments (local + Docker). Called automatically by `run-tests.sh`; can also be run standalone to pre-build images. |
-| `tests/run-tests.sh` | Run all test cases across all environments. |
+| `tests/coverage-lib.sh` | Coverage-map helpers (`COVERS` header parsing, glob matching, `coverage-exclude` parsing). Sourced by the runner and `test-coverage-map.sh`. |
+| `tests/coverage-exclude` | Scripts intentionally without a covering test, with reasons. |
+| `tests/create-test-envs.sh` | Build/update test environments (local + Docker). Called automatically by `run-tests.sh`; can also be run standalone to pre-build images. `--print-setup-files` prints every file that feeds a setup hash and exits. |
+| `tests/run-tests.sh` | Run all (or, with `--changed`, the relevant) test cases across all environments. |
 | `tests/docker/build-image.sh` | Builds a single full Docker image. Accepts `IMAGE_NAME` and `DOCKERFILE_PATH` as env vars. |
 | `tests/docker/build-image-remote.sh` | Builds a single minimal (SSH-enabled) Docker image. Same interface as `build-image.sh` plus `DOCKER_RUN_ARGS` for `--build-arg HOST_PUBLIC_KEY=<key>`. |
 | `tests/docker/augment-image.sh` | Augments an existing test image by running a `configure_*.sh` script on top of it and retagging the result with the same name. Used to install optional tools (Go, .NET, Docker) into a test image so their optional tests can run. |

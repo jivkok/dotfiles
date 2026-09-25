@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
+# COVERS: vscode/configure_vscode.sh
 set -euo pipefail
 
-HELPERS="$(cd "$(dirname "$0")/helpers" && pwd)"
+DOTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # shellcheck source=../testlib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/../testlib.sh"
 
-# ── Source testable functions (self-contained helper, works in all envs) ──────
-# shellcheck source=helpers/vscode-functions.sh
-source "${HELPERS}/vscode-functions.sh"
+# ── Source the real script (its main block runs only when executed) ───────────
+# shellcheck source=../../setup/setup_functions.sh
+source "${DOTDIR}/setup/setup_functions.sh"
+# shellcheck source=../../vscode/configure_vscode.sh
+source "${DOTDIR}/vscode/configure_vscode.sh"
 
 # ── Temp workspace ────────────────────────────────────────────────────────────
 tmpdir="$(mktemp -d)"

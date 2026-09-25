@@ -8,8 +8,7 @@ source "$dotdir/setup/setup_functions.sh"
 log_info "Configuring OSX-specific settings ..."
 
 # Command-line tools (must be first since they install gcc)
-xcode-select -p >/dev/null 2>&1
-if [ $? != 0 ]; then
+if ! xcode-select -p >/dev/null 2>&1; then
     log_trace "Installing XCode command-line tools ..."
     # xcode-select --install
     touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress;

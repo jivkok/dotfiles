@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # REQUIRES: docker ssh
+# COVERS: setup/setup-remote-vm.sh setup/deploy-remote-vm.sh linux/configure_packages_minimal_*.sh
 set -euo pipefail
 
 DOTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

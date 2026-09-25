@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # REQUIRES: docker
+# COVERS: docker/configure_docker.sh
 set -euo pipefail
 
 # shellcheck source=../testlib.sh

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2015  # 'cond && ok || fail': ok always returns 0, so fail runs only when cond fails
 set -euo pipefail
 
 # ${BASH_SOURCE[0]} is bash-only; fall back to $0 when run via zsh.

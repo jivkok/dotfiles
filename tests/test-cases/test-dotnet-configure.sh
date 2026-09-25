@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # REQUIRES: dotnet
+# COVERS: dotnet/configure_dotnet.sh
 set -euo pipefail
 
 # dotnet-install.sh places the SDK and global tools under $HOME/.dotnet.

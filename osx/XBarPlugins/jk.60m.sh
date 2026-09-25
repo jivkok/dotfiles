@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2206,SC2207  # top output is split into lines/fields on purpose (IFS set explicitly)
 
 # <xbar.title>JK Meta Plugin</xbar.title>
 # <xbar.version>v1.0</xbar.version>
@@ -12,9 +13,10 @@
 
 function print-offset-month() {
   local month_offset="$1"
-  local month=$(date -v${month_offset}m +%m)
-  local year=$(date -v${month_offset}m +%Y)
-  local month_name=$(date -jf %Y-%m-%d "$year"-"$month"-01 '+%b')
+  local month year month_name
+  month=$(date -v"${month_offset}"m +%m)
+  year=$(date -v"${month_offset}"m +%Y)
+  month_name=$(date -jf %Y-%m-%d "$year"-"$month"-01 '+%b')
 
   echo "-----"
   echo "--$month_name $year|trim=false font=$font"
@@ -148,7 +150,7 @@ else
 fi
 
 # Find active interfaces
-INTERFACES=$(ifconfig | grep UP | egrep -o '(^en[0-9]*|^utun[0-9]*)' | sort -n)
+INTERFACES=$(ifconfig | grep UP | grep -Eo '(^en[0-9]*|^utun[0-9]*)' | sort -n)
 # Loop through the interfaces and output MAC, IPv4 and IPv6 information
 echo "-----"
 for INT in $INTERFACES; do
