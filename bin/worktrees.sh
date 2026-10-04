@@ -203,6 +203,38 @@ find_worktree_for_branch() {
   return 1
 }
 
+# Task worktrees live outside the repo, so a container or VM that sees only
+# the repo (e.g. claude-code-docker.sh without `worktrees: true`) finds their
+# directories missing and `git worktree prune` would drop their metadata. A
+# lock makes prune/gc skip them; `new` locks, `cleanup` unlocks first.
+WT_LOCK_REASON="managed by worktrees.sh"
+
+# is_worktree_locked <repo_root> <path> [reason] -- with a reason, true only
+# for a lock carrying exactly that reason (i.e. one we placed).
+is_worktree_locked() {
+  local repo_root="$1" path="$2" want="${3:-}"
+  git -C "$repo_root" worktree list --porcelain \
+    | awk -v p="$path" -v w="$want" '
+        $1 == "worktree" { cur = substr($0, 10) }
+        $1 == "locked" && cur == p { if (w == "" || substr($0, 8) == w) found = 1 }
+        END { exit !found }'
+}
+
+# Idempotent: a no-op when the worktree is already locked.
+lock_worktree() {
+  local repo_root="$1" path="$2"
+  is_worktree_locked "$repo_root" "$path" && return 0
+  git -C "$repo_root" worktree lock --reason "$WT_LOCK_REASON" -- "$path"
+}
+
+# Idempotent: a no-op unless the worktree carries our lock -- a lock placed by
+# hand (different reason) is left alone, so removing it still fails loudly.
+unlock_worktree() {
+  local repo_root="$1" path="$2"
+  is_worktree_locked "$repo_root" "$path" "$WT_LOCK_REASON" || return 0
+  git -C "$repo_root" worktree unlock -- "$path"
+}
+
 # Removes now-empty directories from $dir upward, stopping once $boundary
 # itself would be reached (the boundary, e.g. $WORKTREES_DIR/<repo>, is
 # always left in place even if empty).
@@ -307,7 +339,10 @@ cmd_new() {
   current="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
   [ "$current" != "HEAD" ] || current=""
 
-  # Forget worktrees whose directories were deleted by hand, so they can be re-added.
+  # Forget worktrees whose directories were deleted by hand, so they can be
+  # re-added. Ours are locked (see lock_worktree), which prune skips, so
+  # unlock this task's own if its directory is gone; other tasks' stay put.
+  [ -d "$wt_path" ] || unlock_worktree "$repo_root" "$wt_path"
   git -C "$repo_root" worktree prune
 
   # Base branch record (kept if already recorded)
@@ -337,6 +372,7 @@ cmd_new() {
     fi
   fi
   set_base_branch "$repo_root" "$branch" "$base"
+  lock_worktree "$repo_root" "$wt_path"
 
   # tmux session + window (create_tmux_task_window reuses an existing session)
   if tmux_window_exists "$session" "$branch"; then
@@ -473,7 +509,13 @@ cmd_cleanup() {
   log_info "Removing worktree $wt_path ..."
   local remove_args=()
   [ "$force" = "1" ] && remove_args=(--force)
-  git -C "$repo_root" worktree remove "${remove_args[@]}" -- "$wt_path"
+  # A locked worktree can't be removed (even with --force), so unlock first,
+  # and restore the lock if the removal fails and the worktree stays.
+  unlock_worktree "$repo_root" "$wt_path"
+  if ! git -C "$repo_root" worktree remove "${remove_args[@]}" -- "$wt_path"; then
+    lock_worktree "$repo_root" "$wt_path"
+    die "Could not remove worktree $wt_path."
+  fi
 
   # -D (not -d): our own base-relative merge check above already gates this;
   # git's built-in -d safety check compares against the current HEAD of the

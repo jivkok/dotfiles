@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2016,SC2088  # single-quoted snippets expand in the child shell; literal ~ is passed to the script under test
+# REQUIRES: git
 # COVERS: docker/docker.sh ai/claude-code/claude-code-docker.sh
 # Tests for the docker shell helpers (docker/docker.sh) and the Claude Code
 # container launcher (ai/claude-code/claude-code-docker.sh). `docker` and
@@ -89,7 +90,7 @@ stamp="${launcher_tmp}/ai-claude-code-version-check-$(id -u)"
 
 # launch [args...]  — run the launcher from $work with stubs; env tweaks via caller.
 launch() {
-  (cd "$work" && env -u TMUX -u ANTHROPIC_API_KEY \
+  (cd "${LAUNCH_DIR:-$work}" && env -u TMUX -u ANTHROPIC_API_KEY \
     PATH="$STUB_PATH" HOME="$fake_home" XDG_STATE_HOME="$state" TMPDIR="$launcher_tmp" \
     STUB_DOCKER_IMAGES="${STUB_DOCKER_IMAGES-ai-claude-code:1.2.3.${build_n}}" \
     STUB_CURL_OUT="${STUB_CURL_OUT:-}" \
@@ -192,6 +193,46 @@ if [ -S /var/run/docker.sock ]; then
 else
   assert_contains "docker: true without a socket: error" "Docker socket" "$out"
 fi
+rm -f "${work}/.aiproj"
+
+log_trace "--- claude-code-docker.sh: worktrees: true ---"
+wt_main="${tmpdir}/wt-main"
+git init -q -b master "$wt_main"
+git -C "$wt_main" -c user.name=t -c user.email=t@t commit -q --allow-empty -m init
+wt_task="${fake_home}/worktrees/wt-main/task1"
+mkdir -p "$(dirname "$wt_task")"
+git -C "$wt_main" worktree add -q -b task1 "$wt_task"
+wt_dir="$(cd -P "${fake_home}/worktrees/wt-main" && pwd -P)"
+wt_common="$(cd -P "${wt_main}/.git" && pwd -P)"
+printf 'worktrees: true\n' > "${wt_main}/.aiproj"
+cp "${wt_main}/.aiproj" "${wt_task}/.aiproj"
+
+# Main repo: the repo's worktrees dir is mounted at the same path and is an add-dir.
+rm -f "$run_log"
+LAUNCH_DIR="$wt_main" launch >/dev/null
+check "worktrees: main repo mounts its worktrees dir at the same path" has_arg_pair -v "${wt_dir}:${wt_dir}"
+check "worktrees: main repo worktrees dir is an --add-dir" has_arg_pair --add-dir "$wt_dir"
+check_not "worktrees: main repo does not mount a git common dir" grep -qxF "${wt_common}:${wt_common}" "$run_log"
+
+# Linked worktree: only the git common dir, and not as an --add-dir.
+rm -f "$run_log"
+LAUNCH_DIR="$wt_task" launch >/dev/null
+check "worktrees: linked worktree mounts the git common dir at the same path" has_arg_pair -v "${wt_common}:${wt_common}"
+check_not "worktrees: git common dir is not an --add-dir" has_arg_pair --add-dir "$wt_common"
+check_not "worktrees: linked worktree does not mount the main working tree" grep -qxF "${wt_main}:${wt_main}" "$run_log"
+check_not "worktrees: linked worktree does not mount the worktrees dir" grep -qxF "${wt_dir}:${wt_dir}" "$run_log"
+
+# Without the key, nothing extra is mounted.
+rm -f "${wt_main}/.aiproj" "$run_log"
+LAUNCH_DIR="$wt_main" launch >/dev/null
+check_not "worktrees: off by default" grep -qxF "${wt_dir}:${wt_dir}" "$run_log"
+
+# Outside a git repo: warns and ignores.
+printf 'worktrees: true\n' > "${work}/.aiproj"
+rm -f "$run_log"
+run_capture launch
+assert_eq "worktrees: outside a git repo: exit code" "0" "$rc"
+assert_contains "worktrees: outside a git repo: warning" "not a git repository" "$out"
 rm -f "${work}/.aiproj"
 
 log_trace "--- claude-code-docker.sh: unresolvable version, no image ---"

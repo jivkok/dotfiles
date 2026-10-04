@@ -101,6 +101,9 @@ make_task() {
   git -C "$repo" config "wt.$branch.base" "$base"
 }
 
+# wt_is_locked <repo> <worktree-path>
+wt_is_locked() { git -C "$1" worktree list --porcelain | awk -v p="$2" '$1=="worktree"{c=substr($0,10)} $1=="locked"&&c==p{f=1} END{exit !f}'; }
+
 tmux_session_exists() { tmux has-session -t "=$1" 2>/dev/null; }
 tmux_window_exists() {
   tmux list-windows -t "=$1" -F '#{window_name}' 2>/dev/null | grep -qxF "$2"
@@ -617,6 +620,15 @@ e2e_wt="$(wt_path_for "$e2e_repo" "$e2e_branch")"
 check "e2e: branch created" git -C "$e2e_repo" show-ref --verify --quiet "refs/heads/$e2e_branch"
 check "e2e: worktree created at expected path" test -d "$e2e_wt"
 check "e2e: tmux session/window created" tmux_window_exists "$e2e_session" "$e2e_branch"
+check "e2e: new locks the worktree" wt_is_locked "$e2e_repo" "$e2e_wt"
+# A missing worktree directory (e.g. repo seen from a container) must not be pruned.
+mv "$e2e_wt" "${e2e_wt}.away"
+git -C "$e2e_repo" worktree prune
+mv "${e2e_wt}.away" "$e2e_wt"
+check "e2e: locked worktree survives git worktree prune" wt_is_locked "$e2e_repo" "$e2e_wt"
+wt_run "$e2e_repo" new "$e2e_branch"
+assert_status "e2e: re-running new on a locked worktree succeeds" 0 "$WT_STATUS"
+check "e2e: worktree still locked after re-running new" wt_is_locked "$e2e_repo" "$e2e_wt"
 e2e_pane_count="$(tmux_pane_count "$e2e_session:$e2e_branch")"
 assert_eq "e2e: window has 4 panes" "4" "$e2e_pane_count"
 
@@ -666,6 +678,17 @@ if [ -z "$(git -C "$e2e_repo" config --get "wt.$e2e_branch.base" 2>/dev/null)" ]
 else
   fail "e2e: base-branch metadata still present after cleanup"
 fi
+
+# A lock placed by hand (not ours) must survive cleanup: removal fails loudly.
+log_trace "--- manual lock respected by cleanup ---"
+lockrepo="$(make_repo master)"
+make_task "$lockrepo" "locked-by-hand"
+lockwt="$(wt_path_for "$lockrepo" "locked-by-hand")"
+git -C "$lockrepo" worktree lock --reason "mine" "$lockwt"
+wt_run "$lockrepo" cleanup "locked-by-hand" --force
+check_not "manual lock: cleanup fails" test "$WT_STATUS" -eq 0
+check "manual lock: worktree still present" test -d "$lockwt"
+check "manual lock: lock retained" wt_is_locked "$lockrepo" "$lockwt"
 
 # ── Summary ──────────────────────────────────────────────────────────────────
 finish_test

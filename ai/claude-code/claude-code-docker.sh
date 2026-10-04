@@ -158,6 +158,35 @@ IFS=$'\n\t'
 #                         # can't usefully bind-mount one of those unless its
 #                         # container path happens to equal its host path.
 #
+#   worktrees: true      # Makes the Git worktree topology (see bin/worktrees.sh)
+#                         # valid inside the container while keeping each
+#                         # agent scoped to its own checkout. Both mounts are
+#                         # at the same absolute path as on the host, since
+#                         # git stores absolute paths between a repo and its
+#                         # worktrees:
+#                         #   - launched from the MAIN repo: mounts
+#                         #     $WORKTREES_DIR/<repo> (default
+#                         #     ~/worktrees/<repo>, created if missing), so
+#                         #     the task worktrees exist in the container
+#                         #     (git would otherwise see them as stale and
+#                         #     `git worktree prune` could drop them) and
+#                         #     are readable to Claude (--add-dir). The mount
+#                         #     is deliberately read-write: this is the
+#                         #     integration container, which runs `rebase`,
+#                         #     `done` and `cleanup` on task worktrees
+#                         #     (rewriting files / deleting directories).
+#                         #   - launched from a LINKED worktree: mounts only
+#                         #     the repo's git common dir (`git rev-parse
+#                         #     --git-common-dir`), which git needs for
+#                         #     refs/objects/config. The main working tree is
+#                         #     NOT mounted, and the git dir is plumbing, not
+#                         #     an --add-dir: integration into the base
+#                         #     branch stays with the main/integration
+#                         #     workflow (`worktrees.sh done`).
+#                         # Note the common dir is mounted read-write (git
+#                         # writes there), including .git/hooks and config.
+#                         # No-op outside a git repo.
+#
 # Builds the image automatically the first time it's needed for the current
 # ai/claude-code/BUILD number, tagged <claude_code_version>.<build_number>
 # (e.g. 2.1.270.1) - the Claude Code version is resolved from
@@ -362,6 +391,7 @@ CFG_VOLUMES=()
 CFG_INSTALL=()
 CFG_ENV=()
 CFG_DOCKER=false
+CFG_WORKTREES=false
 for _f in "${_config_files[@]}"; do
   log_trace "Reading project config: ${_f}"
   while IFS= read -r _v; do [ -n "$_v" ] && CFG_VOLUMES+=("$_v"); done < <(_cfg_list "$_f" volumes)
@@ -369,6 +399,8 @@ for _f in "${_config_files[@]}"; do
   while IFS= read -r _v; do [ -n "$_v" ] && CFG_ENV+=("$_v"); done < <(_cfg_list "$_f" env)
   _v="$(_cfg_scalar "$_f" docker)"
   [ -n "$_v" ] && CFG_DOCKER="$_v"
+  _v="$(_cfg_scalar "$_f" worktrees)"
+  [ -n "$_v" ] && CFG_WORKTREES="$_v"
 done
 
 # ── install: apt packages + built-in recipes -> derived image ────────────────
@@ -654,6 +686,31 @@ for _vol in "${CFG_VOLUMES[@]}"; do
   log_trace "Mounting extra directory (config): ${_vol}"
   _mount_extra_dir "$_vol"
 done
+
+# worktrees: true - see the header comment. Same-path mounts, because git
+# records absolute host paths in both directions (.git file <-> .git/worktrees).
+if [ "$CFG_WORKTREES" = "true" ]; then
+  if _git_dir="$(git rev-parse --path-format=absolute --git-dir 2>/dev/null)"; then
+    _common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
+    if [ "$_git_dir" != "$_common_dir" ]; then
+      # Linked worktree: git needs the common dir, not the main working tree.
+      # Infrastructure only - deliberately no --add-dir.
+      log_trace "Mounting git common dir (worktrees): ${_common_dir}"
+      docker_args+=(-v "${_common_dir}:${_common_dir}")
+    else
+      # Main repo: expose the task worktrees. Named after the main working
+      # tree, as bin/worktrees.sh does.
+      _wt_root="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
+      _wt_dir="${WORKTREES_DIR:-$HOME/worktrees}/${_wt_root##*/}"
+      mkdir -p -- "$_wt_dir"
+      _wt_dir="$(cd -P -- "$_wt_dir" && pwd -P)"
+      log_trace "Mounting task worktrees (worktrees): ${_wt_dir}"
+      _mount_extra_dir "${_wt_dir}:${_wt_dir}"
+    fi
+  else
+    log_warning "claude-code-docker.sh: worktrees: true but ${WORKSPACE_DIR} is not a git repository; ignoring."
+  fi
+fi
 
 docker_args+=("$IMAGE_TAG" claude --permission-mode auto)
 for add_dir in "${CLAUDE_ADD_DIRS[@]}"; do
