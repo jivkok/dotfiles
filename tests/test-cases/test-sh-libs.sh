@@ -179,6 +179,20 @@ assert_dir "${tmpdir}/a/b"
 out="$(sh_run bash system.sh 'PATH="/usr/bin:/bin:/usr/local/bin"; paths')"
 assert_eq "paths prints one PATH entry per line" $'/usr/bin\n/bin\n/usr/local/bin' "$out"
 
+# t: attach to an existing tmux session, else create one (stub tmux records calls;
+# STUB_HAS_SESSION sets whether `has-session` succeeds).
+mkdir -p "${tmpdir}/tmux-stub"
+write_stub "${tmpdir}/tmux-stub/tmux" "echo \"\$*\" >> '${tmpdir}/tmux.log'
+[[ \$1 == has-session ]] && exit \"\${STUB_HAS_SESSION:-1}\"
+exit 0"
+for case in "0::attach -d" "1::new-session -s s0" "0:work:new-session -A -D -s work" "1:work:new-session -A -D -s work"; do
+  IFS=: read -r has name expected <<< "$case"
+  rm -f "${tmpdir}/tmux.log"
+  PATH="${tmpdir}/tmux-stub:$PATH" STUB_HAS_SESSION="$has" sh_run bash system.sh "t $name" >/dev/null
+  assert_eq "t ${name:-<no name>} with has-session=$has: only '$expected'" \
+    "$expected" "$(grep -v '^has-session' "${tmpdir}/tmux.log")"
+done
+
 # ── web.sh ─────────────────────────────────────────────────────────────────────
 if command -v python3 >/dev/null 2>&1; then
   log_trace "--- web.sh ---"

@@ -42,7 +42,6 @@ d1="${tmpdir}/dir one"; d2="${tmpdir}/dir-two"; d3="${tmpdir}/dir3"
 mkdir -p "$d1" "$d2" "$d3"
 
 window_names() { tmux list-windows -t "=$1" -F '#{window_name}' | tr '\n' ' ' | sed 's/ $//'; }
-pane_count()   { tmux list-panes -t "$1" | wc -l | tr -d ' '; }
 pane_paths()   { tmux list-panes -t "$1" -F '#{pane_current_path}' | sort | tr '\n' '|'; }
 
 # kill_server  — kill the test server and wait until it is really gone, so the
@@ -91,8 +90,8 @@ bash "$RESTORE"
 
 check "s1 restored" tmux has-session -t =s1
 assert_eq "s1 window names" "w1 w2" "$(window_names s1)"
-assert_eq "w1 has 2 panes" "2" "$(pane_count s1:w1)"
-assert_eq "w2 has 1 pane" "1" "$(pane_count s1:w2)"
+assert_eq "w1 has 2 panes" "2" "$(tmux_pane_count s1:w1)"
+assert_eq "w2 has 1 pane" "1" "$(tmux_pane_count s1:w2)"
 assert_eq "w1 pane cwds" "$(printf '%s|%s|' "$d1" "$d2" | tr '|' '\n' | sort | tr '\n' '|')" "$(pane_paths s1:w1)"
 assert_eq "w2 pane cwd" "${d3}|" "$(pane_paths s1:w2)"
 
@@ -113,7 +112,7 @@ tmux new-session -d -s s1 -c "$d3"
 if wait_for_shell s1; then
   bash "$RESTORE"
   assert_eq "adopted s1 window names" "w1 w2" "$(window_names s1)"
-  assert_eq "adopted w1 has 2 panes" "2" "$(pane_count s1:w1)"
+  assert_eq "adopted w1 has 2 panes" "2" "$(tmux_pane_count s1:w1)"
 else
   fail "lone default pane never reached an idle shell"
 fi

@@ -146,15 +146,28 @@ assert_eq() {
   fi
 }
 
-# assert_contains <label> <needle> <haystack>  — pass if haystack contains needle.
+# assert_contains <label> <needle> <haystack>      — pass if haystack contains needle.
+# assert_not_contains <label> <needle> <haystack>  — pass if it does not.
 assert_contains() {
   if [[ "$3" == *"$2"* ]]; then ok "$1"; else fail "$1 (expected '$2' in: $3)"; fi
+}
+assert_not_contains() {
+  if [[ "$3" == *"$2"* ]]; then fail "$1 (did not expect '$2' in: $3)"; else ok "$1"; fi
 }
 
 # check <label> <cmd...>      — pass if cmd succeeds.
 # check_not <label> <cmd...>  — pass if cmd fails.
-check()     { local label="$1"; shift; if "$@"; then ok "$label"; else fail "$label"; fi; }
-check_not() { local label="$1"; shift; if "$@"; then fail "$label"; else ok "$label"; fi; }
+# The command's output is captured and shown only when the check fails.
+check() {
+  local label="$1" out
+  shift
+  if out="$("$@" 2>&1)"; then ok "$label"; else fail "$label${out:+ — output: $out}"; fi
+}
+check_not() {
+  local label="$1" out
+  shift
+  if out="$("$@" 2>&1)"; then fail "$label${out:+ — output: $out}"; else ok "$label"; fi
+}
 
 # run_capture <cmd...>  — run cmd, setting `out` (stdout+stderr) and `rc` (exit code).
 # shellcheck disable=SC2034  # out/rc are read by the caller
@@ -173,22 +186,29 @@ write_stub() {
 # dir that holds <cmd> is replaced by a symlink mirror of it (under
 # <scratch-dir>) minus <cmd>, so everything else in that dir stays reachable.
 path_without() {
-  local cmd="$1" scratch="$2" result="" dir entry i=0
+  local cmd="$1" scratch="$2" result="" dir real mirror
   local -a dirs
+  local -A seen=()
   IFS=':' read -r -a dirs <<< "$PATH"
   for dir in "${dirs[@]}"; do
     if [[ -e "${dir}/${cmd}" ]]; then
-      i=$((i + 1))
-      mkdir -p "${scratch}/no-${cmd}-${i}"
-      for entry in "$dir"/*; do
-        [[ "${entry##*/}" == "$cmd" ]] || ln -sf "$entry" "${scratch}/no-${cmd}-${i}/${entry##*/}"
-      done
-      dir="${scratch}/no-${cmd}-${i}"
+      real="$(cd -P -- "$dir" && pwd -P)"
+      mirror="${scratch}/no-${cmd}${real//\//_}"
+      if [[ -z "${seen[$real]:-}" ]]; then   # e.g. /bin and /usr/bin on merged-/usr systems
+        seen[$real]=1
+        mkdir -p "$mirror"
+        ln -s "$real"/* "$mirror"/ 2>/dev/null || true
+        rm -f "${mirror}/${cmd}"
+      fi
+      dir="$mirror"
     fi
     result+="${result:+:}${dir}"
   done
   printf '%s' "$result"
 }
+
+# tmux_pane_count <target>  — number of panes in a tmux window.
+tmux_pane_count() { tmux list-panes -t "$1" | wc -l | tr -d ' '; }
 
 # finish_test  — print summary and exit 1 if any assertions failed.
 finish_test() {

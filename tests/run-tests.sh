@@ -35,6 +35,14 @@ set -euo pipefail
 #     image's baked copy, so scripts under test are always current.
 #   - Reports pass/fail counts; exits non-zero if any test fails.
 
+# Tests must never be able to reach the invoking shell's real tmux session.
+# `tmux` prefers `$TMUX` (a live session reference) over `$TMUX_TMPDIR` when
+# already inside a session, so a test that sets TMUX_TMPDIR to sandbox its own
+# tmux server is NOT isolated unless TMUX (and TMUX_PANE) is also stripped --
+# otherwise, run from inside a real tmux pane, its tmux calls silently target
+# the real server instead of its private one.
+unset TMUX TMUX_PANE
+
 tests_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "${tests_root}/.." && pwd)"
 testenv_file="${tests_root}/.testenv"

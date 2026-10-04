@@ -81,7 +81,8 @@ out="$(list_override "git/git.sh")"
 assert_contains "--list prints name<TAB>COVERS" "test-git-env.sh"$'\t'"git/git.sh" "$out"
 assert_eq "--list alone lists every test" "$all_tests" "$(names "$(bash "$RUNNER" --list 2>&1)")"
 assert_eq "--list --all lists every test" "$all_tests" "$(names "$(bash "$RUNNER" --list --all 2>&1)")"
-assert_eq "--list --filter tmux selects by REQUIRES" "test-tmux-session.sh" "$(names "$(bash "$RUNNER" --list --filter tmux 2>&1)")"
+tmux_tests="$(grep -lE '^# REQUIRES:.*\btmux\b' "${DOTDIR}"/tests/test-cases/test-*.sh | xargs -n1 basename | sort | paste -sd' ')"
+assert_eq "--list --filter tmux selects by REQUIRES" "$tmux_tests" "$(names "$(bash "$RUNNER" --list --filter tmux 2>&1)")"
 assert_eq "--changed combines with --filter" "test-git-env.sh" \
   "$(names "$(list_override $'git/git.sh\nbin/tmux-status-cpu.sh' --filter git)")"
 

@@ -4,7 +4,12 @@
 # embeds rtk (Rust Token Killer, https://github.com/rtk-ai/rtk) with its
 # Claude Code hook active by default for token savings. Intended to be run
 # via ai/claude-code/claude-code-docker.sh, which builds this image on first
-# use and mounts a project directory at /workspace.
+# use and mounts a project directory at its own real host path, not a fixed
+# /workspace (see that script's WORKSPACE_DIR comment for why: it keeps
+# Claude Code's per-project session history/settings distinct between
+# projects, and lines up bind-mount sources for docker: true). /workspace
+# below is only the image's own default WORKDIR, used as-is for a manual
+# `docker run` of this image directly.
 #
 # Image tag = <claude_code_version>.<build_number>, e.g. 2.1.270.1:
 #   - the first three numbers are the exact Claude Code CLI version pinned

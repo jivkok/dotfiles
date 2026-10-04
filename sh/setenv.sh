@@ -12,5 +12,8 @@ source "$dotdir/sh/web.sh"
 source "$dotdir/sh/marks.sh"
 [ -f "$dotdir/git/git.sh" ] && source "$dotdir/git/git.sh"
 [ -f "$dotdir/docker/docker.sh" ] && source "$dotdir/docker/docker.sh"
-$_is_osx && source "$dotdir/osx/setenv.sh"
-true  # keep the file's status 0 when the OS-specific source above is skipped
+# shellcheck disable=SC2139  # $dotdir is a stable, exported env var; intentional expansion at definition time
+[ -f "$dotdir/bin/worktrees.sh" ] && alias wt="$dotdir/bin/worktrees.sh"
+if $_is_osx; then
+  source "$dotdir/osx/setenv.sh"
+fi

@@ -52,8 +52,18 @@ alias nh='unset HISTFILE'
 # Tools
 alias mk='make'
 alias rr='ranger'
-# Tmux auto-attach
-_has tmux && alias t='(tmux has-session 2>/dev/null && tmux attach -d) || (tmux new-session)'
+# Tmux auto-attach; with a session name, attach to it (creating it if needed)
+if _has tmux; then
+  t() {
+    if [ $# -gt 0 ]; then
+      tmux new-session -A -D -s "$1"   # attach (detaching others) or create
+    elif tmux has-session 2>/dev/null; then
+      tmux attach -d
+    else
+      tmux new-session -s s0
+    fi
+  }
+fi
 
 # Environment inspection
 alias envs='env | sort'
