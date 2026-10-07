@@ -652,9 +652,26 @@ done
 # within Claude Code itself; scroll-wheel support is unaffected either way.
 if [ -n "${TMUX:-}" ] && [ -S "${TMUX%%,*}" ]; then
   docker_args+=(-e "TMUX=${TMUX}" -v "${TMUX%%,*}:${TMUX%%,*}")
+  # Also name the pane. tmux sets $TMUX_PANE, and a host-side tool watching
+  # this container (ccmux) can read it from the container process's environ:
+  # the container's own tty number (pts/0, in its private devpts) can't be
+  # matched against host panes, so this is how it knows which pane hosts it.
+  [ -n "${TMUX_PANE:-}" ] && docker_args+=(-e "TMUX_PANE=${TMUX_PANE}")
 else
   docker_args+=(-e "CLAUDE_CODE_DISABLE_MOUSE_CLICKS=1")
 fi
+
+# ccmux (a tmux agent-session tracker) learns an agent's state from marker
+# files that Claude Code hooks write into <CCMUX_HOME or ~/.config/ccmux>/
+# session-pids. The hooks run inside this container, so share that directory
+# (at the container user's default location, where the hook looks) or the
+# session would never show up. Only when ccmux is set up on the host - the
+# directory is created by it - so this stays out of the way for everyone else.
+_ccmux_markers="${CCMUX_HOME:-$HOME/.config/ccmux}/session-pids"
+if [ -d "$_ccmux_markers" ]; then
+  docker_args+=(-v "${_ccmux_markers}:/home/claude/.config/ccmux/session-pids")
+fi
+unset _ccmux_markers
 
 # Pass through the host's effective git identity (user.name / user.email,
 # resolved the same way any git command run outside Docker would resolve

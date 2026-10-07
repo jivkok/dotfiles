@@ -41,6 +41,10 @@
 # above since that --user override has no /etc/passwd entry for Docker to
 # infer it from.
 #
+# procps (for `ps`) is installed because ccmux's Claude hook scripts walk the
+# process tree with `ps` to find the agent's pid; this base image has none,
+# and without it the hook records a short-lived wrapper pid instead.
+#
 # tmux is installed so that, when claude-code-docker.sh is itself run from
 # inside a host tmux session, Claude Code's own tmux-aware clipboard
 # integration (mouse selection -> "Copied N chars to tmux buffer") works the
@@ -62,6 +66,7 @@ RUN apt-get update -qq && \
   curl \
   git \
   jq \
+  procps \
   python3 \
   tmux \
   tzdata \

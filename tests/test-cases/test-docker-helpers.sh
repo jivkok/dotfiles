@@ -115,6 +115,38 @@ else
 fi
 check "state kept under XDG_STATE_HOME" test -n "$(ls -A "$state")"
 
+log_trace "--- claude-code-docker.sh: ccmux integration ---"
+# TMUX_PANE is only passed along with the tmux socket bridge: it needs a real
+# socket for the launcher's `-S` check, so bind one.
+tmux_sock="${tmpdir}/tmux.sock"
+python3 -c 'import socket,sys; s=socket.socket(socket.AF_UNIX); s.bind(sys.argv[1]); import time; time.sleep(30)' "$tmux_sock" &
+sock_pid=$!
+for _ in 1 2 3 4 5 6 7 8 9 10; do [ -S "$tmux_sock" ] && break; sleep 0.2; done
+rm -f "$run_log"
+(cd "$work" && env -u ANTHROPIC_API_KEY TMUX="${tmux_sock},1,0" TMUX_PANE="%7" \
+  PATH="$STUB_PATH" HOME="$fake_home" XDG_STATE_HOME="$state" TMPDIR="$launcher_tmp" \
+  STUB_DOCKER_IMAGES="ai-claude-code:1.2.3.${build_n}" bash "$LAUNCHER" >/dev/null 2>&1)
+kill "$sock_pid" 2>/dev/null
+check "tmux bridge also passes TMUX_PANE" has_arg_pair -e "TMUX_PANE=%7"
+
+rm -f "$run_log"
+launch >/dev/null
+check_not "no TMUX_PANE without a tmux bridge" grep -qF "TMUX_PANE=" "$run_log"
+check_not "no ccmux mount when ccmux is not set up" grep -qF "ccmux" "$run_log"
+
+mkdir -p "${fake_home}/.config/ccmux/session-pids"
+rm -f "$run_log"
+launch >/dev/null
+check "mounts ccmux marker dir where the container's hook looks" \
+  has_arg_pair -v "${fake_home}/.config/ccmux/session-pids:/home/claude/.config/ccmux/session-pids"
+
+rm -rf "${fake_home}/.config/ccmux"
+mkdir -p "${tmpdir}/ccmux-home/session-pids"
+rm -f "$run_log"
+CCMUX_HOME="${tmpdir}/ccmux-home" launch >/dev/null
+check "CCMUX_HOME overrides the host marker dir" \
+  has_arg_pair -v "${tmpdir}/ccmux-home/session-pids:/home/claude/.config/ccmux/session-pids"
+
 log_trace "--- claude-code-docker.sh: CLI mount ---"
 rm -f "$run_log"
 launch '~/x:/x' >/dev/null
