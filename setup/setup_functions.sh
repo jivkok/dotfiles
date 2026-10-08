@@ -22,6 +22,17 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../sh/helpers.sh"
 export HOMEBREW_NO_ASK=1
 
 #######################################
+# Appends a line to the history log. Best-effort: a read-only/missing $HOME
+# (e.g. inside a container) must not abort the caller under `set -e`.
+# Arguments:
+#   $1 - line to append
+# Returns:
+#   None
+function _log_history() {
+  echo "$1" >>~/.dotfiles_history 2>/dev/null || true
+}
+
+#######################################
 # Logs trace messages (level 3)
 # Arguments:
 #   $1 - message
@@ -34,7 +45,7 @@ function log_trace() {
 
   timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
   echo -e "$(tput setaf 8 2>/dev/null)$timestamp: $msg$(tput sgr0 2>/dev/null)"
-  echo "$timestamp: [TRACE] $msg" >>~/.dotfiles_history
+  _log_history "$timestamp: [TRACE] $msg"
 }
 
 #######################################
@@ -50,7 +61,7 @@ function log_warning() {
 
   timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
   echo -e "$(tput setaf 3 2>/dev/null)$timestamp: $msg$(tput sgr0 2>/dev/null)"
-  echo "$timestamp: [WARNING] $msg" >>~/.dotfiles_history
+  _log_history "$timestamp: [WARNING] $msg"
 }
 
 #######################################
@@ -66,7 +77,7 @@ function log_info() {
 
   timestamp="$(date "+%Y-%m-%d %H:%M:%S")"
   echo -e "$(tput setaf 2 2>/dev/null)$timestamp: $msg$(tput sgr0 2>/dev/null)"
-  echo "$timestamp: [INFO] $msg" >>~/.dotfiles_history
+  _log_history "$timestamp: [INFO] $msg"
 }
 
 #######################################
@@ -81,7 +92,7 @@ function log_error() {
 
   timestamp=$(date "+%Y-%m-%d %H:%M:%S")
   echo -e "\n$(tput setaf 1 2>/dev/null)$timestamp: $msg$(tput sgr0 2>/dev/null)\n"
-  echo "$timestamp: [ERROR] $msg" >>~/.dotfiles_history
+  _log_history "$timestamp: [ERROR] $msg"
 }
 
 #######################################

@@ -182,6 +182,15 @@ write_stub() {
   chmod +x "$1"
 }
 
+# isolate_home <dir>  — exports HOME to <dir> (created if needed), so
+# anything keyed off $HOME -- notably setup/setup_functions.sh's log_*,
+# which append to $HOME/.dotfiles_history -- lands in a throwaway location
+# instead of the real developer's actual home directory.
+isolate_home() {
+  export HOME="$1"
+  mkdir -p "$HOME"
+}
+
 # path_without <cmd> <scratch-dir>  — print $PATH with <cmd> hidden: every PATH
 # dir that holds <cmd> is replaced by a symlink mirror of it (under
 # <scratch-dir>) minus <cmd>, so everything else in that dir stays reachable.

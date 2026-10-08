@@ -23,6 +23,7 @@
 # main/master.
 
 set -Eeuo pipefail
+IFS=$'\n\t'
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
@@ -34,7 +35,17 @@ source "${DOTFILES_ROOT}/setup/setup_functions.sh"
 # ancestor. Portable (macOS has no GNU realpath by default).
 abs_physical_path() {
   local p="$1" rest=""
+  [[ "$p" == "~" ]] && p="$HOME"
+  # shellcheck disable=SC2088  # intentional: matching a literal leading "~"
+  # in $p's value (e.g. from WORKTREES_DIR="~/worktrees"), not expanding one.
+  [[ "$p" == "~/"* ]] && p="$HOME/${p:2}"
   [[ "$p" == /* ]] || p="$PWD/$p"
+  # Strip trailing slashes (but keep a bare "/" as-is): otherwise the next
+  # line's `${p##*/}` greedily matches through a trailing slash to an empty
+  # basename, and the real last component is lost.
+  while [[ "$p" == */ && "$p" != "/" ]]; do
+    p="${p%/}"
+  done
   while [ ! -d "$p" ]; do
     rest="/${p##*/}${rest}"
     p="$(dirname -- "$p")"
@@ -123,7 +134,9 @@ check_dependencies() {
     _has "$cmd" || missing+=("$cmd")
   done
   if [ "${#missing[@]}" -gt 0 ]; then
-    die "Missing required command(s): ${missing[*]}. Install them before running 'new'."
+    # `[*]` joins with IFS's first character; do it in a subshell with IFS
+    # set to a plain space, rather than depending on the script's own IFS.
+    die "Missing required command(s): $(IFS=' '; printf '%s' "${missing[*]}"). Install them before running 'new'."
   fi
 }
 
@@ -150,12 +163,14 @@ remove_base_branch() {
 }
 
 # Resolves and validates a task's recorded base branch, or dies with a clear
-# message. Prints the base branch name on stdout.
+# message. Prints the base branch name on stdout -- callers capture this with
+# `$(...)`, so die's own message is redirected to stderr here; otherwise it
+# would be swallowed into the capture instead of reaching the terminal.
 get_base_branch_or_die() {
   local repo_root="$1" branch="$2" base
   base="$(get_base_branch "$repo_root" "$branch")" || true
-  [ -n "$base" ] || die "No recorded base branch for '$branch' (it may not have been created with 'new')."
-  branch_exists "$repo_root" "$base" || die "Recorded base branch '$base' for '$branch' no longer exists."
+  [ -n "$base" ] || die "No recorded base branch for '$branch' (it may not have been created with 'new')." >&2
+  branch_exists "$repo_root" "$base" || die "Recorded base branch '$base' for '$branch' no longer exists." >&2
   printf '%s\n' "$base"
 }
 
@@ -207,8 +222,7 @@ find_worktree_for_branch() {
 # the repo (e.g. claude-code-docker.sh without `worktrees: true`) finds their
 # directories missing and `git worktree prune` would drop their metadata. A
 # lock makes prune/gc skip them; `new` locks, `cleanup` unlocks first.
-WT_LOCK_REASON="managed by worktrees.sh"
-
+#
 # is_worktree_locked <repo_root> <path> [reason] -- with a reason, true only
 # for a lock carrying exactly that reason (i.e. one we placed).
 is_worktree_locked() {
@@ -220,18 +234,26 @@ is_worktree_locked() {
         END { exit !found }'
 }
 
+# Our lock's reason embeds the worktree's own path, not just a generic
+# phrase, so a lock placed by hand would have to coincidentally reuse this
+# exact path-specific string (not just a guessable constant) to be mistaken
+# for ours.
+_wt_lock_reason() {
+  printf 'managed by worktrees.sh: %s' "$1"
+}
+
 # Idempotent: a no-op when the worktree is already locked.
 lock_worktree() {
   local repo_root="$1" path="$2"
   is_worktree_locked "$repo_root" "$path" && return 0
-  git -C "$repo_root" worktree lock --reason "$WT_LOCK_REASON" -- "$path"
+  git -C "$repo_root" worktree lock --reason "$(_wt_lock_reason "$path")" -- "$path"
 }
 
 # Idempotent: a no-op unless the worktree carries our lock -- a lock placed by
 # hand (different reason) is left alone, so removing it still fails loudly.
 unlock_worktree() {
   local repo_root="$1" path="$2"
-  is_worktree_locked "$repo_root" "$path" "$WT_LOCK_REASON" || return 0
+  is_worktree_locked "$repo_root" "$path" "$(_wt_lock_reason "$path")" || return 0
   git -C "$repo_root" worktree unlock -- "$path"
 }
 
@@ -393,7 +415,7 @@ cmd_list() {
   # Fetched once, not per task: open windows and recorded base branches.
   windows=$'\n'"$(tmux list-windows -t "=$session" -F '#{window_name}' 2>/dev/null || true)"$'\n'
   local -A bases=()
-  while read -r key value; do
+  while IFS=' ' read -r key value; do
     key="${key#wt.}"
     bases[${key%.base}]="$value"
   done < <(git -C "$repo_root" config --get-regexp '^wt\..*\.base$' 2>/dev/null || true)
@@ -475,7 +497,7 @@ cmd_done() {
 
 cmd_cleanup() {
   local branch="$1" force="$2" repo_root repo_name session wt_path
-  local base dirty ahead unmerged=0 base_exists=0
+  local base dirty ahead unmerged=0 base_exists=0 verify_failed=0
   load_task_ctx "$branch"
 
   require_worktree_exists "$wt_path" "$branch"
@@ -485,8 +507,14 @@ cmd_cleanup() {
 
   if [ -n "$base" ] && branch_exists "$repo_root" "$base"; then
     base_exists=1
-    ahead="$(git -C "$repo_root" rev-list --count "$base..$branch" 2>/dev/null || printf '0')"
-    [ "$ahead" -gt 0 ] && unmerged=1
+    if ahead="$(git -C "$repo_root" rev-list --count "$base..$branch" 2>/dev/null)"; then
+      [ "$ahead" -gt 0 ] && unmerged=1
+    else
+      # rev-list failed: merged status is unknown, not "0 commits ahead" --
+      # treat it like the no-valid-base case below (refuse without --force).
+      unmerged=1
+      verify_failed=1
+    fi
   else
     unmerged=1
   fi
@@ -494,7 +522,9 @@ cmd_cleanup() {
   if [ "$force" != "1" ]; then
     [ -z "$dirty" ] || die "Worktree for '$branch' has uncommitted changes. Commit/stash them, or re-run with --force to discard."
     if [ "$unmerged" -eq 1 ]; then
-      if [ "$base_exists" -eq 1 ]; then
+      if [ "$verify_failed" -eq 1 ]; then
+        die "Could not verify '$branch' is fully merged ('git rev-list' failed). Re-run with --force to discard."
+      elif [ "$base_exists" -eq 1 ]; then
         die "Branch '$branch' has commits not yet integrated into '$base'. Run 'done $branch' first, or re-run with --force to discard."
       else
         die "Could not verify '$branch' is fully merged (no recorded/valid base branch). Re-run with --force to discard."
@@ -504,18 +534,21 @@ cmd_cleanup() {
     log_warning "--force: discarding task '$branch' (uncommitted-changes=$([ -n "$dirty" ] && echo yes || echo no), unmerged=$([ "$unmerged" -eq 1 ] && echo yes || echo no))."
   fi
 
-  close_tmux_window_if_exists "$session" "$branch"
-
   log_info "Removing worktree $wt_path ..."
   local remove_args=()
   [ "$force" = "1" ] && remove_args=(--force)
   # A locked worktree can't be removed (even with --force), so unlock first,
   # and restore the lock if the removal fails and the worktree stays.
   unlock_worktree "$repo_root" "$wt_path"
-  if ! git -C "$repo_root" worktree remove "${remove_args[@]}" -- "$wt_path"; then
+  if ! git -C "$repo_root" worktree remove "${remove_args[@]+"${remove_args[@]}"}" -- "$wt_path"; then
     lock_worktree "$repo_root" "$wt_path"
     die "Could not remove worktree $wt_path."
   fi
+
+  # Only close the tmux window once the worktree is actually gone -- closing
+  # it first would destroy the task's panes even on a failed removal above,
+  # which leaves the worktree/branch (correctly) in place.
+  close_tmux_window_if_exists "$session" "$branch"
 
   # -D (not -d): our own base-relative merge check above already gates this;
   # git's built-in -d safety check compares against the current HEAD of the

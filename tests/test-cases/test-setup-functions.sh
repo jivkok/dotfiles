@@ -17,6 +17,12 @@ source "$DOTDIR/setup/setup_functions.sh"
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
+# log_trace/log_info/log_warning/log_error (exercised throughout this file,
+# both directly and via `bash -c "source ...; log_*"` below) append every
+# message to $HOME/.dotfiles_history -- isolate HOME so that lands in this
+# throwaway dir instead of the real developer's actual history file.
+isolate_home "$tmpdir/home"
+
 # ── LOG_LEVEL filtering ────────────────────────────────────────────────────────
 log_trace "--- LOG_LEVEL filtering ---"
 

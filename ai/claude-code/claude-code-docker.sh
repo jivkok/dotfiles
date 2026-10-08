@@ -295,6 +295,14 @@ trap _cleanup EXIT
 CLI_ENV=()
 CLI_MOUNTS=()
 RESUME_ID=""
+# Shared by both --resume forms below: a session ID that looks like a flag
+# means the next argument was swallowed by mistake (e.g. a missing value).
+_validate_resume_id() {
+  if [[ "$RESUME_ID" == -* ]]; then
+    log_error "claude-code-docker.sh: --resume value \"${RESUME_ID}\" looks like a flag, not a session ID."
+    exit 1
+  fi
+}
 while [ $# -gt 0 ]; do
   case "$1" in
     -e | --env)
@@ -315,10 +323,16 @@ while [ $# -gt 0 ]; do
         exit 1
       fi
       RESUME_ID="$2"
+      _validate_resume_id
       shift 2
       ;;
     --resume=*)
       RESUME_ID="${1#--resume=}"
+      if [ -z "$RESUME_ID" ]; then
+        log_error "claude-code-docker.sh: $1 needs a session-id argument (the bare/picker form isn't supported - see the script header)."
+        exit 1
+      fi
+      _validate_resume_id
       shift
       ;;
     *)
@@ -348,8 +362,10 @@ _cfg_list() {
     return 0
   fi
   # Minimal fallback for the flat "key:\n  - item" format, used without yq.
+  # The key line itself may carry a trailing "# comment" (the script's own
+  # header examples are written that way, e.g. "install:  # system deps").
   while IFS= read -r line || [ -n "$line" ]; do
-    if [[ "$line" =~ ^${key}:[[:space:]]*$ ]]; then
+    if [[ "$line" =~ ^${key}:[[:space:]]*(\#.*)?$ ]]; then
       in_list=true
     elif $in_list; then
       if [[ "$line" =~ ^[[:space:]]+-[[:space:]]*(.+)$ ]]; then
@@ -363,15 +379,23 @@ _cfg_list() {
 }
 
 # _cfg_scalar <file> <key>: prints a top-level scalar value (empty if absent).
+# YAML 1.1 boolean spellings (True/yes/on/... ) are normalized to lowercase
+# true/false, since the only consumers (docker:/worktrees:) compare with
+# `= "true"`.
 _cfg_scalar() {
-  local file="$1" key="$2" line
+  local file="$1" key="$2" line val
   if _has yq; then
     yq -r ".${key} // \"\"" "$file" 2>/dev/null
     return 0
   fi
   while IFS= read -r line || [ -n "$line" ]; do
     if [[ "$line" =~ ^${key}:[[:space:]]*(.+)$ ]]; then
-      _strip_item "${BASH_REMATCH[1]}"
+      val="$(_strip_item "${BASH_REMATCH[1]}")"
+      case "$val" in
+        [Tt][Rr][Uu][Ee] | [Yy][Ee][Ss] | [Oo][Nn] | 1) val="true" ;;
+        [Ff][Aa][Ll][Ss][Ee] | [Nn][Oo] | [Oo][Ff][Ff] | 0) val="false" ;;
+      esac
+      printf '%s\n' "$val"
     fi
   done <"$file"
 }
@@ -392,7 +416,11 @@ CFG_INSTALL=()
 CFG_ENV=()
 CFG_DOCKER=false
 CFG_WORKTREES=false
-for _f in "${_config_files[@]}"; do
+# "${arr[@]+"${arr[@]}"}" (used throughout this script wherever an array
+# that may be empty is expanded): plain "${arr[@]}" on an empty array is an
+# "unbound variable" error under `set -u` on bash <4.4 (macOS's system
+# /bin/bash is 3.2); this idiom expands to nothing instead.
+for _f in "${_config_files[@]+"${_config_files[@]}"}"; do
   log_trace "Reading project config: ${_f}"
   while IFS= read -r _v; do [ -n "$_v" ] && CFG_VOLUMES+=("$_v"); done < <(_cfg_list "$_f" volumes)
   while IFS= read -r _v; do [ -n "$_v" ] && CFG_INSTALL+=("$_v"); done < <(_cfg_list "$_f" install)
@@ -413,7 +441,7 @@ INSTALL_RECIPES=()
 
 _uses_recipe() {
   local r
-  for r in "${INSTALL_RECIPES[@]}"; do
+  for r in "${INSTALL_RECIPES[@]+"${INSTALL_RECIPES[@]}"}"; do
     [ "$r" = "$1" ] && return 0
   done
   return 1
@@ -448,7 +476,7 @@ DFEOF
 
 # docker: true implies the docker-cli recipe - no need to list it.
 [ "$CFG_DOCKER" = "true" ] && _add_recipe docker-cli
-for _item in "${CFG_INSTALL[@]}"; do
+for _item in "${CFG_INSTALL[@]+"${CFG_INSTALL[@]}"}"; do
   # Interpolated into a Dockerfile: allow only valid package-name characters.
   if [[ ! "$_item" =~ ^[a-z0-9][a-z0-9+.-]*$ ]]; then
     log_error "claude-code-docker.sh: invalid install entry \"${_item}\" (expected an apt package name or a recipe name)."
@@ -463,8 +491,8 @@ done
 _sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum; else shasum -a 256; fi; }
 
 if [ "${#INSTALL_APT[@]}" -gt 0 ] || [ "${#INSTALL_RECIPES[@]}" -gt 0 ]; then
-  _apt_sorted="$(printf '%s\n' "${INSTALL_APT[@]}" | sed '/^$/d' | sort -u | tr '\n' ' ')"
-  _recipes_sorted="$(printf '%s\n' "${INSTALL_RECIPES[@]}" | sed '/^$/d' | sort -u | tr '\n' ' ')"
+  _apt_sorted="$(printf '%s\n' "${INSTALL_APT[@]+"${INSTALL_APT[@]}"}" | sed '/^$/d' | sort -u | tr '\n' ' ')"
+  _recipes_sorted="$(printf '%s\n' "${INSTALL_RECIPES[@]+"${INSTALL_RECIPES[@]}"}" | sed '/^$/d' | sort -u | tr '\n' ' ')"
   # The hash covers the base tag, so a new base image (Claude Code release
   # or BUILD bump) yields a new project tag and a rebuild; an unchanged
   # project starts instantly.
@@ -482,7 +510,7 @@ USER root
     while IFS= read -r _r; do
       [ -n "$_r" ] && _dockerfile+="$(_recipe_dockerfile "$_r")
 "
-    done < <(printf '%s\n' "${INSTALL_RECIPES[@]}" | sed '/^$/d' | sort -u)
+    done < <(printf '%s\n' "${INSTALL_RECIPES[@]+"${INSTALL_RECIPES[@]}"}" | sed '/^$/d' | sort -u)
     _dockerfile+="USER claude
 "
     if ! printf '%s' "$_dockerfile" | docker build -t "$_proj_tag" -; then
@@ -568,25 +596,46 @@ fi
 # env: NAME passes the host's value through (docker reads it itself from
 # `-e NAME` - this script never expands, logs or stores it); NAME=value is a
 # literal, written to a 0600 env-file rather than argv so it stays out of
-# `ps`. Config entries come first, so CLI -e wins on a repeated name.
+# `ps`. Config entries are recorded first, then CLI entries, into these two
+# parallel (plain, bash-3.2-friendly) arrays keyed by position -- a repeat of
+# the same name overwrites its earlier slot in place, so a later (CLI) entry
+# always wins over an earlier (config) one regardless of which side used
+# which kind. Resolving the winner ourselves (rather than emitting both a
+# `-e NAME` and an `--env-file` line and letting docker pick) means the "CLI
+# wins" contract holds even when config and CLI mix bare vs literal for the
+# same name.
+_ENV_NAMES=()
+_ENV_ENTRIES=()
 _add_env() {
-  local entry="$1" name
+  local entry="$1" name i
   name="${entry%%=*}"
   if [[ ! "$name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
     log_error "claude-code-docker.sh: invalid env entry name \"${name}\"."
     exit 1
   fi
-  if [[ "$entry" == *=* ]]; then
-    [ -n "$_env_file" ] || _env_file="$(mktemp)"
-    printf '%s\n' "$entry" >>"$_env_file"
-  elif [ -n "${!name+x}" ]; then
-    docker_args+=(-e "$name")
-  else
-    log_warning "claude-code-docker.sh: env ${name} is not set on the host; not passing it."
-  fi
+  for i in "${!_ENV_NAMES[@]}"; do
+    if [ "${_ENV_NAMES[i]}" = "$name" ]; then
+      _ENV_ENTRIES[i]="$entry"
+      return 0
+    fi
+  done
+  _ENV_NAMES+=("$name")
+  _ENV_ENTRIES+=("$entry")
 }
-for _e in "${CFG_ENV[@]}" "${CLI_ENV[@]}"; do
+for _e in "${CFG_ENV[@]+"${CFG_ENV[@]}"}" "${CLI_ENV[@]+"${CLI_ENV[@]}"}"; do
   _add_env "$_e"
+done
+for _i in "${!_ENV_NAMES[@]}"; do
+  _name="${_ENV_NAMES[_i]}"
+  _entry="${_ENV_ENTRIES[_i]}"
+  if [[ "$_entry" == *=* ]]; then
+    [ -n "$_env_file" ] || _env_file="$(mktemp)"
+    printf '%s\n' "$_entry" >>"$_env_file"
+  elif [ -n "${!_name+x}" ]; then
+    docker_args+=(-e "$_name")
+  else
+    log_warning "claude-code-docker.sh: env ${_name} is not set on the host; not passing it."
+  fi
 done
 [ -n "$_env_file" ] && docker_args+=(--env-file "$_env_file")
 
@@ -675,13 +724,13 @@ _mount_extra_dir() {
   CLAUDE_ADD_DIRS+=("${_rest%%:*}")
 }
 
-for extra_dir in "${CLI_MOUNTS[@]}"; do
+for extra_dir in "${CLI_MOUNTS[@]+"${CLI_MOUNTS[@]}"}"; do
   extra_dir="${extra_dir/#\~/$HOME}"
   log_trace "Mounting extra directory (CLI): ${extra_dir}"
   _mount_extra_dir "$extra_dir"
 done
 
-for _vol in "${CFG_VOLUMES[@]}"; do
+for _vol in "${CFG_VOLUMES[@]+"${CFG_VOLUMES[@]}"}"; do
   _vol="${_vol/#\~/$HOME}"
   log_trace "Mounting extra directory (config): ${_vol}"
   _mount_extra_dir "$_vol"
@@ -713,16 +762,11 @@ if [ "$CFG_WORKTREES" = "true" ]; then
 fi
 
 docker_args+=("$IMAGE_TAG" claude --permission-mode auto)
-for add_dir in "${CLAUDE_ADD_DIRS[@]}"; do
+for add_dir in "${CLAUDE_ADD_DIRS[@]+"${CLAUDE_ADD_DIRS[@]}"}"; do
   docker_args+=(--add-dir "$add_dir")
 done
-if [ -n "$RESUME_ID" ]; then
-  if [[ "$RESUME_ID" == -* ]]; then
-    log_error "claude-code-docker.sh: --resume value \"${RESUME_ID}\" looks like a flag, not a session ID."
-    exit 1
-  fi
-  docker_args+=(--resume "$RESUME_ID")
-fi
+# Validated at parse time (above), before any slow image build runs.
+[ -n "$RESUME_ID" ] && docker_args+=(--resume "$RESUME_ID")
 
 log_info "Launching ${IMAGE_TAG} ..."
 docker "${docker_args[@]}"
