@@ -157,16 +157,28 @@ assert_not_contains() {
 
 # check <label> <cmd...>      — pass if cmd succeeds.
 # check_not <label> <cmd...>  — pass if cmd fails.
-# The command's output is captured and shown only when the check fails.
-check() {
-  local label="$1" out
-  shift
-  if out="$("$@" 2>&1)"; then ok "$label"; else fail "$label${out:+ — output: $out}"; fi
-}
-check_not() {
-  local label="$1" out
-  shift
-  if out="$("$@" 2>&1)"; then fail "$label${out:+ — output: $out}"; else ok "$label"; fi
+# cmd runs in the current shell (not a $(...) subshell), so a function's side
+# effects -- variables, cd, background jobs -- persist, and it reads the
+# caller's stdin (e.g. `check "..." grep -q x <<< "$s"`); like any command, an
+# `exit` in it ends the test file. Its output goes to a temp file, read back
+# only when the check fails.
+check()     { _check_run 0 "$@"; }
+check_not() { _check_run 1 "$@"; }
+
+# _check_run <negate 0|1> <label> <cmd...>
+# Locals are prefixed so they don't shadow globals the command sets (out, rc).
+_check_run() {
+  local _cr_negate="$1" _cr_label="$2" _cr_file _cr_out _cr_rc=0
+  shift 2
+  _cr_file="$(mktemp)"
+  "$@" >"$_cr_file" 2>&1 || _cr_rc=$?
+  if [ "$((_cr_rc == 0))" -ne "$_cr_negate" ]; then
+    ok "$_cr_label"
+  else
+    _cr_out="$(<"$_cr_file")"
+    fail "$_cr_label${_cr_out:+ — output: $_cr_out}"
+  fi
+  rm -f "$_cr_file"
 }
 
 # run_capture <cmd...>  — run cmd, setting `out` (stdout+stderr) and `rc` (exit code).
@@ -186,9 +198,13 @@ write_stub() {
 # anything keyed off $HOME -- notably setup/setup_functions.sh's log_*,
 # which append to $HOME/.dotfiles_history -- lands in a throwaway location
 # instead of the real developer's actual home directory.
+# An empty ~/.zshrc is created so a zsh login shell started under this HOME
+# (e.g. in a tmux pane) doesn't run the zsh-newuser-install wizard, which
+# swallows the keys the test sends.
 isolate_home() {
   export HOME="$1"
   mkdir -p "$HOME"
+  : >>"$HOME/.zshrc"
 }
 
 # path_without <cmd> <scratch-dir>  — print $PATH with <cmd> hidden: every PATH

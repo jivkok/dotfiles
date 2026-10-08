@@ -275,12 +275,29 @@ tmux_window_exists() {
   tmux list-windows -t "=$session" -F '#{window_name}' 2>/dev/null | grep -qxF "$window"
 }
 
+# Closes the window, stopping every pane's process. If this script is running
+# in one of those panes, killing the window now would SIGHUP it mid-command:
+# stop the other panes now and close the window once the script exits
+# successfully (on failure this pane stays, with the error on screen).
 close_tmux_window_if_exists() {
   local session="$1" window="$2"
-  if tmux_window_exists "$session" "$window"; then
-    tmux kill-window -t "=$session:$window"
-    log_info "Closed tmux window '$window' in session '$session'."
+  tmux_window_exists "$session" "$window" || return 0
+  if [ -n "${TMUX_PANE:-}" ] \
+    && tmux list-panes -t "=$session:$window" -F '#{pane_id}' | grep -qxF "$TMUX_PANE"; then
+    tmux kill-pane -a -t "$TMUX_PANE"
+    DEFERRED_WINDOW="=$session:$window"
+    trap close_deferred_window EXIT
+    log_info "Closing tmux window '$window' in session '$session' on exit."
+    return 0
   fi
+  tmux kill-window -t "=$session:$window"
+  log_info "Closed tmux window '$window' in session '$session'."
+}
+
+# EXIT trap set by close_tmux_window_if_exists.
+close_deferred_window() {
+  local rc=$?
+  [ "$rc" -ne 0 ] || tmux kill-window -t "$DEFERRED_WINDOW"
 }
 
 # split_pane <-h|-v> <target-pane> <percent> <dir>  — split <percent> of the
@@ -320,6 +337,13 @@ create_tmux_task_window() {
   pane1="$(split_pane -h "$pane0" 33 "$worktree_path")"
   pane2="$(split_pane -v "$pane1" 67 "$worktree_path")"
   pane3="$(split_pane -v "$pane2" 50 "$worktree_path")"
+
+  # Pane titles are the task layout's labels; stop each pane's shell prompt
+  # (title escape sequences) from overwriting them.
+  local p
+  for p in "$pane0" "$pane1" "$pane2" "$pane3"; do
+    tmux set-option -p -t "$p" allow-set-title off 2>/dev/null || true
+  done
 
   tmux select-pane -t "$pane0" -T "claude" 2>/dev/null || true
   tmux select-pane -t "$pane1" -T "ranger" 2>/dev/null || true

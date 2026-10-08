@@ -82,11 +82,21 @@ rsync -az --delete \
   --include="tmux/" \
   --include="tmux/**" \
   --exclude="*" \
-  "${dotdir}/" "${remote_target}:${remote_dotfiles_dir}"
+  "${dotdir}/" "${remote_target}:${remote_dotfiles_dir}" || {
+  rc=$?
+  log_error "deploy-remote-vm.sh: rsync to ${remote_target} failed (exit ${rc})."
+  exit "${rc}"
+}
 
 log_trace "Dotfiles rsynced. Running setup-remote-vm.sh on ${remote_target} ..."
 
 # shellcheck disable=SC2029  # Intentional: remote_dotfiles_dir with ~ expands on the remote
-ssh -t "${ssh_opts[@]}" "${remote_target}" "DOT_RELOAD_SHELL=0 bash ${remote_dotfiles_dir}/setup/setup-remote-vm.sh"
+# Failures exit with the command's own status (255: ssh itself failed); this
+# script has no `set -e`, and would otherwise end with the log call's 0.
+ssh -t "${ssh_opts[@]}" "${remote_target}" "DOT_RELOAD_SHELL=0 bash ${remote_dotfiles_dir}/setup/setup-remote-vm.sh" || {
+  rc=$?
+  log_error "deploy-remote-vm.sh: setup-remote-vm.sh on ${remote_target} failed (exit ${rc})."
+  exit "${rc}"
+}
 
 log_trace "Minimal setup complete on ${remote_target}."

@@ -29,11 +29,15 @@ echo "\${!#}" >> "$curl_log"
 printf '%s\n' "\${STUB_CURL_OUT:-}"
 EOF
 )"
-# docker stub: `images` prints $STUB_DOCKER_IMAGES; `run`/`build` log one arg per line.
+env_file_log="${tmpdir}/env-file"
+# docker stub: `images` prints $STUB_DOCKER_IMAGES; `run`/`build` log one arg per
+# line; `run` also copies its --env-file (the launcher deletes it on exit).
 write_stub "${stubs}/docker" "$(cat <<EOF
 case "\$1" in
   images) [[ -n "\${STUB_DOCKER_IMAGES:-}" ]] && printf '%s\n' "\$STUB_DOCKER_IMAGES" ;;
-  run)    shift; printf '%s\n' "\$@" > "$run_log" ;;
+  run)    shift; printf '%s\n' "\$@" > "$run_log"
+          : > "$env_file_log"
+          while [ \$# -gt 1 ]; do [ "\$1" = --env-file ] && cat "\$2" > "$env_file_log"; shift; done ;;
   build)  shift; printf '%s\n' "\$@" > "$build_log"; [[ "\${!#}" == "-" ]] && cat > "$dockerfile_log" ;;
 esac
 exit 0
@@ -42,6 +46,35 @@ EOF
 
 # PATH without yq: the launcher's fallback .aiproj parser is under test.
 STUB_PATH="${stubs}:$(path_without yq "$tmpdir")"
+
+# PATH with yq: the real one when installed; otherwise a stand-in for
+# `yq -r <filter> <file>` on the flat .aiproj format, converted to JSON and
+# evaluated by the real jq (same filter semantics).
+yq_stubs="${tmpdir}/yq-stubs"
+mkdir -p "$yq_stubs"
+write_stub "${yq_stubs}/yq" "$(cat <<'EOF'
+python3 - "$3" <<'PY' | jq -r "$2"
+import json, sys
+def scalar(v):
+    v = v.split(" #")[0].strip().strip('"').strip("'")
+    return {"true": True, "false": False}.get(v, v)
+doc, key = {}, None
+for line in open(sys.argv[1]):
+    if line.strip().startswith("- ") and key:
+        doc.setdefault(key, []).append(scalar(line.strip()[2:]))
+    elif ":" in line and not line[0].isspace():
+        key, val = line.split(":", 1)
+        if val.strip():
+            doc[key] = scalar(val)
+print(json.dumps(doc))
+PY
+EOF
+)"
+if command -v yq >/dev/null 2>&1; then
+  YQ_PATH="${stubs}:${PATH}"
+else
+  YQ_PATH="${yq_stubs}:${STUB_PATH}"
+fi
 
 # ── docker/docker.sh: docker_tags ──────────────────────────────────────────────
 log_trace "--- docker_tags ---"
@@ -91,7 +124,7 @@ stamp="${launcher_tmp}/ai-claude-code-version-check-$(id -u)"
 # launch [args...]  — run the launcher from $work with stubs; env tweaks via caller.
 launch() {
   (cd "${LAUNCH_DIR:-$work}" && env -u TMUX -u ANTHROPIC_API_KEY \
-    PATH="$STUB_PATH" HOME="$fake_home" XDG_STATE_HOME="$state" TMPDIR="$launcher_tmp" \
+    PATH="${LAUNCH_PATH:-$STUB_PATH}" HOME="$fake_home" XDG_STATE_HOME="$state" TMPDIR="$launcher_tmp" \
     STUB_DOCKER_IMAGES="${STUB_DOCKER_IMAGES-ai-claude-code:1.2.3.${build_n}}" \
     STUB_CURL_OUT="${STUB_CURL_OUT:-}" \
     ${API_KEY:+ANTHROPIC_API_KEY="$API_KEY"} \
@@ -100,6 +133,15 @@ launch() {
 run_args() { cat "$run_log" 2>/dev/null; }
 # has_arg_pair <a> <b>  — true if run args contain <a> immediately followed by <b>.
 has_arg_pair() { run_args | grep -xF -A1 -- "$1" | grep -qxF -- "$2"; }
+
+log_trace "--- claude-code-docker.sh: bash 3.2-safe array expansions ---"
+# macOS's /bin/bash 3.2 (any bash < 4.4) fails `"${a[@]}"` on an empty array
+# under set -u, so every possibly-empty array must be expanded as
+# ${a[@]+"${a[@]}"}. Static check: no such bash in the test environments.
+unguarded="$(sed -E 's/\$\{[A-Za-z_][A-Za-z0-9_]*\[@\]\+"\$\{[A-Za-z_][A-Za-z0-9_]*\[@\]\}"\}//g' "$LAUNCHER" \
+  | grep -oE '"\$\{[A-Za-z_][A-Za-z0-9_]*\[@\]\}"' \
+  | grep -vxE '"\$\{(docker_args|CONFIG_CANDIDATES)\[@\]\}"' || true)"
+assert_eq "no unguarded expansion of a possibly-empty array" "" "$unguarded"
 
 log_trace "--- claude-code-docker.sh: default run ---"
 date +%Y-%m-%d > "$stamp"
@@ -153,6 +195,25 @@ launch '~/x:/x' >/dev/null
 check "CLI mount expands ~" has_arg_pair -v "${fake_home}/x:/x"
 check "CLI mount adds --add-dir /x" has_arg_pair --add-dir /x
 
+log_trace "--- claude-code-docker.sh: CLI usage / unknown options ---"
+rm -f "$stamp" "$run_log"
+: > "$curl_log"
+run_capture launch --help
+assert_eq "--help: exit code" "0" "$rc"
+assert_contains "--help: prints usage" "Usage: claude-code-docker.sh" "$out"
+assert_file_absent "$run_log"
+check_not "--help: no version check (parsed before any network/docker work)" test -s "$curl_log"
+run_capture launch -h
+assert_eq "-h: exit code" "0" "$rc"
+run_capture launch --bogus
+assert_eq "unknown option: exit code" "1" "$rc"
+assert_contains "unknown option: error" 'unknown option "--bogus"' "$out"
+run_capture launch notamount
+assert_eq "positional without ':': exit code" "1" "$rc"
+assert_contains "positional without ':': error" "is not a host_path:container_path mount" "$out"
+assert_file_absent "$run_log"
+date +%Y-%m-%d > "$stamp"
+
 log_trace "--- claude-code-docker.sh: .aiproj volumes (no yq) ---"
 printf 'volumes:\n  - /a:/b\n' > "${work}/.aiproj"
 rm -f "$run_log"
@@ -184,6 +245,26 @@ env_file_arg="$(grep -xF -A1 -- --env-file "$run_log" | tail -n1)"
 check "env-file removed after run" test ! -e "$env_file_arg"
 rm -f "${work}/.aiproj" "${work}/.aiproj.local"
 
+log_trace "--- claude-code-docker.sh: env precedence (last entry per NAME wins) ---"
+printf 'env:\n  - CFG_PASS\n  - CFG_LIT=from-config\n  - TWICE=first\n  - TWICE=second\n' > "${work}/.aiproj"
+rm -f "$run_log"
+CFG_PASS=host CFG_LIT=host launch -e CFG_PASS=from-cli -e CFG_LIT >/dev/null
+check "CLI literal overrides config passthrough: literal in env-file" grep -qxF CFG_PASS=from-cli "$env_file_log"
+check_not "CLI literal overrides config passthrough: no -e CFG_PASS" has_arg_pair -e CFG_PASS
+check "CLI passthrough overrides config literal: -e CFG_LIT" has_arg_pair -e CFG_LIT
+check_not "CLI passthrough overrides config literal: not in env-file" grep -q '^CFG_LIT=' "$env_file_log"
+assert_eq "repeated literal: only the last is kept" "TWICE=second" "$(grep '^TWICE=' "$env_file_log")"
+# An unset passthrough doesn't override an earlier literal of the same NAME.
+rm -f "$run_log"
+(unset CFG_LIT; launch -e CFG_LIT >/dev/null)
+check "unset CLI passthrough keeps the config literal" grep -qxF CFG_LIT=from-config "$env_file_log"
+rm -f "$run_log"
+run_capture launch -e $'NL=a\nINJECTED=1'
+assert_eq "literal with a newline: exit code" "1" "$rc"
+assert_contains "literal with a newline: error" "can't contain a newline" "$out"
+assert_file_absent "$run_log"
+rm -f "${work}/.aiproj"
+
 log_trace "--- claude-code-docker.sh: install -> derived image ---"
 printf 'install:\n  - postgresql-client\n  - uv\n' > "${work}/.aiproj"
 rm -f "$run_log" "$build_log" "$dockerfile_log"
@@ -194,6 +275,13 @@ check "Dockerfile apt-installs postgresql-client" grep -q 'install.*postgresql-c
 check "Dockerfile has uv recipe" grep -q 'astral.sh/uv' "$dockerfile_log"
 check "run uses the project image" grep -q '^ai-claude-code-proj:' "$run_log"
 check "uv cache mounted" grep -q '/home/claude/.cache/uv$' "$run_log"
+check "Dockerfile sets pipefail before any RUN (curl | sh fails the build)" \
+  test "$(grep -m1 -E '^(SHELL|RUN) ' "$dockerfile_log")" = 'SHELL ["/bin/bash", "-o", "pipefail", "-c"]'
+# The tag hashes the full generated Dockerfile, so editing a recipe's text
+# (not only the package/recipe names) yields a new tag and a rebuild.
+dockerfile_hash="$(sha256sum "$dockerfile_log" 2>/dev/null || shasum -a 256 "$dockerfile_log")"
+check "project tag is the hash of the generated Dockerfile" \
+  grep -qxF "ai-claude-code-proj:${dockerfile_hash:0:12}" "$run_log"
 printf 'install:\n  - "bad pkg; rm -rf /"\n' > "${work}/.aiproj"
 run_capture launch
 assert_eq "invalid install entry: exit code" "1" "$rc"
@@ -258,6 +346,43 @@ check_not "worktrees: linked worktree does not mount the worktrees dir" grep -qx
 rm -f "${wt_main}/.aiproj" "$run_log"
 LAUNCH_DIR="$wt_main" launch >/dev/null
 check_not "worktrees: off by default" grep -qxF "${wt_dir}:${wt_dir}" "$run_log"
+
+# .aiproj.local can switch a key off again: `false` is a value, not "absent" -
+# with yq and with the fallback parser alike.
+printf 'worktrees: true\n' > "${wt_main}/.aiproj"
+printf 'worktrees: false\n' > "${wt_main}/.aiproj.local"
+for parser in yq fallback; do
+  rm -f "$run_log"
+  parser_path="$STUB_PATH"
+  [ "$parser" = yq ] && parser_path="$YQ_PATH"
+  LAUNCH_PATH="$parser_path" LAUNCH_DIR="$wt_main" launch >/dev/null
+  check_not "worktrees: .aiproj.local 'false' overrides 'true' (${parser})" \
+    grep -qxF "${wt_dir}:${wt_dir}" "$run_log"
+done
+rm -f "${wt_main}/.aiproj.local" "$run_log"
+LAUNCH_PATH="$YQ_PATH" LAUNCH_DIR="$wt_main" launch >/dev/null
+check "worktrees: 'true' read via yq" has_arg_pair -v "${wt_dir}:${wt_dir}"
+
+# A subdirectory launch would leave the worktree's .git unmounted: refused.
+mkdir -p "${wt_main}/sub"
+cp "${wt_main}/.aiproj" "${wt_main}/sub/.aiproj"
+rm -f "$run_log"
+LAUNCH_DIR="${wt_main}/sub" run_capture launch
+assert_eq "worktrees: subdirectory launch: exit code" "1" "$rc"
+assert_contains "worktrees: subdirectory launch: error names the root" "launched from the worktree root" "$out"
+assert_file_absent "$run_log"
+rm -rf "${wt_main}/sub"
+
+# No task worktrees yet: nothing created on the host, nothing mounted.
+wt_fresh="${tmpdir}/wt-fresh"
+git init -q -b master "$wt_fresh"
+printf 'worktrees: true\n' > "${wt_fresh}/.aiproj"
+rm -f "$run_log"
+LAUNCH_DIR="$wt_fresh" launch >/dev/null
+check_not "worktrees: missing worktrees dir is not created on the host" test -e "${fake_home}/worktrees/wt-fresh"
+check_not "worktrees: missing worktrees dir is not mounted" grep -qF "/worktrees/wt-fresh" "$run_log"
+check "worktrees: run still launches" grep -qxF claude "$run_log"
+rm -f "${wt_main}/.aiproj"
 
 # Outside a git repo: warns and ignores.
 printf 'worktrees: true\n' > "${work}/.aiproj"

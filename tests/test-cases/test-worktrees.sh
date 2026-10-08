@@ -133,18 +133,22 @@ tmux_session_exists() { tmux has-session -t "=$1" 2>/dev/null; }
 tmux_window_exists() {
   tmux list-windows -t "=$1" -F '#{window_name}' 2>/dev/null | grep -qxF "$2"
 }
+window_gone() { ! tmux_window_exists "$@"; }
 
-# wait_pane_contains <pane-target> <substring> -- polls capture-pane briefly.
-wait_pane_contains() {
-  local target="$1" needle="$2" _n
+# wait_until <cmd...> -- polls cmd for up to ~3s; true once it succeeds.
+wait_until() {
+  local _n
   for _n in $(seq 1 30); do
-    if tmux capture-pane -p -t "$target" 2>/dev/null | grep -qF "$needle"; then
-      return 0
-    fi
+    "$@" && return 0
     sleep 0.1
   done
   return 1
 }
+
+pane_contains() { tmux capture-pane -p -t "$1" 2>/dev/null | grep -qF "$2"; }
+
+# wait_pane_contains <pane-target> <substring> -- polls capture-pane briefly.
+wait_pane_contains() { wait_until pane_contains "$@"; }
 
 assert_status() {
   local label="$1" expected="$2" actual="$3"
@@ -757,6 +761,23 @@ wt_run "$lockrepo" cleanup "locked-by-hand" --force
 check_not "manual lock: cleanup fails" test "$WT_STATUS" -eq 0
 check "manual lock: worktree still present" test -d "$lockwt"
 check "manual lock: lock retained" wt_is_locked "$lockrepo" "$lockwt"
+
+# Run from a pane of the task's own window: closing that window SIGHUPs the
+# script, so it must be the last step, not one that strands the cleanup.
+log_trace "--- cleanup from inside the task's own window ---"
+selfrepo="$(make_repo master)"
+selfbranch="self-cleanup"
+wt_run "$selfrepo" new "$selfbranch"
+selfwt="$(wt_path_for "$selfrepo" "$selfbranch")"
+selflog="$ROOT_TMP/self-cleanup.log"
+selfpane="$(tmux list-panes -t "=$(repo_name "$selfrepo"):$selfbranch" -F '#{pane_id}' | tail -n1)"
+tmux send-keys -t "$selfpane" "cd '$selfrepo' && '$WT' cleanup '$selfbranch' --force >'$selflog' 2>&1" Enter
+wait_until window_gone "$(repo_name "$selfrepo")" "$selfbranch"
+check_not "self-cleanup: window closed" tmux_window_exists "$(repo_name "$selfrepo")" "$selfbranch"
+check "self-cleanup: script ran to completion" grep -qF "Cleaned up task '$selfbranch'" "$selflog"
+check_not "self-cleanup: worktree removed" test -e "$selfwt"
+check_not "self-cleanup: branch removed" git -C "$selfrepo" show-ref --verify --quiet "refs/heads/$selfbranch"
+check_not "self-cleanup: base-branch metadata removed" git -C "$selfrepo" config --get "wt.$selfbranch.base"
 
 # ── Summary ──────────────────────────────────────────────────────────────────
 finish_test

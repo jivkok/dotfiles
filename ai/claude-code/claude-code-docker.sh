@@ -81,8 +81,9 @@ IFS=$'\n\t'
 #                         # with apt's own "Unable to locate package" error.
 #                         #
 #                         # The derived image is tagged
-#                         # ai-claude-code-proj:<hash of base tag + sorted
-#                         # apt list + sorted recipe list>, and only rebuilt
+#                         # ai-claude-code-proj:<hash of the generated
+#                         # Dockerfile: base tag, sorted apt list and the
+#                         # recipes' own text>, and only rebuilt
 #                         # when that hash is new - an unchanged project
 #                         # starts instantly, while a new Claude Code base
 #                         # image (new version, or a bumped BUILD) yields a
@@ -106,12 +107,11 @@ IFS=$'\n\t'
 #                         #     same trap that cleans up the gitconfig temp
 #                         #     file) rather than passed as a -e argument, so
 #                         #     the value never appears in argv/`ps` output.
-#                         # Entries from config and any CLI -e/--env flags
-#                         # are all applied in order (config first, then
-#                         # CLI), so a later entry for the same NAME wins -
-#                         # in particular, a CLI -e overrides a same-named
-#                         # config entry. NAME must be a valid shell
-#                         # identifier ([A-Za-z_][A-Za-z0-9_]*); anything
+#                         # The last entry per NAME wins (config first,
+#                         # then CLI), so a CLI -e overrides config; a bare
+#                         # NAME unset on the host is skipped. NAME must be a
+#                         # valid shell identifier ([A-Za-z_][A-Za-z0-9_]*)
+#                         # and a literal can't contain a newline; anything
 #                         # else is rejected.
 #                         # Security note: anything passed this way is
 #                         # readable by Claude and by anything it runs
@@ -166,7 +166,8 @@ IFS=$'\n\t'
 #                         # worktrees:
 #                         #   - launched from the MAIN repo: mounts
 #                         #     $WORKTREES_DIR/<repo> (default
-#                         #     ~/worktrees/<repo>, created if missing), so
+#                         #     ~/worktrees/<repo>; skipped if it doesn't
+#                         #     exist yet - it's not created), so
 #                         #     the task worktrees exist in the container
 #                         #     (git would otherwise see them as stale and
 #                         #     `git worktree prune` could drop them) and
@@ -185,7 +186,10 @@ IFS=$'\n\t'
 #                         #     workflow (`worktrees.sh done`).
 #                         # Note the common dir is mounted read-write (git
 #                         # writes there), including .git/hooks and config.
-#                         # No-op outside a git repo.
+#                         # Must be launched from the worktree root (only the
+#                         # cwd is mounted, so a subdirectory would leave
+#                         # .git out); a subdirectory is an error. No-op
+#                         # outside a git repo.
 #
 # Builds the image automatically the first time it's needed for the current
 # ai/claude-code/BUILD number, tagged <claude_code_version>.<build_number>
@@ -219,6 +223,94 @@ IFS=$'\n\t'
 
 dotdir="$(cd "$(dirname "$0")/../.." && pwd)"
 source "$dotdir/setup/setup_functions.sh"
+
+# ── Command line ─────────────────────────────────────────────────────────────
+# -r/--resume <session-id> resumes a previous `claude` conversation instead
+# of starting a new one, forwarded as `claude ... --resume <session-id>`
+# below. Its transcript (~/.claude/projects/<cwd>/<session-id>.jsonl) and
+# ~/.claude.json's per-project record both live under the ~/.claude bind
+# mount this script already persists (see STATE_DIR below), so a session
+# from an earlier run of this same project directory is already there to
+# resume - no extra mount needed. A value is always required (unlike native
+# claude, where --resume alone opens an interactive picker across every
+# session claude can see): this wrapper doesn't support the bare/picker
+# form, both to keep CLI parsing unambiguous against the positional mount
+# arguments below, and because every project run without docker: true
+# currently shares one project bucket (see the WORKSPACE_DIR/docker: true
+# comment above) - a picker there would list unrelated projects' sessions
+# together, not just this one's.
+_usage() {
+  cat <<'EOF'
+Usage: claude-code-docker.sh [-e NAME | -e NAME=value ...] [-r SESSION_ID] [host_path:container_path ...]
+
+  -e, --env NAME[=value]    pass a host env var through, or set a literal (repeatable)
+  -r, --resume SESSION_ID   resume a previous claude conversation
+  -h, --help                show this help
+  host_path:container_path  extra directory to bind-mount (also an --add-dir)
+
+Per-project settings: .aiproj[.yaml|.yml] and .aiproj.local (see the script header).
+EOF
+}
+
+CLI_ENV=()
+CLI_MOUNTS=()
+RESUME_ID=""
+# Shared by both --resume forms below: a session ID that looks like a flag
+# means the next argument was swallowed by mistake (e.g. a missing value).
+_validate_resume_id() {
+  if [[ "$RESUME_ID" == -* ]]; then
+    log_error "claude-code-docker.sh: --resume value \"${RESUME_ID}\" looks like a flag, not a session ID."
+    exit 1
+  fi
+}
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -e | --env)
+      if [ $# -lt 2 ]; then
+        log_error "claude-code-docker.sh: $1 needs a NAME or NAME=value argument."
+        exit 1
+      fi
+      CLI_ENV+=("$2")
+      shift 2
+      ;;
+    --env=*)
+      CLI_ENV+=("${1#--env=}")
+      shift
+      ;;
+    -r | --resume)
+      if [ $# -lt 2 ]; then
+        log_error "claude-code-docker.sh: $1 needs a session-id argument (the bare/picker form isn't supported - see the script header)."
+        exit 1
+      fi
+      RESUME_ID="$2"
+      _validate_resume_id
+      shift 2
+      ;;
+    --resume=*)
+      RESUME_ID="${1#--resume=}"
+      _validate_resume_id
+      shift
+      ;;
+    -h | --help)
+      _usage
+      exit 0
+      ;;
+    -*)
+      log_error "claude-code-docker.sh: unknown option \"$1\"."
+      _usage >&2
+      exit 1
+      ;;
+    *:*)
+      CLI_MOUNTS+=("$1")
+      shift
+      ;;
+    *)
+      log_error "claude-code-docker.sh: \"$1\" is not a host_path:container_path mount."
+      _usage >&2
+      exit 1
+      ;;
+  esac
+done
 
 IMAGE_DIR="$dotdir/ai/claude-code"
 IMAGE_NAME="ai-claude-code"
@@ -277,71 +369,6 @@ _env_file=""
 _cleanup() { rm -f "$_gitconfig_tmp" "$_env_file"; }
 trap _cleanup EXIT
 
-# ── Command line ─────────────────────────────────────────────────────────────
-# -r/--resume <session-id> resumes a previous `claude` conversation instead
-# of starting a new one, forwarded as `claude ... --resume <session-id>`
-# below. Its transcript (~/.claude/projects/<cwd>/<session-id>.jsonl) and
-# ~/.claude.json's per-project record both live under the ~/.claude bind
-# mount this script already persists (see STATE_DIR below), so a session
-# from an earlier run of this same project directory is already there to
-# resume - no extra mount needed. A value is always required (unlike native
-# claude, where --resume alone opens an interactive picker across every
-# session claude can see): this wrapper doesn't support the bare/picker
-# form, both to keep CLI parsing unambiguous against the positional mount
-# arguments below, and because every project run without docker: true
-# currently shares one project bucket (see the WORKSPACE_DIR/docker: true
-# comment above) - a picker there would list unrelated projects' sessions
-# together, not just this one's.
-CLI_ENV=()
-CLI_MOUNTS=()
-RESUME_ID=""
-# Shared by both --resume forms below: a session ID that looks like a flag
-# means the next argument was swallowed by mistake (e.g. a missing value).
-_validate_resume_id() {
-  if [[ "$RESUME_ID" == -* ]]; then
-    log_error "claude-code-docker.sh: --resume value \"${RESUME_ID}\" looks like a flag, not a session ID."
-    exit 1
-  fi
-}
-while [ $# -gt 0 ]; do
-  case "$1" in
-    -e | --env)
-      if [ $# -lt 2 ]; then
-        log_error "claude-code-docker.sh: $1 needs a NAME or NAME=value argument."
-        exit 1
-      fi
-      CLI_ENV+=("$2")
-      shift 2
-      ;;
-    --env=*)
-      CLI_ENV+=("${1#--env=}")
-      shift
-      ;;
-    -r | --resume)
-      if [ $# -lt 2 ]; then
-        log_error "claude-code-docker.sh: $1 needs a session-id argument (the bare/picker form isn't supported - see the script header)."
-        exit 1
-      fi
-      RESUME_ID="$2"
-      _validate_resume_id
-      shift 2
-      ;;
-    --resume=*)
-      RESUME_ID="${1#--resume=}"
-      if [ -z "$RESUME_ID" ]; then
-        log_error "claude-code-docker.sh: $1 needs a session-id argument (the bare/picker form isn't supported - see the script header)."
-        exit 1
-      fi
-      _validate_resume_id
-      shift
-      ;;
-    *)
-      CLI_MOUNTS+=("$1")
-      shift
-      ;;
-  esac
-done
-
 # ── Project config (.aiproj[.yaml|.yml] + optional .aiproj.local) ───────────
 # Trims trailing " # comment", surrounding whitespace and matching quotes
 # from a list item (fallback parser only; yq does this natively).
@@ -385,7 +412,9 @@ _cfg_list() {
 _cfg_scalar() {
   local file="$1" key="$2" line val
   if _has yq; then
-    yq -r ".${key} // \"\"" "$file" 2>/dev/null
+    # Not `.key // ""`: `//` also replaces a literal false, so an .aiproj.local
+    # `docker: false` couldn't override the primary file's `docker: true`.
+    yq -r ".${key} | select(. != null)" "$file" 2>/dev/null
     return 0
   fi
   while IFS= read -r line || [ -n "$line" ]; do
@@ -416,11 +445,11 @@ CFG_INSTALL=()
 CFG_ENV=()
 CFG_DOCKER=false
 CFG_WORKTREES=false
-# "${arr[@]+"${arr[@]}"}" (used throughout this script wherever an array
-# that may be empty is expanded): plain "${arr[@]}" on an empty array is an
-# "unbound variable" error under `set -u` on bash <4.4 (macOS's system
-# /bin/bash is 3.2); this idiom expands to nothing instead.
-for _f in "${_config_files[@]+"${_config_files[@]}"}"; do
+# ${arr[@]+"${arr[@]}"} (used wherever an array that may be empty is expanded):
+# a plain quoted expansion of an empty array is an "unbound variable" error under
+# `set -u` on bash <4.4 (macOS's /bin/bash is 3.2); this expands to nothing.
+# Deliberately unquoted outside, so an empty array yields zero words, not "".
+for _f in ${_config_files[@]+"${_config_files[@]}"}; do
   log_trace "Reading project config: ${_f}"
   while IFS= read -r _v; do [ -n "$_v" ] && CFG_VOLUMES+=("$_v"); done < <(_cfg_list "$_f" volumes)
   while IFS= read -r _v; do [ -n "$_v" ] && CFG_INSTALL+=("$_v"); done < <(_cfg_list "$_f" install)
@@ -441,7 +470,7 @@ INSTALL_RECIPES=()
 
 _uses_recipe() {
   local r
-  for r in "${INSTALL_RECIPES[@]+"${INSTALL_RECIPES[@]}"}"; do
+  for r in ${INSTALL_RECIPES[@]+"${INSTALL_RECIPES[@]}"}; do
     [ "$r" = "$1" ] && return 0
   done
   return 1
@@ -476,7 +505,7 @@ DFEOF
 
 # docker: true implies the docker-cli recipe - no need to list it.
 [ "$CFG_DOCKER" = "true" ] && _add_recipe docker-cli
-for _item in "${CFG_INSTALL[@]+"${CFG_INSTALL[@]}"}"; do
+for _item in ${CFG_INSTALL[@]+"${CFG_INSTALL[@]}"}; do
   # Interpolated into a Dockerfile: allow only valid package-name characters.
   if [[ ! "$_item" =~ ^[a-z0-9][a-z0-9+.-]*$ ]]; then
     log_error "claude-code-docker.sh: invalid install entry \"${_item}\" (expected an apt package name or a recipe name)."
@@ -491,28 +520,33 @@ done
 _sha256() { if command -v sha256sum >/dev/null 2>&1; then sha256sum; else shasum -a 256; fi; }
 
 if [ "${#INSTALL_APT[@]}" -gt 0 ] || [ "${#INSTALL_RECIPES[@]}" -gt 0 ]; then
-  _apt_sorted="$(printf '%s\n' "${INSTALL_APT[@]+"${INSTALL_APT[@]}"}" | sed '/^$/d' | sort -u | tr '\n' ' ')"
-  _recipes_sorted="$(printf '%s\n' "${INSTALL_RECIPES[@]+"${INSTALL_RECIPES[@]}"}" | sed '/^$/d' | sort -u | tr '\n' ' ')"
-  # The hash covers the base tag, so a new base image (Claude Code release
-  # or BUILD bump) yields a new project tag and a rebuild; an unchanged
-  # project starts instantly.
-  _proj_hash="$(printf '%s|%s|%s' "$IMAGE_TAG" "$_apt_sorted" "$_recipes_sorted" | _sha256 | cut -c1-12)"
+  _apt_sorted="$(printf '%s\n' ${INSTALL_APT[@]+"${INSTALL_APT[@]}"} | sed '/^$/d' | sort -u | tr '\n' ' ')"
+  _recipes="$(printf '%s\n' ${INSTALL_RECIPES[@]+"${INSTALL_RECIPES[@]}"} | sed '/^$/d' | sort -u)"
+  _recipes_sorted="$(printf '%s' "$_recipes" | tr '\n' ' ')"
+  # pipefail: a recipe's `curl ... | sh` must fail the build when the download
+  # fails, not install nothing and get cached under this hash as a good image.
+  _dockerfile="FROM ${IMAGE_TAG}
+USER root
+SHELL [\"/bin/bash\", \"-o\", \"pipefail\", \"-c\"]
+"
+  if [ -n "$_apt_sorted" ]; then
+    _dockerfile+="RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends ${_apt_sorted}&& rm -rf /var/lib/apt/lists/*
+"
+  fi
+  while IFS= read -r _r; do
+    [ -n "$_r" ] && _dockerfile+="$(_recipe_dockerfile "$_r")
+"
+  done <<<"$_recipes"
+  _dockerfile+="USER claude
+"
+  # The tag hashes the generated Dockerfile itself: it names the base tag (a
+  # new Claude Code release or BUILD bump rebuilds), the apt list, and every
+  # recipe's text (editing a recipe rebuilds); an unchanged project starts
+  # instantly.
+  _proj_hash="$(printf '%s' "$_dockerfile" | _sha256 | cut -c1-12)"
   _proj_tag="${IMAGE_NAME}-proj:${_proj_hash}"
   if ! docker images "${IMAGE_NAME}-proj" --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | grep -qxF "$_proj_tag"; then
     log_info "Building project image ${_proj_tag} (apt: ${_apt_sorted:-none}; recipes: ${_recipes_sorted:-none}) ..."
-    _dockerfile="FROM ${IMAGE_TAG}
-USER root
-"
-    if [ -n "$_apt_sorted" ]; then
-      _dockerfile+="RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends ${_apt_sorted}&& rm -rf /var/lib/apt/lists/*
-"
-    fi
-    while IFS= read -r _r; do
-      [ -n "$_r" ] && _dockerfile+="$(_recipe_dockerfile "$_r")
-"
-    done < <(printf '%s\n' "${INSTALL_RECIPES[@]+"${INSTALL_RECIPES[@]}"}" | sed '/^$/d' | sort -u)
-    _dockerfile+="USER claude
-"
     if ! printf '%s' "$_dockerfile" | docker build -t "$_proj_tag" -; then
       log_error "claude-code-docker.sh: building the project image failed."
       exit 1
@@ -596,46 +630,40 @@ fi
 # env: NAME passes the host's value through (docker reads it itself from
 # `-e NAME` - this script never expands, logs or stores it); NAME=value is a
 # literal, written to a 0600 env-file rather than argv so it stays out of
-# `ps`. Config entries are recorded first, then CLI entries, into these two
-# parallel (plain, bash-3.2-friendly) arrays keyed by position -- a repeat of
-# the same name overwrites its earlier slot in place, so a later (CLI) entry
-# always wins over an earlier (config) one regardless of which side used
-# which kind. Resolving the winner ourselves (rather than emitting both a
-# `-e NAME` and an `--env-file` line and letting docker pick) means the "CLI
-# wins" contract holds even when config and CLI mix bare vs literal for the
-# same name.
-_ENV_NAMES=()
-_ENV_ENTRIES=()
-_add_env() {
-  local entry="$1" name i
-  name="${entry%%=*}"
-  if [[ ! "$name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
-    log_error "claude-code-docker.sh: invalid env entry name \"${name}\"."
+# `ps`. Docker applies every --env-file before any -e, whatever their order,
+# so precedence is resolved here instead: each NAME reaches docker once.
+_env_all=(${CFG_ENV[@]+"${CFG_ENV[@]}"} ${CLI_ENV[@]+"${CLI_ENV[@]}"})
+for _e in ${_env_all[@]+"${_env_all[@]}"}; do
+  _name="${_e%%=*}"
+  if [[ ! "$_name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+    log_error "claude-code-docker.sh: invalid env entry name \"${_name}\"."
     exit 1
   fi
-  for i in "${!_ENV_NAMES[@]}"; do
-    if [ "${_ENV_NAMES[i]}" = "$name" ]; then
-      _ENV_ENTRIES[i]="$entry"
-      return 0
-    fi
-  done
-  _ENV_NAMES+=("$name")
-  _ENV_ENTRIES+=("$entry")
-}
-for _e in "${CFG_ENV[@]+"${CFG_ENV[@]}"}" "${CLI_ENV[@]+"${CLI_ENV[@]}"}"; do
-  _add_env "$_e"
+  # An env-file holds one NAME=value per line: a newline would inject a line.
+  if [[ "$_e" == *$'\n'* ]]; then
+    log_error "claude-code-docker.sh: env ${_name}: values can't contain a newline."
+    exit 1
+  fi
 done
-for _i in "${!_ENV_NAMES[@]}"; do
-  _name="${_ENV_NAMES[_i]}"
-  _entry="${_ENV_ENTRIES[_i]}"
-  if [[ "$_entry" == *=* ]]; then
+# Newest first, so the first entry seen for a NAME is the one that wins.
+_env_seen=" "
+_i=${#_env_all[@]}
+while [ "$_i" -gt 0 ]; do
+  _i=$((_i - 1))
+  _e="${_env_all[$_i]}"
+  _name="${_e%%=*}"
+  case "$_env_seen" in *" ${_name} "*) continue ;; esac
+  if [[ "$_e" == *=* ]]; then
     [ -n "$_env_file" ] || _env_file="$(mktemp)"
-    printf '%s\n' "$_entry" >>"$_env_file"
+    printf '%s\n' "$_e" >>"$_env_file"
   elif [ -n "${!_name+x}" ]; then
     docker_args+=(-e "$_name")
   else
+    # Unset on the host: nothing to pass, and an earlier entry still applies.
     log_warning "claude-code-docker.sh: env ${_name} is not set on the host; not passing it."
+    continue
   fi
+  _env_seen+="${_name} "
 done
 [ -n "$_env_file" ] && docker_args+=(--env-file "$_env_file")
 
@@ -741,13 +769,13 @@ _mount_extra_dir() {
   CLAUDE_ADD_DIRS+=("${_rest%%:*}")
 }
 
-for extra_dir in "${CLI_MOUNTS[@]+"${CLI_MOUNTS[@]}"}"; do
+for extra_dir in ${CLI_MOUNTS[@]+"${CLI_MOUNTS[@]}"}; do
   extra_dir="${extra_dir/#\~/$HOME}"
   log_trace "Mounting extra directory (CLI): ${extra_dir}"
   _mount_extra_dir "$extra_dir"
 done
 
-for _vol in "${CFG_VOLUMES[@]+"${CFG_VOLUMES[@]}"}"; do
+for _vol in ${CFG_VOLUMES[@]+"${CFG_VOLUMES[@]}"}; do
   _vol="${_vol/#\~/$HOME}"
   log_trace "Mounting extra directory (config): ${_vol}"
   _mount_extra_dir "$_vol"
@@ -757,6 +785,13 @@ done
 # records absolute host paths in both directions (.git file <-> .git/worktrees).
 if [ "$CFG_WORKTREES" = "true" ]; then
   if _git_dir="$(git rev-parse --path-format=absolute --git-dir 2>/dev/null)"; then
+    # Only the cwd is mounted, so from a subdirectory the worktree's .git
+    # (dir or file) would be missing in the container and git would break.
+    _toplevel="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+    if [ -z "$_toplevel" ] || [ ! "$_toplevel" -ef . ]; then
+      log_error "claude-code-docker.sh: worktrees: true must be launched from the worktree root${_toplevel:+ (${_toplevel})}."
+      exit 1
+    fi
     _common_dir="$(git rev-parse --path-format=absolute --git-common-dir)"
     if [ "$_git_dir" != "$_common_dir" ]; then
       # Linked worktree: git needs the common dir, not the main working tree.
@@ -768,10 +803,15 @@ if [ "$CFG_WORKTREES" = "true" ]; then
       # tree, as bin/worktrees.sh does.
       _wt_root="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
       _wt_dir="${WORKTREES_DIR:-$HOME/worktrees}/${_wt_root##*/}"
-      mkdir -p -- "$_wt_dir"
-      _wt_dir="$(cd -P -- "$_wt_dir" && pwd -P)"
-      log_trace "Mounting task worktrees (worktrees): ${_wt_dir}"
-      _mount_extra_dir "${_wt_dir}:${_wt_dir}"
+      # Not created here: without it there are no task worktrees to expose
+      # (and docker would create a missing bind source root-owned).
+      if [ -d "$_wt_dir" ]; then
+        _wt_dir="$(cd -P -- "$_wt_dir" && pwd -P)"
+        log_trace "Mounting task worktrees (worktrees): ${_wt_dir}"
+        _mount_extra_dir "${_wt_dir}:${_wt_dir}"
+      else
+        log_trace "No task worktrees at ${_wt_dir}; not mounting it."
+      fi
     fi
   else
     log_warning "claude-code-docker.sh: worktrees: true but ${WORKSPACE_DIR} is not a git repository; ignoring."
@@ -779,7 +819,7 @@ if [ "$CFG_WORKTREES" = "true" ]; then
 fi
 
 docker_args+=("$IMAGE_TAG" claude --permission-mode auto)
-for add_dir in "${CLAUDE_ADD_DIRS[@]+"${CLAUDE_ADD_DIRS[@]}"}"; do
+for add_dir in ${CLAUDE_ADD_DIRS[@]+"${CLAUDE_ADD_DIRS[@]}"}; do
   docker_args+=(--add-dir "$add_dir")
 done
 # Validated at parse time (above), before any slow image build runs.

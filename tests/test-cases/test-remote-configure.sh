@@ -128,9 +128,14 @@ assert_minimal_setup() {
 
   log_trace "--- ${label}: bash login shell startup ---"
 
+  # Guarded: under set -e an unguarded ssh failure (255) would abort the whole
+  # test with that status and no FAIL line, skipping every later assertion.
+  local startup_errors startup_rc=0
   startup_errors=$(ssh "${_SSH_TEST_OPTS[@]}" -p "${port}" test@127.0.0.1 \
-    "bash -l -c true" 2>&1 >/dev/null)
-  if [[ -z "${startup_errors}" ]]; then
+    "bash -l -c true" 2>&1 >/dev/null) || startup_rc=$?
+  if [[ ${startup_rc} -ne 0 ]]; then
+    fail "${label}: ssh 'bash -l -c true' exited ${startup_rc}: ${startup_errors}"
+  elif [[ -z "${startup_errors}" ]]; then
     ok "${label}: bash login shell starts with no errors"
   else
     fail "${label}: bash login shell produced errors on startup: ${startup_errors}"
