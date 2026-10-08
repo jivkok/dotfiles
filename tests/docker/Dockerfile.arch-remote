@@ -16,6 +16,7 @@ RUN pacman -Syu --noconfirm \
     bash \
     ca-certificates \
     curl \
+    dropbear \
     git \
     openssh \
     rsync \
@@ -42,4 +43,12 @@ RUN mkdir -p /home/test/.ssh \
 
 EXPOSE 22
 
-CMD ["/usr/sbin/sshd", "-D"]
+# The SSH server is Dropbear, not OpenSSH sshd: this image is linux/amd64 and, on
+# arm64 hosts, runs under emulation (Rosetta/QEMU), which does not implement the
+# seccomp prctl that sshd's privilege-separation sandbox requires
+# ("ssh_sandbox_child: prctl(PR_SET_SECCOMP): Invalid argument" -> every
+# connection is reset). Dropbear has no such sandbox. The tests only need an SSH
+# transport into the container; the authorized key is picked up from ~/.ssh.
+#   -F foreground  -E log to stderr  -s no password login  -w no root login
+#   -R generate host keys on first connection
+CMD ["/usr/bin/dropbear", "-F", "-E", "-s", "-w", "-R"]

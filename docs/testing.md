@@ -116,6 +116,15 @@ Full images (`*_DOCKER_IMAGE`) are picked up automatically by `run-tests.sh` for
 
 ---
 
+## Docker availability and platforms
+
+`tests/docker/docker-env.sh` (sourced by `run-tests.sh`, `create-test-envs.sh`, `test-remote-configure.sh`) owns the Docker environment rules:
+
+- **Auto-start.** If the daemon is down, macOS starts Docker Desktop / OrbStack / Colima and waits up to 180s (`DOTFILES_TEST_DOCKER_TIMEOUT`). `DOTFILES_TEST_NO_DOCKER_START=1` disables starting; Linux never auto-starts.
+- **Failure is a test failure.** If Docker (or a required platform) is unavailable, the reason is recorded and every test that should have run in the affected container(s) is reported as FAILED (`test-remote-configure.sh` fails instead of skipping). Nothing is silently skipped. `create-test-envs.sh` exits 3 in that case and keeps the old hashes so the next run retries.
+- **Platforms.** The Arch images are `linux/amd64` (no arm64 `archlinux` image exists); on Apple Silicon they run under emulation. They are built and run with an explicit `--platform` (`DOTFILES_TEST_ARCH_PLATFORM` overrides). Images that exist but are labelled with the wrong platform are rebuilt automatically. If amd64 emulation is unavailable, only the Arch environments fail.
+- **SSH under emulation.** OpenSSH `sshd` cannot run under Rosetta/QEMU (its seccomp sandbox fails), so `Dockerfile.arch-remote` serves SSH with Dropbear.
+
 ## Docker images
 
 Docker images are built with the repo root as the build context, so the entire dotfiles repo is available during the build. The dotfiles setup script is run inside the image at build time, producing a ready-to-test environment.

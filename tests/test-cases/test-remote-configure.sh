@@ -8,6 +8,8 @@ tests_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # shellcheck source=../testlib.sh
 source "${tests_root}/testlib.sh"
+# shellcheck source=../docker/docker-env.sh
+source "${tests_root}/docker/docker-env.sh"
 
 # Runtime guard: docker and ssh must both be available (REQUIRES header is advisory;
 # the runner has a known issue with multi-word REQUIRES so we enforce it here too).
@@ -19,8 +21,13 @@ if ! command -v docker >/dev/null 2>&1 || ! command -v ssh >/dev/null 2>&1; then
   log_info "SKIPPED: docker or ssh not available in this environment"
   _HAVE_DEPS=0
 elif ! docker info >/dev/null 2>&1; then
-  log_info "SKIPPED: Docker daemon is not running"
   _HAVE_DEPS=0
+  if [[ -n "${DOCKER_BLOCKED_ENVS:-}" ]]; then
+    # run-tests.sh already tried to start Docker and failed: that is a failure, not a skip.
+    fail "Docker unavailable: ${DOCKER_BLOCKED_REASON:-daemon is not running}"
+  else
+    log_info "SKIPPED: Docker daemon is not running"
+  fi
 elif [[ -f /.dockerenv ]]; then
   log_info "SKIPPED: running inside a Docker container — minimal SSH ports are mapped to host loopback, not container loopback"
   _HAVE_DEPS=0
@@ -48,10 +55,16 @@ docker ps -aq --filter "label=${_CONTAINER_LABEL}" | xargs -r docker rm -f >/dev
 
 # Start a remote minimal container and return the SSH port via stdout.
 start_remote_container() {
-  local image="$1"
-  local cid port
+  local image="$1" os="$2"
+  local cid port platform_args=()
 
-  cid=$(docker run -d --rm -P --label "${_CONTAINER_LABEL}" "${image}")
+  # Run as the platform the image was built for (Arch images are linux/amd64,
+  # emulated on arm64 hosts).
+  local platform
+  platform="$(docker_platform_for "${os}")"
+  [[ -z "${platform}" ]] || platform_args=(--platform "${platform}")
+
+  cid=$(docker run -d --rm -P "${platform_args[@]}" --label "${_CONTAINER_LABEL}" "${image}")
   CONTAINERS+=("${cid}")
 
   # Get the mapped SSH port (container exposes 22)
@@ -244,7 +257,7 @@ fi
 
 if [[ -n "${DEBIAN_REMOTE_IMAGE}" ]]; then
   log_trace "--- Debian remote: starting container ---"
-  result=$(start_remote_container "${DEBIAN_REMOTE_IMAGE}")
+  result=$(start_remote_container "${DEBIAN_REMOTE_IMAGE}" DEBIAN_REMOTE)
   debian_cid="${result%%:*}"
   debian_port="${result##*:}"
   log_trace "Debian container: ${debian_cid} (SSH port ${debian_port})"
@@ -264,6 +277,8 @@ if [[ -n "${DEBIAN_REMOTE_IMAGE}" ]]; then
   else
     fail "Debian: deploy-remote-vm.sh failed (run 2 — idempotency)"
   fi
+elif [[ " ${DOCKER_BLOCKED_ENVS:-} " == *" DEBIAN_REMOTE "* ]]; then
+  fail "Debian: Docker environment unavailable: ${DOCKER_BLOCKED_REASON}"
 else
   log_info "SKIPPED: Debian remote image not found in .testenv (run create-test-envs.sh first)"
 fi
@@ -272,7 +287,7 @@ fi
 
 if [[ -n "${ARCH_REMOTE_IMAGE}" ]]; then
   log_trace "--- Arch remote: starting container ---"
-  result=$(start_remote_container "${ARCH_REMOTE_IMAGE}")
+  result=$(start_remote_container "${ARCH_REMOTE_IMAGE}" ARCH_REMOTE)
   arch_cid="${result%%:*}"
   arch_port="${result##*:}"
   log_trace "Arch container: ${arch_cid} (SSH port ${arch_port})"
@@ -292,6 +307,8 @@ if [[ -n "${ARCH_REMOTE_IMAGE}" ]]; then
   else
     fail "Arch: deploy-remote-vm.sh failed (run 2 — idempotency)"
   fi
+elif [[ " ${DOCKER_BLOCKED_ENVS:-} " == *" ARCH_REMOTE "* ]]; then
+  fail "Arch: Docker environment unavailable: ${DOCKER_BLOCKED_REASON}"
 else
   log_info "SKIPPED: Arch remote image not found in .testenv (run create-test-envs.sh first)"
 fi

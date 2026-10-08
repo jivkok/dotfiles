@@ -5,6 +5,13 @@ tests_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=testlib.sh
 source "${tests_root}/testlib.sh"
+# shellcheck source=docker/docker-env.sh
+source "${tests_root}/docker/docker-env.sh"
+
+# Exit code meaning "everything buildable was built, but some Docker environments
+# could not be (daemon down, platform emulation missing)". run-tests.sh tolerates
+# it and fails the tests that were meant to run in those environments.
+readonly EXIT_DOCKER_BLOCKED=3
 
 # --print-setup-files: print every file that feeds any setup hash (repo-relative,
 # one per line) and exit without building anything. Used by run-tests.sh --changed.
@@ -167,6 +174,18 @@ else
   log_info "No existing ${testenv_path} found. Assuming all setups are new."
 fi
 
+# Docker environments that cannot be built or run here (os -> reason). A blocked
+# environment keeps its previous hash in tests/.testenv so it is retried next time.
+docker_ensure_running || true
+declare -A DOCKER_BLOCKED=()
+for _os in "${TARGET_OSES[@]}" "${REMOTE_OSES[@]}"; do
+  [[ "${_os}" == "OSX" || "${_os}" == "${HOST_OS}" ]] && continue
+  if ! docker_env_check "${_os}"; then
+    DOCKER_BLOCKED[$_os]="${DOCKER_ENV_REASON}"
+    log_error "ERROR: Docker environment ${_os} unavailable: ${DOCKER_ENV_REASON}" >&2
+  fi
+done
+
 # Identify OSes whose setup files have changed. Update their env.
 # If that OS matches the local OS, then just run /setup/setup.sh to update the test environment.
 # If that OS does not match the local OS, need to set up a test env via Docker.
@@ -180,8 +199,14 @@ fi
 
 for os in "${TARGET_OSES[@]}"; do
   if [[ "${OS_SETUP_HASHES[$os]}" == "${LAST_OS_SETUP_HASHES[$os]}" ]]; then
-    log_trace "${os} setup is up-to-date."
-    continue
+    # An unchanged hash is only up to date if its Docker image is still there and
+    # usable (e.g. not removed, not mislabelled with the wrong platform).
+    if [[ "${os}" == "OSX" || "${os}" == "${HOST_OS}" || -n "${DOCKER_BLOCKED[$os]:-}" ]] \
+        || docker_image_usable "dotfiles-test-${os,,}-${OS_SETUP_HASHES[$os]}" "$(docker_platform_for "${os}")"; then
+      log_trace "${os} setup is up-to-date."
+      continue
+    fi
+    log_info "Docker image for ${os} is missing or unusable as $(docker_platform_for "${os}" | sed 's/^$/native/'); rebuilding."
   fi
 
   log_info "Setup has changed for: ${os} (${LAST_OS_SETUP_HASHES[$os]:-none} -> ${OS_SETUP_HASHES[$os]})"
@@ -192,10 +217,13 @@ for os in "${TARGET_OSES[@]}"; do
       || { log_error "ERROR: local setup failed (exit code $?)" >&2; exit 1; }
   elif [[ "${os}" == "OSX" ]]; then
     log_info "  Skipping ${os}: Docker target not supported."
+  elif [[ -n "${DOCKER_BLOCKED[$os]:-}" ]]; then
+    log_error "  Skipping ${os}: ${DOCKER_BLOCKED[$os]}"
+    OS_SETUP_HASHES[$os]="${LAST_OS_SETUP_HASHES[$os]}"
   else
     image_prefix="dotfiles-test-${os,,}-"
     image_name="${image_prefix}${OS_SETUP_HASHES[$os]}"
-    if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
+    if docker_image_usable "${image_name}" "$(docker_platform_for "${os}")"; then
       log_info "  Docker image already exists: ${image_name}"
     else
       # Match only full images (hex hash suffix); exclude minimal images (which contain "-remote-")
@@ -207,6 +235,7 @@ for os in "${TARGET_OSES[@]}"; do
       fi
       log_info "  Building Docker image: ${image_name}..."
       IMAGE_NAME="${image_name}" DOCKERFILE_PATH="${tests_root}/${OS_DOCKERFILE[$os]}" \
+      DOCKER_PLATFORM="$(docker_platform_for "${os}")" \
         bash "${tests_root}/docker/build-image.sh"
     fi
   fi
@@ -224,18 +253,29 @@ done
 
 for remote_os in "${REMOTE_OSES[@]}"; do
   if [[ "${REMOTE_SETUP_HASHES[$remote_os]}" == "${LAST_REMOTE_SETUP_HASHES[$remote_os]}" ]]; then
-    log_trace "${remote_os} setup is up-to-date."
-    continue
+    _remote_image="dotfiles-test-${remote_os//_REMOTE/-remote}"
+    if [[ -n "${DOCKER_BLOCKED[$remote_os]:-}" ]] \
+        || docker_image_usable "${_remote_image,,}-${REMOTE_SETUP_HASHES[$remote_os]}" "$(docker_platform_for "${remote_os}")"; then
+      log_trace "${remote_os} setup is up-to-date."
+      continue
+    fi
+    log_info "Docker image for ${remote_os} is missing or unusable as $(docker_platform_for "${remote_os}" | sed 's/^$/native/'); rebuilding."
   fi
 
   log_info "Setup has changed for: ${remote_os} (${LAST_REMOTE_SETUP_HASHES[$remote_os]:-none} -> ${REMOTE_SETUP_HASHES[$remote_os]})"
+
+  if [[ -n "${DOCKER_BLOCKED[$remote_os]:-}" ]]; then
+    log_error "  Skipping ${remote_os}: ${DOCKER_BLOCKED[$remote_os]}"
+    REMOTE_SETUP_HASHES[$remote_os]="${LAST_REMOTE_SETUP_HASHES[$remote_os]}"
+    continue
+  fi
 
   # Normalise: DEBIAN_REMOTE -> debian-remote, ARCH_REMOTE -> arch-remote
   image_prefix="dotfiles-test-${remote_os//_REMOTE/-remote}"
   image_prefix="${image_prefix,,}-"
   image_name="${image_prefix}${REMOTE_SETUP_HASHES[$remote_os]}"
 
-  if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
+  if docker_image_usable "${image_name}" "$(docker_platform_for "${remote_os}")"; then
     log_info "  Docker image already exists: ${image_name}"
   elif [[ -z "${_host_pubkey}" ]]; then
     log_info "  WARNING: no SSH public key found; skipping remote image build for ${remote_os}."
@@ -249,15 +289,16 @@ for remote_os in "${REMOTE_OSES[@]}"; do
     IMAGE_NAME="${image_name}" \
     DOCKERFILE_PATH="${tests_root}/${REMOTE_DOCKERFILE[$remote_os]}" \
     DOCKER_RUN_ARGS="--build-arg HOST_PUBLIC_KEY=${_host_pubkey}" \
+    DOCKER_PLATFORM="$(docker_platform_for "${remote_os}")" \
       bash "${tests_root}/docker/build-image-remote.sh"
   fi
 done
 
 # Resolve current Docker image names from existing images (image name is deterministic from hash)
 for os in "${TARGET_OSES[@]}"; do
-  [[ "${os}" == "OSX" ]] && continue
+  [[ "${os}" == "OSX" || -n "${DOCKER_BLOCKED[$os]:-}" ]] && continue
   image_name="dotfiles-test-${os,,}-${OS_SETUP_HASHES[$os]}"
-  if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
+  if docker_image_usable "${image_name}" "$(docker_platform_for "${os}")"; then
     LATEST_DOCKER_IMAGES[$os]="${image_name}"
     log_trace "${os}_DOCKER_IMAGE=${LATEST_DOCKER_IMAGES[$os]}"
   fi
@@ -265,9 +306,10 @@ done
 
 # Resolve current remote Docker image names
 for remote_os in "${REMOTE_OSES[@]}"; do
+  [[ -n "${DOCKER_BLOCKED[$remote_os]:-}" ]] && continue
   image_name="dotfiles-test-${remote_os//_REMOTE/-remote}"
   image_name="${image_name,,}-${REMOTE_SETUP_HASHES[$remote_os]}"
-  if [[ -n "$(docker image ls --quiet --filter reference="${image_name}")" ]]; then
+  if docker_image_usable "${image_name}" "$(docker_platform_for "${remote_os}")"; then
     LATEST_REMOTE_DOCKER_IMAGES[$remote_os]="${image_name}"
     log_trace "${remote_os}_MINIMAL_IMAGE=${LATEST_REMOTE_DOCKER_IMAGES[$remote_os]}"
   fi
@@ -296,3 +338,8 @@ done
     echo "${remote_os}_MINIMAL_IMAGE=${LATEST_REMOTE_DOCKER_IMAGES[$remote_os]}"
   done
 } > "${tests_root}/.testenv"
+
+if (( ${#DOCKER_BLOCKED[@]} > 0 )); then
+  log_error "ERROR: Docker environments not set up: ${!DOCKER_BLOCKED[*]}"
+  exit "${EXIT_DOCKER_BLOCKED}"
+fi

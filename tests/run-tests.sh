@@ -286,8 +286,39 @@ if (( list_only )); then
 fi
 
 # ── Test environments ──────────────────────────────────────────────────────────
-# Ensure test environments are up to date before running tests.
-bash "${tests_root}/create-test-envs.sh"
+# shellcheck source=docker/docker-env.sh
+source "${tests_root}/docker/docker-env.sh"
+
+# Make sure Docker is up (starting it on macOS if needed), then work out which
+# Docker environments cannot be used. Tests meant for those environments are
+# FAILED below rather than skipped, so a missing daemon or missing amd64
+# emulation can never make the run look green.
+docker_ensure_running || log_error "ERROR: Docker unavailable: ${DOCKER_UNAVAILABLE_REASON}"
+export DOCKER_UNAVAILABLE_REASON
+
+blocked_envs="" blocked_reason=""
+declare -A docker_blocked=()
+case "$(uname -s)" in
+  Darwin) host_os=OSX ;;
+  *) if [[ -f /etc/arch-release ]]; then host_os=ARCH; else host_os=DEBIAN; fi ;;
+esac
+for _os in DEBIAN ARCH DEBIAN_REMOTE ARCH_REMOTE; do
+  [[ "$_os" == "$host_os" ]] && continue
+  if ! docker_env_check "$_os"; then
+    docker_blocked[$_os]="$DOCKER_ENV_REASON"
+    blocked_envs+="${blocked_envs:+ }${_os}"
+    blocked_reason="$DOCKER_ENV_REASON"
+  fi
+done
+# Read by test-remote-configure.sh, which drives the *_REMOTE images itself.
+export DOCKER_BLOCKED_ENVS="$blocked_envs" DOCKER_BLOCKED_REASON="$blocked_reason"
+
+# Ensure test environments are up to date before running tests. Exit code 3
+# (EXIT_DOCKER_BLOCKED) only means some Docker environments are unavailable,
+# which is handled above/below; anything else is fatal.
+create_rc=0
+bash "${tests_root}/create-test-envs.sh" || create_rc=$?
+if [[ $create_rc -ne 0 && $create_rc -ne 3 ]]; then exit "$create_rc"; fi
 
 # ── Pass/fail tracking ─────────────────────────────────────────────────────────
 
@@ -359,14 +390,19 @@ run_local() {
 }
 
 run_in_docker() {
-  local image="$1"
-  shift
+  local image="$1" os="$2"
+  shift 2
   local -a files=("$@")
   local container_repo="/home/test/dotfiles"
   local container_test_cases="${container_repo}/tests/test-cases"
   # Mount the working tree (read-only) over the image's baked copy so scripts
   # that are not part of the setup hash are tested at their current version.
   local -a mount_args=(-e LOG_LEVEL -v "${repo_root}:${container_repo}:ro")
+  # Run as the platform the image was built for (the Arch images are linux/amd64,
+  # emulated on arm64 hosts); without this Docker warns and may pick another variant.
+  local -a platform_args=() platform
+  platform="$(docker_platform_for "${os}")"
+  [[ -z "${platform}" ]] || platform_args=(--platform "${platform}")
   # Setup installs vim-plug and plugins into these gitignored dirs inside the
   # repo; anonymous volumes re-expose the image's own copies over the host's
   # (Docker seeds an empty anonymous volume from the image; --rm removes it).
@@ -390,7 +426,7 @@ run_in_docker() {
     if [[ -n "$requires" ]]; then
       local check_cmd="true" cmd
       for cmd in $requires; do check_cmd+=" && command -v ${cmd}"; done
-      if ! docker run --rm "${image}" bash -li -c "$check_cmd" >/dev/null 2>&1; then
+      if ! docker run --rm "${platform_args[@]}" "${image}" bash -li -c "$check_cmd" >/dev/null 2>&1; then
         log_info "  SKIPPED (requires: ${requires})"
         continue
       fi
@@ -400,11 +436,11 @@ run_in_docker() {
 
     if _should_log "$LOG_LEVEL_TRACE"; then
       # Trace: Docker output flows through including preamble.
-      docker run --rm "${mount_args[@]}" \
+      docker run --rm "${platform_args[@]}" "${mount_args[@]}" \
         "${image}" bash -li "${container_test_cases}/${test_name}" || test_exit=$?
     else
       local docker_output
-      docker_output=$(docker run --rm "${mount_args[@]}" \
+      docker_output=$(docker run --rm "${platform_args[@]}" "${mount_args[@]}" \
         "${image}" bash -li "${container_test_cases}/${test_name}" 2>&1) || test_exit=$?
 
       # FAIL lines are error-level; visible at info and above.
@@ -421,6 +457,28 @@ run_in_docker() {
 
 run_local
 
+# Unavailable Docker environments: every test that should have run there fails.
+fail_blocked_docker() {
+  local os="$1" test_file
+  shift
+  log_info ""
+  log_info "==> Environment: Docker ${os} (UNAVAILABLE: ${docker_blocked[$os]})"
+  for test_file in "$@"; do
+    log_info ""
+    log_info "Test file: ${test_file##*/}"
+    log_error "  FAIL: Docker environment ${os} unavailable: ${docker_blocked[$os]}"
+    _record_result 1
+  done
+}
+
+if (( ${#docker_blocked[@]} > 0 )); then
+  _blocked_files=("${candidate_files[@]}")
+  if [[ "$mode" != "default" ]]; then _blocked_files=("${test_files[@]}"); fi
+  for _os in DEBIAN ARCH; do
+    [[ -n "${docker_blocked[$_os]:-}" ]] && fail_blocked_docker "$_os" "${_blocked_files[@]}"
+  done
+fi
+
 if [[ -f "${testenv_file}" ]]; then
   # In default mode, Docker evaluates its own REQUIRES per container, so pass
   # all candidate tests. In filter/all modes the selection is already correct.
@@ -432,7 +490,8 @@ if [[ -f "${testenv_file}" ]]; then
   while IFS='=' read -r key value; do
     [[ "$key" =~ _DOCKER_IMAGE$ ]] || continue
     [[ -n "$value" ]] || continue
-    run_in_docker "$value" "${_docker_files[@]}"
+    [[ -z "${docker_blocked[${key%_DOCKER_IMAGE}]:-}" ]] || continue
+    run_in_docker "$value" "${key%_DOCKER_IMAGE}" "${_docker_files[@]}"
   done < "${testenv_file}"
 fi
 

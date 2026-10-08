@@ -6,6 +6,8 @@ IMAGE_NAME="${IMAGE_NAME:-}"
 DOCKERFILE_PATH="${DOCKERFILE_PATH:-}"
 # Pass extra args to docker run via DOCKER_RUN_ARGS env var if needed.
 DOCKER_RUN_ARGS="${DOCKER_RUN_ARGS:-}"
+# Target platform (e.g. linux/amd64); empty = the daemon's native platform.
+DOCKER_PLATFORM="${DOCKER_PLATFORM:-}"
 # ------------------------
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -26,7 +28,11 @@ if [[ ! -f "${repo_root}/setup/setup.sh" ]]; then
 fi
 
 echo "==> Building image: ${IMAGE_NAME}"
+platform_args=()
+[[ -n "${DOCKER_PLATFORM}" ]] && platform_args=(--platform "${DOCKER_PLATFORM}")
+
 docker build \
+  "${platform_args[@]}" \
   -t "${IMAGE_NAME}" \
   -f "${DOCKERFILE_PATH}" \
   "${repo_root}"

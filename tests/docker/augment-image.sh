@@ -103,7 +103,12 @@ EOF
 echo "==> Augmenting image: ${image}"
 echo "    configure script: ${configure_script}"
 
+# Build for the base image's own platform (e.g. the Arch images are linux/amd64
+# even on an arm64 host); otherwise the daemon would look for a native variant.
+image_platform="$(docker image inspect --format '{{.Os}}/{{.Architecture}}' "$image")"
+
 docker build \
+  --platform "${image_platform}" \
   --no-cache \
   -t "${image}" \
   -f "${tmpdir}/Dockerfile" \

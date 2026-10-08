@@ -7,6 +7,9 @@ source "$dotdir/setup/setup_functions.sh"
 log_info "Configuring locale ..."
 
 if $_is_debian; then
+  # Minimal installs (and the Docker test image) ship without the locales package,
+  # so locale-gen is missing and en_US.UTF-8 is never generated.
+  install_apt_package locales
   sudo localectl set-locale LANG=en_US.UTF-8
   sudo locale-gen --purge "en_US.UTF-8"
   sudo dpkg-reconfigure --frontend noninteractive locales

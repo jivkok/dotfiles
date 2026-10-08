@@ -6,6 +6,8 @@ IMAGE_NAME="${IMAGE_NAME:-}"
 DOCKERFILE_PATH="${DOCKERFILE_PATH:-}"
 # Pass extra --build-arg flags via DOCKER_RUN_ARGS (despite the name, used for build args here).
 DOCKER_RUN_ARGS="${DOCKER_RUN_ARGS:-}"
+# Target platform (e.g. linux/amd64); empty = the daemon's native platform.
+DOCKER_PLATFORM="${DOCKER_PLATFORM:-}"
 # ------------------------
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -27,6 +29,9 @@ fi
 
 echo "==> Building image: ${IMAGE_NAME}"
 
+platform_args=()
+[[ -n "${DOCKER_PLATFORM}" ]] && platform_args=(--platform "${DOCKER_PLATFORM}")
+
 # Extract HOST_PUBLIC_KEY from DOCKER_RUN_ARGS for --build-arg passing
 host_pubkey=""
 if [[ "${DOCKER_RUN_ARGS}" =~ --build-arg[[:space:]]+HOST_PUBLIC_KEY=(.+)$ ]]; then
@@ -35,12 +40,14 @@ fi
 
 if [[ -n "${host_pubkey}" ]]; then
   docker build \
+    "${platform_args[@]}" \
     -t "${IMAGE_NAME}" \
     -f "${DOCKERFILE_PATH}" \
     --build-arg "HOST_PUBLIC_KEY=${host_pubkey}" \
     "${repo_root}"
 else
   docker build \
+    "${platform_args[@]}" \
     -t "${IMAGE_NAME}" \
     -f "${DOCKERFILE_PATH}" \
     "${repo_root}"
