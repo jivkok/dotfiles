@@ -92,7 +92,7 @@ for _f in "${DOTDIR}"/tests/test-cases/test-*.sh; do
   _requires=" $(cov_get_header "$_f" REQUIRES) "
   [[ "$_requires" == *" tmux "* ]] && tmux_tests+="$(basename "$_f")"$'\n'
 done
-tmux_tests="$(printf '%s' "$tmux_tests" | sort | paste -sd' ')"
+tmux_tests="$(printf '%s' "$tmux_tests" | sort | paste -s -d' ' -)"
 assert_eq "--list --filter tmux selects by REQUIRES" "$tmux_tests" "$(names "$(bash "$RUNNER" --list --filter tmux 2>&1)")"
 assert_eq "--changed combines with --filter" "test-git-env.sh" \
   "$(names "$(list_override $'git/git.sh\nbin/tmux-status-cpu.sh' --filter git)")"
