@@ -191,6 +191,31 @@ IFS=$'\n\t'
 #                         # .git out); a subdirectory is an error. No-op
 #                         # outside a git repo.
 #
+#   skills: true         # Default true. Makes the HOST's ~/.claude/skills
+#                         # available inside the container (otherwise its
+#                         # ~/.claude is a separate state dir, so none of your
+#                         # host skills would exist there). Values:
+#                         #   true        - all host skills (the default)
+#                         #   false       - none
+#                         #   a list      - only the named skills, e.g.
+#                         #     skills:
+#                         #       - channel
+#                         #       - my-skill
+#                         # Mechanism: at each launch the selected skills are
+#                         # copied, with symlinks resolved (cp -L), into
+#                         # $STATE_DIR/host-skills, which is bind-mounted
+#                         # READ-ONLY at ~/.claude/skills. Resolving matters
+#                         # because skills are often symlinks to a checkout
+#                         # elsewhere on the host, which would dangle inside
+#                         # the container. The copy is a snapshot taken at
+#                         # launch (host edits show up on the next start) and
+#                         # is rebuilt every time, so removed/deselected
+#                         # skills don't linger. Skills contain instructions
+#                         # and scripts the agent will follow - use the list
+#                         # form to expose only the ones a project needs.
+#                         # A later .aiproj.local value replaces an earlier one
+#                         # (unlike the additive volumes/install/env lists).
+#
 # Builds the image automatically the first time it's needed for the current
 # ai/claude-code/BUILD number, tagged <claude_code_version>.<build_number>
 # (e.g. 2.1.270.1) - the Claude Code version is resolved from
@@ -445,6 +470,8 @@ CFG_INSTALL=()
 CFG_ENV=()
 CFG_DOCKER=false
 CFG_WORKTREES=false
+CFG_SKILLS_MODE=true # true | false | list
+CFG_SKILLS=()
 # ${arr[@]+"${arr[@]}"} (used wherever an array that may be empty is expanded):
 # a plain quoted expansion of an empty array is an "unbound variable" error under
 # `set -u` on bash <4.4 (macOS's /bin/bash is 3.2); this expands to nothing.
@@ -458,6 +485,22 @@ for _f in ${_config_files[@]+"${_config_files[@]}"}; do
   [ -n "$_v" ] && CFG_DOCKER="$_v"
   _v="$(_cfg_scalar "$_f" worktrees)"
   [ -n "$_v" ] && CFG_WORKTREES="$_v"
+  _v="$(_cfg_scalar "$_f" skills)"
+  case "$_v" in
+    true | false)
+      CFG_SKILLS_MODE="$_v"
+      CFG_SKILLS=()
+      ;;
+    *)
+      # A list replaces (not extends) whatever an earlier file chose.
+      _skills_found=()
+      while IFS= read -r _v; do [ -n "$_v" ] && _skills_found+=("$_v"); done < <(_cfg_list "$_f" skills)
+      if [ "${#_skills_found[@]}" -gt 0 ]; then
+        CFG_SKILLS_MODE=list
+        CFG_SKILLS=(${_skills_found[@]+"${_skills_found[@]}"})
+      fi
+      ;;
+  esac
 done
 
 # ── install: apt packages + built-in recipes -> derived image ────────────────
@@ -753,6 +796,39 @@ docker_args+=(
   -v "$STATE_DIR/claude.json:/home/claude/.claude.json"
   -v "$STATE_DIR/claude:/home/claude/.claude"
 )
+# skills: see the header comment. Snapshot with symlinks resolved, mounted
+# read-only over the container's ~/.claude/skills.
+if [ "$CFG_SKILLS_MODE" != "false" ] && [ -d "$HOME/.claude/skills" ]; then
+  _skills_src="$HOME/.claude/skills"
+  _skills_dst="$STATE_DIR/host-skills"
+  rm -rf "$_skills_dst"
+  mkdir -p "$_skills_dst"
+  _skill_names=()
+  if [ "$CFG_SKILLS_MODE" = "list" ]; then
+    for _s in ${CFG_SKILLS[@]+"${CFG_SKILLS[@]}"}; do
+      if [[ ! "$_s" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+        log_error "claude-code-docker.sh: invalid skills entry \"${_s}\" (expected a skill directory name)."
+        exit 1
+      fi
+      if [ -e "$_skills_src/$_s" ]; then
+        _skill_names+=("$_s")
+      else
+        log_warning "claude-code-docker.sh: skill \"${_s}\" not found in ${_skills_src}; skipping."
+      fi
+    done
+  else
+    for _s in "$_skills_src"/* "$_skills_src"/.[!.]*; do
+      [ -e "$_s" ] && _skill_names+=("${_s##*/}")
+    done
+  fi
+  for _s in ${_skill_names[@]+"${_skill_names[@]}"}; do
+    log_trace "Syncing host skill: ${_s}"
+    cp -RL "$_skills_src/$_s" "$_skills_dst/$_s" 2>/dev/null ||
+      log_warning "claude-code-docker.sh: couldn't copy skill \"${_s}\" (broken symlink?); skipping."
+  done
+  docker_args+=(-v "$_skills_dst:/home/claude/.claude/skills:ro")
+fi
+
 if _uses_recipe uv; then
   mkdir -p "$STATE_DIR/uv-cache"
   docker_args+=(-v "$STATE_DIR/uv-cache:/home/claude/.cache/uv")
