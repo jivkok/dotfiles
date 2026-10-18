@@ -392,6 +392,50 @@ assert_eq "worktrees: outside a git repo: exit code" "0" "$rc"
 assert_contains "worktrees: outside a git repo: warning" "not a git repository" "$out"
 rm -f "${work}/.aiproj"
 
+log_trace "--- claude-code-docker.sh: skills: host skills sync ---"
+host_skills="${fake_home}/.claude/skills"
+synced="${state}/ai-claude-code/host-skills"
+mkdir -p "${host_skills}/alpha" "${host_skills}/beta" "${tmpdir}/ext-skill"
+echo a > "${host_skills}/alpha/SKILL.md"
+echo b > "${host_skills}/beta/SKILL.md"
+echo ext > "${tmpdir}/ext-skill/SKILL.md"
+ln -s "${tmpdir}/ext-skill" "${host_skills}/linked"
+
+# Default (no config): everything is synced, symlinks resolved, mounted read-only.
+rm -f "$run_log"
+launch >/dev/null
+check "skills default: mounted read-only" has_arg_pair -v "${synced}:/home/claude/.claude/skills:ro"
+check "skills default: plain skill copied" test -f "${synced}/alpha/SKILL.md"
+check "skills default: symlinked skill copied as real files" test ! -L "${synced}/linked" -a -f "${synced}/linked/SKILL.md"
+
+# skills: false -> no mount.
+printf 'skills: false\n' > "${work}/.aiproj"
+rm -f "$run_log"
+launch >/dev/null
+check_not "skills: false: no skills mount" grep -qF ":/home/claude/.claude/skills" "$run_log"
+
+# List -> only named skills; a missing one warns; stale copies are dropped.
+printf 'skills:\n  - alpha\n  - nope\n' > "${work}/.aiproj"
+rm -f "$run_log"
+run_capture launch
+assert_contains "skills list: missing skill warns" 'skill "nope" not found' "$out"
+check "skills list: named skill synced" test -f "${synced}/alpha/SKILL.md"
+check_not "skills list: unnamed skill absent" test -e "${synced}/beta"
+
+# Invalid name is rejected.
+printf 'skills:\n  - ../etc\n' > "${work}/.aiproj"
+run_capture launch
+assert_eq "skills: invalid entry: exit code" "1" "$rc"
+assert_contains "skills: invalid entry: message" "invalid skills entry" "$out"
+
+# .aiproj.local overrides the primary file.
+printf 'skills: true\n' > "${work}/.aiproj"
+printf 'skills: false\n' > "${work}/.aiproj.local"
+rm -f "$run_log"
+launch >/dev/null
+check_not "skills: .aiproj.local false overrides true" grep -qF ":/home/claude/.claude/skills" "$run_log"
+rm -f "${work}/.aiproj" "${work}/.aiproj.local"
+
 log_trace "--- claude-code-docker.sh: unresolvable version, no image ---"
 rm -f "$stamp" "$run_log"
 STUB_DOCKER_IMAGES="" STUB_CURL_OUT="garbage" run_capture launch
