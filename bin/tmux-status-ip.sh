@@ -10,6 +10,13 @@
 CACHE_DIR="${TMPDIR:-/tmp}"
 CACHE_TTL=3600 # 1h
 
+is_ipv4() {
+    local ip=$1 o
+    [[ "$ip" =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]] || return 1
+    local IFS=.
+    for o in $ip; do (( 10#$o <= 255 )) || return 1; done
+}
+
 get_external_ip() {
     local cache_file="$CACHE_DIR/tmux_external_ip"
     local now
@@ -26,13 +33,15 @@ get_external_ip() {
         fi
     fi
 
-    # Try each service in order; fall through to the next on empty output.
-    # Use -4 to force IPv4 (fits better in status bar).
+    # Primary: OpenDNS DNS lookup. Fallback: Cloudflare HTTPS trace (ip= field).
+    # Each result must be a valid IPv4 address, else the next provider is tried.
     local ip=""
-    ip=$(curl -4 -s --max-time 3 https://api.ipify.org 2>/dev/null)
-    [[ -z "$ip" ]] && ip=$(curl -4 -s --max-time 3 https://icanhazip.com 2>/dev/null)
-    [[ -z "$ip" ]] && ip=$(curl -4 -s --max-time 3 https://ipecho.net/plain 2>/dev/null)
-    [[ -z "$ip" ]] && ip=$(dig +short +timeout=2 myip.opendns.com @resolver1.opendns.com 2>/dev/null | grep -E '^[0-9]+\.')
+    ip=$(dig +time=2 +tries=1 +short -4 myip.opendns.com @resolver1.opendns.com 2>/dev/null | head -n1)
+    if ! is_ipv4 "$ip"; then
+        ip=$(curl -4fsS --max-time 3 https://www.cloudflare.com/cdn-cgi/trace 2>/dev/null \
+            | sed -n 's/^ip=//p' | tr -d '\r' | head -n1)
+        is_ipv4 "$ip" || ip=""
+    fi
 
     if [[ -n "$ip" ]]; then
         # Atomic write to avoid partial reads under concurrent tmux polling

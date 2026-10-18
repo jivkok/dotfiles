@@ -57,9 +57,10 @@ done
 stubs="${tmpdir}/stubs"
 mkdir -p "$stubs"
 curl_log="${tmpdir}/curl.log"
-# curl stub: records each call; prints $STUB_CURL_OUT (may be empty).
+# curl stub: records each call; prints $STUB_CURL_OUT (Cloudflare trace body, may be empty).
+# dig stub: prints $STUB_DIG_OUT (may be empty).
 write_stub "${stubs}/curl" "echo \"\$*\" >> '$curl_log'; printf '%s' \"\${STUB_CURL_OUT:-}\""
-write_stub "${stubs}/dig" 'exit 0'
+write_stub "${stubs}/dig" "printf '%s' \"\${STUB_DIG_OUT:-}\""
 
 ext_ip() {  # ext_ip <cache-dir>  — run get_external_ip with stubs first on PATH
   PATH="${stubs}:${PATH}" TMPDIR="$1" bash -c "source '$IP_SCRIPT'; get_external_ip"
@@ -69,7 +70,7 @@ log_trace "--- get_external_ip: fresh cache ---"
 fresh="${tmpdir}/fresh"; mkdir -p "$fresh"
 echo "203.0.113.7" > "${fresh}/tmux_external_ip"
 : > "$curl_log"
-assert_eq "fresh cache value returned" "203.0.113.7" "$(STUB_CURL_OUT=198.51.100.1 ext_ip "$fresh")"
+assert_eq "fresh cache value returned" "203.0.113.7" "$(STUB_DIG_OUT=198.51.100.1 ext_ip "$fresh")"
 assert_eq "fresh cache: curl not invoked" "0" "$(wc -l < "$curl_log" | tr -d ' ')"
 
 log_trace "--- get_external_ip: stale cache ---"
@@ -77,9 +78,29 @@ stale="${tmpdir}/stale"; mkdir -p "$stale"
 echo "203.0.113.7" > "${stale}/tmux_external_ip"
 touch -t 200001010000 "${stale}/tmux_external_ip"
 : > "$curl_log"
-assert_eq "stale cache: fetched value returned" "198.51.100.1" "$(STUB_CURL_OUT=198.51.100.1 ext_ip "$stale")"
-check "stale cache: curl invoked" test -s "$curl_log"
+assert_eq "stale cache: fetched value returned" "198.51.100.1" "$(STUB_DIG_OUT=198.51.100.1 ext_ip "$stale")"
 assert_eq "stale cache: cache rewritten" "198.51.100.1" "$(cat "${stale}/tmux_external_ip")"
+
+log_trace "--- get_external_ip: primary ok skips fallback ---"
+prim="${tmpdir}/prim"; mkdir -p "$prim"
+: > "$curl_log"
+assert_eq "primary: dig value" "198.51.100.1" "$(STUB_DIG_OUT=198.51.100.1 STUB_CURL_OUT=ip=192.0.2.9 ext_ip "$prim")"
+assert_eq "primary: curl not invoked" "0" "$(wc -l < "$curl_log" | tr -d ' ')"
+
+log_trace "--- get_external_ip: fallback ---"
+for case in "empty dig:" "invalid dig:999.1.1.1" "non-ip dig:;; timed out"; do
+  fb="${tmpdir}/fb-${case%%:*}"; fb="${fb// /_}"; mkdir -p "$fb"
+  : > "$curl_log"
+  assert_eq "fallback (${case%%:*}): cloudflare ip" "192.0.2.9" \
+    "$(STUB_DIG_OUT="${case#*:}" STUB_CURL_OUT=$'fl=1\nip=192.0.2.9\nts=1' ext_ip "$fb")"
+  check "fallback (${case%%:*}): curl invoked" test -s "$curl_log"
+done
+
+log_trace "--- get_external_ip: fallback invalid ---"
+inv="${tmpdir}/inv"; mkdir -p "$inv"
+STUB_DIG_OUT='' STUB_CURL_OUT='ip=<html>' run_capture ext_ip "$inv"
+assert_eq "invalid fallback: no output" "" "$out"
+assert_file_absent "${inv}/tmux_external_ip"
 
 log_trace "--- get_external_ip: all services empty ---"
 empty="${tmpdir}/empty"; mkdir -p "$empty"
