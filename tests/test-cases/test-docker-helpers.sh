@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2016,SC2088  # single-quoted snippets expand in the child shell; literal ~ is passed to the script under test
-# REQUIRES: git
+# REQUIRES: git ssh ssh-keygen
 # COVERS: docker/docker.sh ai/claude-code/claude-code-docker.sh
 # Tests for the docker shell helpers (docker/docker.sh) and the Claude Code
 # container launcher (ai/claude-code/claude-code-docker.sh). `docker` and
@@ -30,6 +30,8 @@ printf '%s\n' "\${STUB_CURL_OUT:-}"
 EOF
 )"
 env_file_log="${tmpdir}/env-file"
+ssh_snap="${tmpdir}/ssh-snap"      # copy of the mounted ssh dir, taken while `docker run` is "running"
+ssh_mount_log="${tmpdir}/ssh-mount" # the mount's host-side source path
 # docker stub: `images` prints $STUB_DOCKER_IMAGES; `run`/`build` log one arg per
 # line; `run` also copies its --env-file (the launcher deletes it on exit).
 write_stub "${stubs}/docker" "$(cat <<EOF
@@ -37,6 +39,8 @@ case "\$1" in
   images) [[ -n "\${STUB_DOCKER_IMAGES:-}" ]] && printf '%s\n' "\$STUB_DOCKER_IMAGES" ;;
   run)    shift; printf '%s\n' "\$@" > "$run_log"
           : > "$env_file_log"
+          rm -rf "$ssh_snap" "$ssh_mount_log"
+          for a in "\$@"; do case "\$a" in *:/home/claude/.ssh:ro) src="\${a%%:*}"; echo "\$src" > "$ssh_mount_log"; cp -R "\$src" "$ssh_snap" ;; esac; done
           while [ \$# -gt 1 ]; do [ "\$1" = --env-file ] && cat "\$2" > "$env_file_log"; shift; done ;;
   build)  shift; printf '%s\n' "\$@" > "$build_log"; [[ "\${!#}" == "-" ]] && cat > "$dockerfile_log" ;;
 esac
@@ -434,6 +438,137 @@ printf 'skills: false\n' > "${work}/.aiproj.local"
 rm -f "$run_log"
 launch >/dev/null
 check_not "skills: .aiproj.local false overrides true" grep -qF ":/home/claude/.claude/skills" "$run_log"
+rm -f "${work}/.aiproj" "${work}/.aiproj.local"
+
+log_trace "--- claude-code-docker.sh: ssh: host SSH aliases ---"
+host_ssh="${fake_home}/.ssh"
+mode_of() { stat -c %a "$1" 2>/dev/null || stat -f %Lp "$1"; }
+ssh_dirs_left() { find "${state}/ai-claude-code" -maxdepth 1 -name "host-ssh*"; }
+mkdir -p "$host_ssh"
+ssh-keygen -q -t ed25519 -N "" -f "${host_ssh}/id_bot"
+ssh-keygen -q -t ed25519 -N "" -f "${host_ssh}/id_other"
+ssh-keygen -q -t ed25519 -N "" -f "${tmpdir}/hostkey"
+cat > "${host_ssh}/config" <<EOF
+Host bot
+    HostName git.example.test
+    User git
+    Port 2222
+    IdentityFile ~/.ssh/id_bot
+    IdentitiesOnly yes
+Host bot2
+    HostName git.example.test
+    User git
+    Port 2222
+    IdentityFile ${host_ssh}/id_bot
+Host nokey
+    HostName nokey.example.test
+    IdentityFile ~/.ssh/does-not-exist
+Host jumpy
+    HostName jumpy.example.test
+    ProxyJump bot
+    IdentityFile ~/.ssh/id_bot
+Host secret
+    HostName secret.example.test
+    IdentityFile ~/.ssh/id_other
+EOF
+{
+  printf '[git.example.test]:2222 %s\n' "$(cut -d' ' -f1,2 "${tmpdir}/hostkey.pub")"
+  printf 'secret.example.test %s\n' "$(cut -d' ' -f1,2 "${tmpdir}/hostkey.pub")"
+} > "${host_ssh}/known_hosts"
+
+# No ssh: no mount, nothing created.
+rm -f "$run_log"
+launch >/dev/null
+check_not "ssh absent: no ssh mount" grep -qF ":/home/claude/.ssh" "$run_log"
+check "ssh absent: no host-ssh dir in state" test -z "$(ssh_dirs_left)"
+
+# Alias resolved into a minimal config + only its key + only its known_hosts line.
+printf 'ssh:\n  - bot\n' > "${work}/.aiproj"
+rm -f "$run_log"
+run_capture launch
+check "ssh: mounted read-only at ~/.ssh" test -s "$ssh_mount_log"
+check "ssh: snapshot removed on exit" test ! -e "$(cat "$ssh_mount_log")"
+check "ssh: no host-ssh dirs left in state" test -z "$(ssh_dirs_left)"
+assert_contains "ssh: security warning logged" "Claude can read them" "$out"
+for want in "Host bot" "HostName git.example.test" "Port 2222" "User git" \
+  "IdentityFile /home/claude/.ssh/keys/id_bot" "IdentitiesOnly yes" "StrictHostKeyChecking yes"; do
+  assert_file_content "${ssh_snap}/config" "$want"
+done
+check "ssh: key copied" test "$(cat "${host_ssh}/id_bot")" = "$(cat "${ssh_snap}/keys/id_bot")"
+check "ssh: key mode 0600" test "$(mode_of "${ssh_snap}/keys/id_bot")" = 600
+check "ssh: dir mode 0700" test "$(mode_of "$ssh_snap")" = 700
+check_not "ssh: unlisted key not copied" test -e "${ssh_snap}/keys/id_other"
+check "ssh: known_hosts has the alias's line" grep -qF "[git.example.test]:2222" "${ssh_snap}/known_hosts"
+check_not "ssh: known_hosts lacks other hosts" grep -qF "secret.example.test" "${ssh_snap}/known_hosts"
+check_not "ssh: no unrelated host config" grep -qF "secret" "${ssh_snap}/config"
+
+# Two aliases sharing one key: copied once, both blocks reference it.
+printf 'ssh:\n  - bot\n  - bot2\n' > "${work}/.aiproj"
+launch >/dev/null
+assert_eq "ssh: shared key copied once" "1" "$(find "${ssh_snap}/keys" -type f | wc -l | tr -d ' ')"
+assert_eq "ssh: both blocks use the shared key" "2" "$(grep -cF 'IdentityFile /home/claude/.ssh/keys/id_bot' "${ssh_snap}/config")"
+
+# Skipped aliases: missing key, ProxyJump, undefined Host.
+printf 'ssh:\n  - nokey\n  - jumpy\n  - ghost\n' > "${work}/.aiproj"
+rm -f "$run_log"
+run_capture launch
+assert_contains "ssh: missing key warns" "ssh: nokey: no readable IdentityFile" "$out"
+assert_contains "ssh: ProxyJump warns" "ssh: jumpy: ProxyJump/ProxyCommand is not supported" "$out"
+assert_contains "ssh: undefined alias warns" "ssh: ghost: no such Host" "$out"
+assert_eq "ssh: launch continues after skips: exit code" "0" "$rc"
+check_not "ssh: nothing usable: no ssh mount" grep -qF ":/home/claude/.ssh" "$run_log"
+check_not "ssh: nothing usable: no security warning" grep -qF "Claude can read them" <<<"$out"
+
+# Missing known_hosts entry warns with the fix.
+printf 'ssh:\n  - secret\n' > "${work}/.aiproj"
+: > "${host_ssh}/known_hosts"
+run_capture launch
+assert_contains "ssh: no known_hosts entry warns" "ssh-keyscan -p 22 secret.example.test" "$out"
+
+# Concurrent sessions get distinct snapshot dirs; none are left behind.
+printf 'ssh:\n  - bot\n' > "${work}/.aiproj"
+launch >/dev/null; first_mount="$(cat "$ssh_mount_log")"
+launch >/dev/null; second_mount="$(cat "$ssh_mount_log")"
+check "ssh: each launch uses its own snapshot dir" test "$first_mount" != "$second_mount"
+check "ssh: no snapshot dirs left after both exits" test -z "$(ssh_dirs_left)"
+
+# Aliases without an explicit IdentityFile never copy a default key.
+cat >> "${host_ssh}/config" <<EOF
+Host nodefault
+    HostName nodefault.example.test
+EOF
+cp "${host_ssh}/id_other" "${host_ssh}/id_ed25519"
+printf 'ssh:\n  - nodefault\n' > "${work}/.aiproj"
+run_capture launch
+assert_contains "ssh: default key refused" "ssh: nodefault: no explicit IdentityFile" "$out"
+check_not "ssh: default key not mounted" test -s "$ssh_mount_log"
+rm -f "${host_ssh}/id_ed25519"
+
+# A passphrase-protected key can't be used non-interactively: skipped.
+ssh-keygen -q -t ed25519 -N "secretpass" -f "${host_ssh}/id_locked"
+cat >> "${host_ssh}/config" <<EOF
+Host locked
+    HostName locked.example.test
+    IdentityFile ~/.ssh/id_locked
+EOF
+printf 'ssh:\n  - locked\n' > "${work}/.aiproj"
+run_capture launch
+assert_contains "ssh: passphrase-protected key skipped" "ssh: locked: key" "$out"
+assert_contains "ssh: passphrase warning text" "passphrase-protected" "$out"
+
+# Invalid entry is rejected before anything runs.
+printf 'ssh:\n  - "bad host"\n' > "${work}/.aiproj"
+rm -f "$run_log"
+run_capture launch
+assert_eq "ssh: invalid entry: exit code" "1" "$rc"
+assert_contains "ssh: invalid entry: message" "invalid ssh entry" "$out"
+assert_file_absent "$run_log"
+
+# .aiproj.local adds to the primary list.
+printf 'ssh:\n  - bot\n' > "${work}/.aiproj"
+printf 'ssh:\n  - secret\n' > "${work}/.aiproj.local"
+launch >/dev/null
+for want in "Host bot" "Host secret"; do assert_file_content "${ssh_snap}/config" "$want"; done
 rm -f "${work}/.aiproj" "${work}/.aiproj.local"
 
 log_trace "--- claude-code-docker.sh: unresolvable version, no image ---"

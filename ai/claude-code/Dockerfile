@@ -66,6 +66,8 @@ RUN apt-get update -qq && \
   curl \
   git \
   jq \
+  libnss-wrapper \
+  openssh-client \
   procps \
   python3 \
   tmux \

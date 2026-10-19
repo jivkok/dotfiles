@@ -216,6 +216,26 @@ IFS=$'\n\t'
 #                         # A later .aiproj.local value replaces an earlier one
 #                         # (unlike the additive volumes/install/env lists).
 #
+#   ssh:                  # Host aliases from the host's ~/.ssh/config that the
+#     - gitea-bot         # container may use, e.g. for a remote such as
+#                         # git@gitea-bot:owner/repo.git. Additive list;
+#                         # entries must match ^[A-Za-z0-9][A-Za-z0-9._-]*$.
+#                         # Each launch builds a private 0700 directory (removed
+#                         # on exit) mounted READ-ONLY at ~/.ssh, holding only a
+#                         # minimal config for the listed aliases (resolved via
+#                         # `ssh -G`), their key (copied, 0600) and their
+#                         # ~/.ssh/known_hosts lines (a missing one warns with
+#                         # the ssh-keyscan fix). Skipped with a warning: an
+#                         # undefined alias, one without an explicit
+#                         # IdentityFile (default keys are never copied), with
+#                         # an unreadable or passphrase-protected key, or using
+#                         # ProxyJump/ProxyCommand. Not supported: Include/Match
+#                         # resolution, system-wide known_hosts, CertificateFile.
+#                         # Security note: Claude can read the copied key and
+#                         # use it wherever the container has network access (a
+#                         # warning is logged every run) - use a dedicated key
+#                         # scoped to just the repos needed.
+#
 # Builds the image automatically the first time it's needed for the current
 # ai/claude-code/BUILD number, tagged <claude_code_version>.<build_number>
 # (e.g. 2.1.270.1) - the Claude Code version is resolved from
@@ -391,7 +411,11 @@ fi
 
 _gitconfig_tmp=""
 _env_file=""
-_cleanup() { rm -f "$_gitconfig_tmp" "$_env_file"; }
+_ssh_dst=""
+_cleanup() {
+  rm -f "$_gitconfig_tmp" "$_env_file"
+  [ -n "$_ssh_dst" ] && rm -rf "$_ssh_dst"
+}
 trap _cleanup EXIT
 
 # ── Project config (.aiproj[.yaml|.yml] + optional .aiproj.local) ───────────
@@ -472,6 +496,7 @@ CFG_DOCKER=false
 CFG_WORKTREES=false
 CFG_SKILLS_MODE=true # true | false | list
 CFG_SKILLS=()
+CFG_SSH=()
 # ${arr[@]+"${arr[@]}"} (used wherever an array that may be empty is expanded):
 # a plain quoted expansion of an empty array is an "unbound variable" error under
 # `set -u` on bash <4.4 (macOS's /bin/bash is 3.2); this expands to nothing.
@@ -481,6 +506,7 @@ for _f in ${_config_files[@]+"${_config_files[@]}"}; do
   while IFS= read -r _v; do [ -n "$_v" ] && CFG_VOLUMES+=("$_v"); done < <(_cfg_list "$_f" volumes)
   while IFS= read -r _v; do [ -n "$_v" ] && CFG_INSTALL+=("$_v"); done < <(_cfg_list "$_f" install)
   while IFS= read -r _v; do [ -n "$_v" ] && CFG_ENV+=("$_v"); done < <(_cfg_list "$_f" env)
+  while IFS= read -r _v; do [ -n "$_v" ] && CFG_SSH+=("$_v"); done < <(_cfg_list "$_f" ssh)
   _v="$(_cfg_scalar "$_f" docker)"
   [ -n "$_v" ] && CFG_DOCKER="$_v"
   _v="$(_cfg_scalar "$_f" worktrees)"
@@ -501,6 +527,15 @@ for _f in ${_config_files[@]+"${_config_files[@]}"}; do
       fi
       ;;
   esac
+done
+
+# ssh: entries become ssh config Host names and file names below; validated
+# here so a bad one fails before any slow image build.
+for _s in ${CFG_SSH[@]+"${CFG_SSH[@]}"}; do
+  if [[ ! "$_s" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+    log_error "claude-code-docker.sh: invalid ssh entry \"${_s}\" (expected a Host alias from ~/.ssh/config)."
+    exit 1
+  fi
 done
 
 # ── install: apt packages + built-in recipes -> derived image ────────────────
@@ -827,6 +862,108 @@ if [ "$CFG_SKILLS_MODE" != "false" ] && [ -d "$HOME/.claude/skills" ]; then
       log_warning "claude-code-docker.sh: couldn't copy skill \"${_s}\" (broken symlink?); skipping."
   done
   docker_args+=(-v "$_skills_dst:/home/claude/.claude/skills:ro")
+fi
+
+# ssh: see the header comment. _ssh_snapshot fills a directory with a minimal
+# ssh config, the referenced keys and their known_hosts lines; returns 0 if any
+# alias was usable.
+_ssh_skip() { log_warning "claude-code-docker.sh: ssh: $1: $2; skipping."; }
+
+_ssh_snapshot() {
+  local dst="$1" src="$HOME/.ssh" name g k v host port user proxy ids key kname n kh found defaults
+  shift
+  if [ ! -f "$src/config" ]; then
+    log_warning "claude-code-docker.sh: ssh: ${src}/config not found; skipping ssh:."
+    return 1
+  fi
+  mkdir "$dst/keys"
+  # What `ssh -G` reports for a host with no IdentityFile of its own: the
+  # default key names (~/.ssh/id_ed25519, ...), which must never be copied.
+  defaults="$(ssh -F /dev/null -G no-such-host.invalid 2>/dev/null | sed -n 's/^identityfile //p')"
+  for name in "$@"; do
+    g="$(ssh -F "$src/config" -G "$name" 2>/dev/null || true)"
+    host="" port="" user="" proxy="" ids=""
+    while IFS=' ' read -r k v; do
+      case "$k" in
+        hostname) [ -n "$host" ] || host="$v" ;;
+        port) port="$v" ;;
+        user) user="$v" ;;
+        proxyjump | proxycommand) proxy=1 ;;
+        identityfile) ids="${ids:+$ids$'\n'}$v" ;;
+      esac
+    done <<<"$g"
+    # `ssh -G` answers for any name (hostname = the name itself, default keys),
+    # so an alias that isn't a defined Host would silently pick up a default key.
+    if [ -z "$host" ] || { [ "$host" = "$name" ] &&
+      ! grep -Eiq "^[[:space:]]*Host[[:space:]=].*(^|[[:space:]=])${name//./\\.}([[:space:]]|\$)" "$src/config"; }; then
+      _ssh_skip "$name" "no such Host in ${src}/config"
+      continue
+    fi
+    if [ -n "$proxy" ]; then
+      _ssh_skip "$name" "ProxyJump/ProxyCommand is not supported"
+      continue
+    fi
+    if [ -n "$defaults" ] && [ "$ids" = "$defaults" ]; then
+      _ssh_skip "$name" "no explicit IdentityFile (refusing to copy a default key)"
+      continue
+    fi
+    key=""
+    while IFS= read -r k; do
+      k="${k/#\~/$HOME}"
+      if [ -f "$k" ]; then
+        key="$k"
+        break
+      fi
+    done <<<"$ids"
+    if [ -z "$key" ]; then
+      _ssh_skip "$name" "no readable IdentityFile"
+      continue
+    fi
+    # ssh can't prompt for a passphrase in the container.
+    if ! ssh-keygen -y -P "" -f "$key" >/dev/null 2>&1; then
+      _ssh_skip "$name" "key ${key} is passphrase-protected or unreadable; ssh can't prompt in the container"
+      continue
+    fi
+    # Copies are named after the key's basename; an identical key already
+    # copied (shared by aliases) is reused, a different one gets a suffix.
+    kname="${key##*/}"
+    n=1
+    while [ -e "$dst/keys/$kname" ] && [ "$(cat "$key")" != "$(cat "$dst/keys/$kname")" ]; do
+      n=$((n + 1))
+      kname="${key##*/}-${n}"
+    done
+    if [ ! -e "$dst/keys/$kname" ]; then
+      cp "$key" "$dst/keys/$kname"
+      chmod 600 "$dst/keys/$kname"
+    fi
+    {
+      printf 'Host %s\n' "$name"
+      printf '    HostName %s\n' "$host"
+      printf '    Port %s\n' "$port"
+      printf '    User %s\n' "$user"
+      printf '    IdentityFile /home/claude/.ssh/keys/%s\n' "$kname"
+      printf '    IdentitiesOnly yes\n'
+      printf '    StrictHostKeyChecking yes\n\n'
+    } >>"$dst/config"
+    if [ "$port" = "22" ]; then kh="$host"; else kh="[${host}]:${port}"; fi
+    found="$(ssh-keygen -F "$kh" -f "$src/known_hosts" 2>/dev/null | grep -v '^#' || true)"
+    if [ -n "$found" ]; then
+      printf '%s\n' "$found" >>"$dst/known_hosts"
+    else
+      log_warning "claude-code-docker.sh: ssh: ${name}: no known_hosts entry for ${kh}; the first connection will fail. Run: ssh-keyscan -p ${port} ${host} >> ~/.ssh/known_hosts (or ssh to it once on the host)."
+    fi
+  done
+  [ -s "$dst/config" ]
+}
+
+if [ "${#CFG_SSH[@]}" -gt 0 ]; then
+  # Private per launch (concurrent sessions must not wipe each other's mounted
+  # keys); removed on exit by _cleanup. mktemp -d already creates it mode 0700.
+  _ssh_dst="$(mktemp -d "$STATE_DIR/host-ssh.XXXXXX")"
+  if _ssh_snapshot "$_ssh_dst" ${CFG_SSH[@]+"${CFG_SSH[@]}"}; then
+    log_warning "claude-code-docker.sh: ssh: private key(s) are copied into the container; Claude can read them and use them wherever the container has network access. Keep them scoped to the repos needed."
+    docker_args+=(-v "$_ssh_dst:/home/claude/.ssh:ro")
+  fi
 fi
 
 if _uses_recipe uv; then
