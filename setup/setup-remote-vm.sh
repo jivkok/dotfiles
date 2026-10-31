@@ -37,6 +37,7 @@ log_trace "Configuring minimal packages for ${os_description} done."
 log_trace "Updating bash shell profile bootstrap files ..."
 append_or_merge_file "${dotdir}/bash/.bash_profile" "${HOME}/.bash_profile"
 append_or_merge_file "${dotdir}/bash/.bashrc" "${HOME}/.bashrc"
+set_dotfiles_root "${HOME}/.bashrc" "${dotdir}"
 log_trace "Updating bash shell profile bootstrap files done."
 
 # Home bin symlinks (minimal-relevant only: tmux-status-ip.sh)

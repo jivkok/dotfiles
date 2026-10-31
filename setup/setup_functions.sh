@@ -681,6 +681,51 @@ function ver {
 }
 
 #######################################
+# Pins the dotfiles repo location in a shell profile (~/.bashrc, ~/.zshrc).
+# Writes
+#   export DOTFILES="${DOTFILES:-<absolute repo path>}"
+#   dotdir="$DOTFILES"
+# immediately above the first `source "$dotdir/<shell>/setenv.sh"` line, so an
+# already exported DOTFILES wins over the written default. Lines left by older
+# versions (`export dotdir=...`, `export DOTFILES=...`, `source "$DOTFILES/..."`)
+# are replaced, so the result is the same however often it runs.
+# Arguments:
+#   $1 - profile file
+#   $2 - dotfiles repo directory
+# Returns:
+#   None
+set_dotfiles_root() {
+  local profile="$1" root escaped tmp
+  root="$(cd "$2" && pwd -P)"
+  escaped="$(printf '%s' "$root" | sed 's/[\\"$`]/\\&/g')"
+  tmp="$(mktemp)"
+  # The value goes through ENVIRON: awk -v would interpret backslash escapes.
+  DOT_ROOT_ESCAPED="$escaped" awk '
+    function block() {
+      print "export DOTFILES=\"${DOTFILES:-" ENVIRON["DOT_ROOT_ESCAPED"] "}\""
+      print "dotdir=\"$DOTFILES\""
+      done = 1
+    }
+    /^(export )?(dotdir|DOTFILES)=/ { next }
+    /^source "\$(dotdir|DOTFILES)\/[a-z]+\/setenv\.sh"/ {
+      if (seen) next
+      seen = 1
+      block()
+      sub(/\$DOTFILES/, "$dotdir")
+    }
+    { print }
+    END { if (!done) block() }
+  ' "$profile" > "$tmp"
+  if cmp -s "$tmp" "$profile"; then
+    log_trace "DOTFILES in '$profile' already up-to-date."
+  else
+    cat "$tmp" > "$profile"
+    log_trace "DOTFILES in '$profile' set to '$root'."
+  fi
+  rm -f "$tmp"
+}
+
+#######################################
 # Appends/merge content of a file into another
 # Arguments:
 #   $1 - source file

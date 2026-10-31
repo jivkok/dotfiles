@@ -9,6 +9,17 @@
 - `misc/` — dotfiles symlinked into `$HOME` (files starting with `.`)
 - `{docker, dotnet, fzf, git, go, nodejs, python, vim, tmux, zsh}/` — component-specific configuration and installers
 
+## Repo location
+
+Two names, with separate responsibilities:
+
+- **`DOTFILES` — the external setting.** Default `~/dotfiles`. It is the only exported variable and the only one read from outside. Only the shell bootstraps (`bash/.bashrc`, `zsh/.zshrc`) and `setup/setup.ps1` use it.
+- **`dotdir` — the internal value: the repo root as the running code knows it.** It is never exported and never read from the environment.
+  - *Executables* (`setup/`, the `configure_*.sh` installers, `bin/`) derive it from their own location — `dotdir="$(cd "$(dirname "$0")/.." && pwd)"` — so they work run on their own or from setup, and an external `DOTFILES` never overrides them.
+  - *Sourced files* (`sh/`, `bash/`, `zsh/`, `docker/docker.sh`, …) cannot find their own location, so they use `$dotdir`, which the bootstrap sets once from `DOTFILES`: `export DOTFILES="${DOTFILES:-$HOME/dotfiles}"` followed by `dotdir="$DOTFILES"`.
+
+Setup pins the location it ran from: `setup/configure_shell_profiles.sh` (via `set_dotfiles_root`) rewrites those two lines in `~/.bashrc` / `~/.zshrc` with `export DOTFILES="${DOTFILES:-<absolute path>}"`, so a checkout elsewhere works and an exported `DOTFILES` still wins. It also replaces lines left by older versions. `setup/setup.ps1` persists `DOTFILES` as a Windows user variable. Remote VMs stay at `~/dotfiles`.
+
 ## How it works (high level)
 
 ### Setup

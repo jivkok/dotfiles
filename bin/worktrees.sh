@@ -26,8 +26,8 @@ set -Eeuo pipefail
 IFS=$'\n\t'
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-DOTFILES_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
-source "${DOTFILES_ROOT}/setup/setup_functions.sh"
+dotdir="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+source "${dotdir}/setup/setup_functions.sh"
 
 # abs_physical_path <path>  — absolute path with symlinks resolved, like
 # `realpath -m`: a relative path is taken relative to the current directory,

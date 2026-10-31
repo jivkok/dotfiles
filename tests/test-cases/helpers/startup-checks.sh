@@ -36,6 +36,10 @@ log_trace "---Shell profiles ---"
 check_file    ~/.bash_profile
 check_file    ~/.bashrc
 check_file    ~/.zshrc
+check_content ~/.bashrc  "DOTFILES"
+check_content ~/.zshrc   "DOTFILES"
+check_content ~/.bashrc  "dotdir"
+check_content ~/.zshrc   "dotdir"
 check_content ~/.bashrc  "dotdir"
 check_content ~/.zshrc   "dotdir"
 

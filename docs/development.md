@@ -73,8 +73,9 @@ If a package is not available in a distro's package manager, do **not** add it t
 
 ### Bash scripting conventions (dotfiles specific)
 - Use `#!/usr/bin/env bash`
-- Determine repo root consistently: `dotdir="$(cd "$(dirname "$0")/.." && pwd)"`
+- Determine repo root consistently: `dotdir="$(cd "$(dirname "$0")/.." && pwd)"` (executables derive it themselves; never read `dotdir` or `DOTFILES` from the environment)
 - Source helpers early: `source "$dotdir/setup/setup_functions.sh"`
+- Sourced files (loaded by the `.bashrc`/`.zshrc` bootstrap) cannot derive their location: use `$dotdir`, which the bootstrap sets once from `DOTFILES`
 - OS detection: use `_is_osx`, `_is_linux`, `_is_arch`, `_is_debian` (from `sh/helpers.sh`, available after sourcing `setup_functions.sh`). No inline `uname -s`.
 - Headless/GUI detection (macOS): use `_skip_gui` (from `sh/helpers.sh`) to gate anything GUI-only (casks, `mas` apps, browsers, fonts). Auto-detected from SSH sessions; overridable via `DOT_SKIP_GUI`. Prefer gating at a shared helper (e.g. `install_cask_package`) over scattering `if $_skip_gui` checks at each call site.
 - Command detection: use `_has <cmd>`. No inline `command -v`.

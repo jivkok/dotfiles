@@ -105,7 +105,6 @@ function update_os() {
   echo -e "\nUpdating system ...\n"
 
   # dotfiles
-  local dotdir="$HOME/dotfiles"
   if [ -d "$dotdir/.git" ]; then
     echo -e "\nUpdating dotfiles ...\n"
     git -C "$dotdir" pull --prune

@@ -57,7 +57,7 @@ command -v python3 >/dev/null && _prepend_to_path "$(python3 -m site --user-base
 _prepend_to_path "$HOME/.opencode/bin"
 
 # Local bins
-_prepend_to_path "$HOME/dotfiles/bin"
+_prepend_to_path "$dotdir/bin"
 _prepend_to_path "$HOME/.local/bin"
 _prepend_to_path "$HOME/bin"
 

@@ -22,12 +22,11 @@ set -uo pipefail
 # ---- Configuration defaults (overridable via env) ----
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
-# Script lives at $DOTFILES_ROOT/bin/; go up one level to reach dotfiles root.
-DEFAULT_DOTFILES_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
-source "${DEFAULT_DOTFILES_ROOT}/setup/setup_functions.sh"
-DOTFILES_ROOT="${DOTFILES_ROOT:-$DEFAULT_DOTFILES_ROOT}"
+# Script lives at <dotfiles>/bin/; go up one level to reach the dotfiles root.
+dotdir="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+source "${dotdir}/setup/setup_functions.sh"
 
-DOTFILES_FONTS_DIR="${DOTFILES_FONTS_DIR:-$DOTFILES_ROOT/fonts}"
+DOTFILES_FONTS_DIR="${DOTFILES_FONTS_DIR:-$dotdir/fonts}"
 
 # Repo settings
 FONTS_REPO_OWNER="${FONTS_REPO_OWNER:-jivkok}"
@@ -261,13 +260,9 @@ install_fonts_linux() {
 }
 
 main() {
-  # If DOTFILES_ROOT is set, normalize it
-  DOTFILES_ROOT="$(cd -- "$DOTFILES_ROOT" && pwd)"
-  DOTFILES_FONTS_DIR="${DOTFILES_FONTS_DIR/#\$DOTFILES_ROOT/$DOTFILES_ROOT}"
-
   log_info "Configuring fonts ..."
 
-  log_trace "DOTFILES_ROOT=$DOTFILES_ROOT"
+  log_trace "dotdir=$dotdir"
   log_trace "DOTFILES_FONTS_DIR=$DOTFILES_FONTS_DIR"
   log_trace "Repo=${FONTS_REPO_OWNER}/${FONTS_REPO_NAME} ref=$FONTS_REPO_REF"
 

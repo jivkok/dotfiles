@@ -95,6 +95,8 @@ Tools not included in the default setup can be configured individually:
 
 `setup/configure_shell_profiles.sh` **merges** bootstrap snippets into your existing `~/.bash_profile`, `~/.bashrc`, and `~/.zshrc` rather than replacing them. Any personal settings already in those files are preserved. Add machine-local overrides directly to those files after running setup.
 
+The repo location is held in `DOTFILES` (default `~/dotfiles`). Setup pins the path it was run from in those files, so a checkout elsewhere works; an exported `DOTFILES` takes precedence. Machine-local overrides that reference the repo can use `$dotdir` (set by the bootstrap, not exported) or `$DOTFILES`.
+
 ### Upgrade
 
 ```sh

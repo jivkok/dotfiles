@@ -1,5 +1,5 @@
 param (
-  [string]$dotfiles = "$HOME\dotfiles"
+  [string]$dotfiles = $(if ($env:DOTFILES) { $env:DOTFILES } else { "$HOME\dotfiles" })
 )
 
 function InstallChocolatey() {
@@ -155,6 +155,13 @@ try {
       Rename-Item $dotfiles "$dotfiles.BACKUP" -Force
     }
     . $git_exe clone --quiet --recursive https://github.com/jivkok/dotfiles.git $dotfiles 2> $null
+  }
+
+  # Persist the repo location for new sessions (user level) and the current one
+  if ($env:DOTFILES -ne $dotfiles) {
+    Write-Output "Setting DOTFILES=$dotfiles"
+    [Environment]::SetEnvironmentVariable('DOTFILES', $dotfiles, 'User')
+    $env:DOTFILES = $dotfiles
   }
 
   $windowsPath = Join-Path $dotfiles 'windows'
