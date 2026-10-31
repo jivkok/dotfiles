@@ -1,5 +1,6 @@
 $env:PLINK_PROTOCOL = "ssh"
 $env:EDITOR = "Notepad"
+if (Get-Command bat -ErrorAction SilentlyContinue) { $env:PAGER = "bat" }
 
 # Aliases
 
@@ -9,7 +10,7 @@ function .... { Push-Location ..\..\.. }
 function l { Get-ChildItem -Name $args }
 function ll { Get-ChildItem -Force $args }
 function n { notepad $args }
-function qg { Start-Process "http://www.google.com/#q=$args" }
+function qg { Start-Process "https://www.google.com/search?q=$([uri]::EscapeDataString("$args"))" }
 function b { msbuild $args }
 function x { exit }
 Set-Alias e code
@@ -45,6 +46,12 @@ function ff {
         $filter = '*.*'
     }
     Get-ChildItem -Path $path -Filter $filter -Recurse | Select-Object Fullname
+}
+
+function envs {
+    Get-ChildItem Env: | Sort-Object Name | ForEach-Object {
+        "{0}={1}" -f $_.Name, $_.Value
+    }
 }
 
 # Prompt
@@ -103,7 +110,19 @@ function prompt {
 
 # VS
 
-if (Test-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\VsDevCmd.bat") {
+if (Test-Path "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat") {
+    Write-Output 'Setting VS 2022 environment ...'
+    $vsEnvFile = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
+}
+elseif (Test-Path "${env:ProgramFiles}\Microsoft Visual Studio\2022\Professional\Common7\Tools\VsDevCmd.bat") {
+    Write-Output 'Setting VS 2022 environment ...'
+    $vsEnvFile = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Professional\Common7\Tools\VsDevCmd.bat"
+}
+elseif (Test-Path "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat") {
+    Write-Output 'Setting VS 2022 environment ...'
+    $vsEnvFile = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"
+}
+elseif (Test-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\VsDevCmd.bat") {
     Write-Output 'Setting VS 2019 environment ...'
     $vsEnvFile = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\VsDevCmd.bat"
 }
@@ -141,10 +160,29 @@ if ($vsEnvFile) {
 }
 
 # FZF
+
 if ((Get-Module -ListAvailable -Name "PSFzf") -and !(Get-Module -Name "PSFzf")) {
     Remove-PSReadlineKeyHandler 'Ctrl+r'
     Remove-PSReadlineKeyHandler 'Ctrl+t'
     Import-Module PSFzf
+}
+
+function fsf {
+    & rg --color=always --line-number --no-heading --smart-case @args |
+    fzf --ansi `
+        --color "hl:-1:underline,hl+:-1:underline:reverse" `
+        --delimiter : `
+        --preview 'bat --color=always {1} --highlight-line {2}' `
+        --preview-window 'up,60%,border-bottom,+{2}+3/3,~3' `
+        --bind "enter:become(code -g {1}:{2})"
+}
+
+# Fast directory switching with zoxide
+if (Get-Command zoxide -ErrorAction SilentlyContinue) {
+  Invoke-Expression (& {
+    $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
+    (zoxide init --hook $hook powershell | Out-String)
+  })
 }
 
 # Custom settings

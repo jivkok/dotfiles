@@ -5,29 +5,23 @@ param (
 function InstallChocolatey() {
   if (!(Test-Path Env:ChocolateyInstall)) {
     Write-Output 'Installing Chocolatey ...'
-    Invoke-Expression ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
     Write-Output 'Installing Chocolatey done.'
+    # Make sure this session sees where Chocolatey was installed (package checks below depend on it)
+    if (!(Test-Path Env:ChocolateyInstall)) {
+      $env:ChocolateyInstall = [Environment]::GetEnvironmentVariable('ChocolateyInstall', 'Machine')
+    }
     Write-Output ''
   }
 }
 
 function InstallChocolateyPackage($package, $source) {
-  if (Test-Path "$Env:ChocolateyInstall\lib\$package") {
-    if ($null -eq $source) {
-      & cup "$package"
-    }
-    else {
-      & cup "$package" -source "$source"
-    }
+  $action = if (Test-Path "$Env:ChocolateyInstall\lib\$package") {"upgrade"} Else {"install"}
+  if ($null -eq $source) {
+    $source = 'https://community.chocolatey.org/api/v2'
   }
-  else {
-    if ($null -eq $source) {
-      & cinst -y "$package"
-    }
-    else {
-      & cinst -y "$package" -source "$source"
-    }
-  }
+
+  & choco "$action" --yes "$package" -source "$source"
 }
 
 function Get-CurrentDirectory {
@@ -102,15 +96,34 @@ function InstallFont($fontFileName) {
   }
 }
 
+$isAdmin = [System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole('Administrators')
+if(-not $isAdmin)
+{
+  $params = @{
+    FilePath = 'powershell'
+    Verb = 'RunAs'
+    Wait = $true
+    PassThru = $true
+    ArgumentList = @(
+      "-ExecutionPolicy ByPass"
+      "-File `"$PSCommandPath`""
+      "-dotfiles `"$dotfiles`""
+    )
+  }
+  $elevated = Start-Process @params
+  Exit $elevated.ExitCode
+}
+
 try {
   # Workaround for not having Git on the path right after install
   $Env:Path += ";$ProgramW6432\Git\cmd;$ProgramFiles(x86)\Git\cmd"
 
-  # Install packages
+  # Packages
+
   InstallChocolatey
 
   InstallChocolateyPackage 'pwsh' # Latest Powershell
-  InstallChocolateyPackage 'console2' # when no Windows Terminal is available
+  # InstallChocolateyPackage 'console2' # when no Windows Terminal is available
   InstallChocolateyPackage 'microsoft-windows-terminal'
 
   InstallChocolateyPackage 'git' # Source code control
@@ -121,8 +134,10 @@ try {
 
   # Terminal prompt themes: https://ohmyposh.dev. Not used at the moment - I have created a simple theme in place.
 
-  InstallChocolateyPackage 'lf' # File manager, Vim-inspired, like Ranger
-
+  InstallChocolateyPackage 'bat' # cat-clone enhanced (syntax highlighting, etc.)
+  InstallChocolateyPackage 'yazi' # Terminal file manager, Vim-inspired, like Ranger
+  InstallChocolateyPackage 'ripgrep' # Command-line regex text search tool, like grep
+  InstallChocolateyPackage 'zoxide' # replacement for cd, inspired by z. It remembers most-frequently-used directories and uses it for navigation.
   InstallChocolateyPackage 'fzf' # CLI text fuzzy finder
   Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
   Install-Module PSFzf -Scope CurrentUser
@@ -164,31 +179,32 @@ try {
     $env:DOTFILES = $dotfiles
   }
 
-  $windowsPath = Join-Path $dotfiles 'windows'
-  if (!(Test-Path $windowsPath)) {
-    throw "Required directory not found: $windowsPath"
+  $dotfileswindows = Join-Path $dotfiles "windows"
+  if (!(Test-Path $dotfileswindows)) {
+    throw "Required directory not found: $dotfileswindows"
   }
 
-  $setenvref = '. ' + $([IO.Path]::Combine($dotfiles, 'windows', 'SetEnv.ps1')).Replace("$HOME", '$HOME')
+  # Add environment setup script to Powershell profile. TODO: consider doing it for both Windows Powershell and Powershell Core
+  $setenvcmd = '. ' + $([IO.Path]::Combine($dotfiles, 'windows', 'SetEnv.ps1')).Replace("$HOME", '$HOME')
   if (Test-Path $PROFILE) {
-    if ($null -eq $(Select-String -Path $PROFILE -Pattern 'SetEnv.ps1')) {
-      Write-Output "Adding SetEnv.ps1 to $PROFILE"
-      Add-Content $PROFILE ("`n" + $setenvref)
+    if ($null -eq $(Select-String -Path $PROFILE -Pattern 'SetEnv.ps1' -SimpleMatch)) {
+      Write-Output "Adding '$setenvcmd' to $PROFILE"
+      Add-Content $PROFILE ("`n" + $setenvcmd)
     }
   }
   else {
-    New-Item -Path $PROFILE -ItemType "file" -Force -Value $setenvref
+    New-Item -Path $PROFILE -ItemType "file" -Force -Value $setenvcmd
   }
 
-  Write-Output "Desktop shortcut (and taskbar pin): $Home\Desktop\Shell.lnk ==> $Env:ChocolateyInstall\bin\Console.exe"
-  New-Shortcut "$Home\Desktop\Shell.lnk" "$Env:ChocolateyInstall\bin\Console.exe" "-c $windowsPath\console.xml" "cmd.exe,0"
-  PinToTaskBar "$Home\Desktop\Shell.lnk"
+  # Write-Output "Desktop shortcut (and taskbar pin): $Home\Desktop\Shell.lnk ==> $Env:ChocolateyInstall\bin\Console.exe"
+  # New-Shortcut "$Home\Desktop\Shell.lnk" "$Env:ChocolateyInstall\bin\Console.exe" "-c $windowsPath\console.xml" "cmd.exe,0"
+  # PinToTaskBar "$Home\Desktop\Shell.lnk"
 
-  Write-Output 'Creating symlinks'
-  CreateFileSymlink 'AutoHotkey.ahk' $windowsPath "$Home\Documents"
+  # Write-Output 'Creating symlinks'
+  # CreateFileSymlink 'AutoHotkey.ahk' $windowsPath "$Home\Documents"
 
   # System configuration
-  Import-Module (Join-Path $windowsPath BoxStarter.psm1)
+  Import-Module (Join-Path $dotfileswindows BoxStarter.psm1)
   Disable-ShutdownTracker
   Disable-InternetExplorerESC
   Set-ExplorerOptions -showHidenFilesFoldersDrives $true -showProtectedOSFiles $true -showFileExtensions $true

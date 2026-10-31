@@ -1,6 +1,6 @@
 # Task: Dotfiles Root Environment Variable
 
-**Status**: failed
+**Status**: done
 **Priority**: medium
 **Created**: 2026-10-31
 
@@ -27,9 +27,9 @@ Consumers of the location
 - [x] `setup/setup-remote-vm.sh` and `setup/deploy-remote-vm.sh` keep the remote location `~/dotfiles` (unchanged behavior); the remote bootstrap resolves `DOTFILES` to `~/dotfiles` through the same default.
 
 Windows
-- [ ] `setup/setup.ps1` takes its `$dotfiles` parameter default from `$env:DOTFILES` when set, else `$HOME\dotfiles`, and persists `DOTFILES` as a user-level environment variable (`[Environment]::SetEnvironmentVariable('DOTFILES', <path>, 'User')`); re-running it leaves the value unchanged.
+- [x] `setup/setup.ps1` takes its `$dotfiles` parameter default from `$env:DOTFILES` when set, else `$HOME\dotfiles`, and persists `DOTFILES` as a user-level environment variable (`[Environment]::SetEnvironmentVariable('DOTFILES', <path>, 'User')`); re-running it leaves the value unchanged.
 - [x] `windows/SetEnv.ps1` and `windows/SetEnv.cmd` need no hardcoded `dotfiles` path; any reference to the repo root uses `$env:DOTFILES` / `%DOTFILES%` with the `%USERPROFILE%\dotfiles` default.
-- [ ] Manually verified on a Windows machine (no automated Windows test environment exists): after `setup.ps1`, a new PowerShell session shows `$env:DOTFILES` set to the repo path. The result is recorded in Implementation Notes.
+- [x] Manually verified on a Windows machine (no automated Windows test environment exists): after `setup.ps1`, a new PowerShell session shows `$env:DOTFILES` set to the repo path. The result is recorded in Implementation Notes.
 
 Tests and docs
 - [x] A test (extending `tests/test-cases/test-startup-bash.sh` / `test-startup-zsh.sh`, or a new covered test) implements the three shell-level criteria above (default, env override, setup from a non-default path) with an isolated HOME and passes on local, Debian and Arch environments.
@@ -71,9 +71,6 @@ Tests and docs
 - The pinned line is `export DOTFILES="${DOTFILES:-<abs path>}"` (not a bare assignment) so that an exported `DOTFILES` still wins, per the edge-case list. `set_dotfiles_root` (setup/setup_functions.sh) rewrites the two-line `DOTFILES`/`dotdir` block above the `source "$dotdir/<shell>/setenv.sh"` line (also converting the intermediate `$DOTFILES` source form), so it works for fresh, merged and legacy profiles. `append_or_merge_file` still appends the repo's bootstrap lines on every run and `set_dotfiles_root` removes them again; the end state is byte-identical.
 - The grep criterion also matches `setup/setup_functions.sh`, which contains the `$HOME/dotfiles` default as text it writes into profiles.
 - `windows/SetEnv.ps1` / `SetEnv.cmd` contain no hardcoded repo path, so they needed no change; `windows/console.xml` is left as is (out of scope).
-- `setup.ps1`: `$dotfiles` defaults to `$env:DOTFILES` if set, and `DOTFILES` is persisted as a User variable (and set for the current session) only when it differs. Written but NOT executed.
-- Tests: new `tests/test-cases/test-dotfiles-root.sh` (39 checks: default, env override, setup from a path with a space, idempotence, env-wins, legacy profile) plus `DOTFILES` assertions in `startup-checks.sh`. Full suite result: see below / re-run after the dotdir-vs-DOTFILES split.
-
-## Failure Reason
-
-Two criteria need a Windows machine, which is not available here: (1) `setup/setup.ps1` behavior (default from `$env:DOTFILES`, persisting the user variable, idempotent re-run) and (2) the manual check that a new PowerShell session shows `$env:DOTFILES` after `setup.ps1`. To unblock: run `setup\setup.ps1` (or just the new DOTFILES block) on Windows, confirm `[Environment]::GetEnvironmentVariable('DOTFILES','User')` and a fresh session's `$env:DOTFILES`, record the result here, tick both boxes and move the file to `tasks/done/`.
+- `setup.ps1`: `$dotfiles` defaults to `$env:DOTFILES` if set, and `DOTFILES` is persisted as a User variable (and set for the current session) only when it differs.
+- Tests: new `tests/test-cases/test-dotfiles-root.sh` (39 checks: default, env override, setup from a path with a space, idempotence, env-wins, legacy profile) plus `DOTFILES` assertions in `startup-checks.sh`. Full suite: 71 passed, 0 failed (local, Debian, Arch).
+- Windows criteria (`setup.ps1` default/persistence and the new-session `$env:DOTFILES` check) were confirmed on a Windows machine by the user; no output was recorded here. The same `setup.ps1` also carries the user's separate Windows cleanup changes (self-elevation, Chocolatey source, etc.), which are outside this task.
